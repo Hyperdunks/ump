@@ -34,7 +34,7 @@ const updateMonitorBody = t.Partial(createMonitorBody);
 export const monitorRouter = new Elysia({ prefix: "/monitors" })
   .use(betterAuthPlugin)
   .get(
-    "/monitors",
+    "/",
     async ({ user, query }) => {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
@@ -68,7 +68,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
   // Get single monitor
   .get(
-    "/monitors/:id",
+    "/:id",
     async ({ user, params, status }) => {
       const [mon] = await db
         .select()
@@ -102,7 +102,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
   // Create monitor
   .post(
-    "/monitors",
+    "/",
     async ({ user, body }) => {
       const id = nanoid();
       const [newMonitor] = await db
@@ -131,7 +131,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
   // Update monitor
   .put(
-    "/monitors/:id",
+    "/:id",
     async ({ user, params, body, status }) => {
       const [existing] = await db
         .select()
@@ -152,7 +152,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
   // Delete monitor
   .delete(
-    "/monitors/:id",
+    "/:id",
     async ({ user, params, status }) => {
       const [existing] = await db
         .select()
@@ -169,7 +169,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
   // Get health checks for monitor
   .get(
-    "/monitors/:id/checks",
+    "/:id/checks",
     async ({ user, params, query, status }) => {
       const [mon] = await db
         .select()
@@ -197,7 +197,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
   // Get monitor stats
   .get(
-    "/monitors/:id/stats",
+    "/:id/stats",
     async ({ user, params, status }) => {
       const [mon] = await db
         .select()

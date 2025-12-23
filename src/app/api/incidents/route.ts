@@ -8,7 +8,7 @@ import { paginationQuery, idParam } from "@/lib/params";
 export const incidentRouter = new Elysia({ prefix: "/incidents" })
   .use(betterAuthPlugin)
   .get(
-    "/incidents",
+    "/",
     async ({ user, query }) => {
       const page = query.page ?? 1;
       const limit = query.limit ?? 20;
@@ -35,7 +35,7 @@ export const incidentRouter = new Elysia({ prefix: "/incidents" })
 
   // Get incident
   .get(
-    "/incidents/:id",
+    "/:id",
     async ({ user, params, status }) => {
       const [inc] = await db
         .select({
@@ -57,7 +57,7 @@ export const incidentRouter = new Elysia({ prefix: "/incidents" })
 
   // Update incident
   .put(
-    "/incidents/:id",
+    "/:id",
     async ({ user, params, body, status }) => {
       const [inc] = await db
         .select({ incident, monitorUserId: monitor.userId })

@@ -8,7 +8,7 @@ import { betterAuthPlugin } from "../[[...slug]]/auth";
 export const adminRouter = new Elysia({ prefix: "/admin" })
 	.use(betterAuthPlugin)
 	.get(
-		"/admin/monitors",
+		"/monitors",
 		async ({ user, query, status }) => {
 			if (user.role !== "admin")
 				return status(403, { message: "Admin access required" });
@@ -31,7 +31,7 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
 
 	// Admin: List all users
 	.get(
-		"/admin/users",
+		"/users",
 		async ({ user: currentUser, query, status }) => {
 			if (currentUser.role !== "admin")
 				return status(403, { message: "Admin access required" });
@@ -60,7 +60,7 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
 
 	// Admin: Update user role
 	.put(
-		"/admin/users/:id/role",
+		"/users/:id/role",
 		async ({ user: currentUser, params, body, status }) => {
 			if (currentUser.role !== "admin")
 				return status(403, { message: "Admin access required" });
@@ -89,7 +89,7 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
 
 	// Admin: System stats
 	.get(
-		"/admin/stats",
+		"/stats",
 		async ({ user, status }) => {
 			if (user.role !== "admin")
 				return status(403, { message: "Admin access required" });

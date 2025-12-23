@@ -9,11 +9,6 @@ import { notFound } from "next/navigation";
 import { openapi } from '@elysiajs/openapi'
 
 const app = new Elysia({ prefix: "/api" })
-	.use(betterAuthPlugin)
-	.use(monitorRouter)
-	.use(incidentRouter)
-	.use(alertsRouter)
-	.use(adminRouter)
 	.use(
 		openapi({
 			documentation: {
@@ -22,6 +17,11 @@ const app = new Elysia({ prefix: "/api" })
 			}
 		})
 	)
+	.use(betterAuthPlugin)
+	.use(monitorRouter)
+	.use(incidentRouter)
+	.use(alertsRouter)
+	.use(adminRouter)
 	.get("/health", () => ({
 		status: "ok",
 		timestamp: new Date().toISOString(),

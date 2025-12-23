@@ -28,7 +28,7 @@ const updateAlertBody = t.Partial(createAlertBody);
 export const alertsRouter = new Elysia({ prefix: "/alerts" })
   .use(betterAuthPlugin)
   .get(
-    "/alerts/monitor/:monitorId",
+    "/monitor/:monitorId",
     async ({ user, params, status }) => {
       const [mon] = await db
         .select()
@@ -50,7 +50,7 @@ export const alertsRouter = new Elysia({ prefix: "/alerts" })
 
   // Create alert
   .post(
-    "/alerts/monitor/:monitorId",
+    "/monitor/:monitorId",
     async ({ user, params, body, status }) => {
       const [mon] = await db
         .select()
@@ -82,7 +82,7 @@ export const alertsRouter = new Elysia({ prefix: "/alerts" })
 
   // Update alert
   .put(
-    "/alerts/:id",
+    "/:id",
     async ({ user, params, body, status }) => {
       const [alert] = await db
         .select({ alertConfig, monitorUserId: monitor.userId })
@@ -104,7 +104,7 @@ export const alertsRouter = new Elysia({ prefix: "/alerts" })
   )
 
   .delete(
-    "/alerts/:id",
+    "/:id",
     async ({ user, params, status }) => {
       const [alert] = await db
         .select({ alertConfig, monitorUserId: monitor.userId })
