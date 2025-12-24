@@ -55,6 +55,7 @@ const app = new Elysia({ prefix: "/api" })
   });
 
 export type App = typeof app;
+export default app;
 
 export const GET = app.handle;
 export const POST = app.handle;
