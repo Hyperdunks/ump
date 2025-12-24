@@ -10,15 +10,19 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
-      // Don't await to prevent timing attacks
-      void sendPasswordResetEmail(user.email, url);
+      // Fire and forget with error handling
+      sendPasswordResetEmail(user.email, url).catch((err) => {
+        console.error("[Auth] Failed to send password reset email:", err);
+      });
     },
   },
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
-      // Don't await to prevent timing attacks
-      void sendVerificationEmail(user.email, url);
+      // Fire and forget with error handling
+      sendVerificationEmail(user.email, url).catch((err) => {
+        console.error("[Auth] Failed to send verification email:", err);
+      });
     },
     autoSignInAfterVerification: true,
   },
