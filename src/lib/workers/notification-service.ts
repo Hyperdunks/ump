@@ -2,6 +2,10 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { alertConfig, notification } from "@/db/schema";
 import { nanoid } from "@/lib/nanoid";
+import {
+  sendMonitorDownEmail,
+  sendMonitorRecoveredEmail,
+} from "@/lib/resend";
 
 export interface AlertPayload {
   monitorId: string;
@@ -59,8 +63,7 @@ async function sendNotification(
         await sendDiscord(config.endpoint, payload);
         break;
       case "email":
-        // TODO: Implement email sending with SMTP/external service (RESEND)
-        console.log(`[Email] Would send to ${config.endpoint}:`, payload);
+        await sendEmail(config.endpoint, payload);
         break;
     }
     success = true;
@@ -79,6 +82,28 @@ async function sendNotification(
     error,
     sentAt: new Date(),
   });
+}
+
+/**
+ * Send email notification via Resend
+ */
+async function sendEmail(to: string, payload: AlertPayload): Promise<void> {
+  if (payload.status === "down") {
+    await sendMonitorDownEmail({
+      to,
+      monitorName: payload.monitorName,
+      monitorUrl: payload.monitorUrl,
+      error: payload.error,
+      timestamp: payload.timestamp,
+    });
+  } else {
+    await sendMonitorRecoveredEmail({
+      to,
+      monitorName: payload.monitorName,
+      monitorUrl: payload.monitorUrl,
+      timestamp: payload.timestamp,
+    });
+  }
 }
 
 /**
@@ -151,14 +176,14 @@ async function sendSlack(
             },
             ...(payload.error
               ? [
-                  {
-                    type: "section",
-                    text: {
-                      type: "mrkdwn",
-                      text: `*Error:* ${payload.error}`,
-                    },
+                {
+                  type: "section",
+                  text: {
+                    type: "mrkdwn",
+                    text: `*Error:* ${payload.error}`,
                   },
-                ]
+                },
+              ]
               : []),
           ],
         },
@@ -203,12 +228,12 @@ async function sendDiscord(
             },
             ...(payload.error
               ? [
-                  {
-                    name: "Error",
-                    value: payload.error,
-                    inline: false,
-                  },
-                ]
+                {
+                  name: "Error",
+                  value: payload.error,
+                  inline: false,
+                },
+              ]
               : []),
           ],
         },
