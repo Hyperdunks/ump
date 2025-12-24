@@ -4,10 +4,10 @@ import { Elysia, NotFoundError } from "elysia";
 import { notFound } from "next/navigation";
 import { APIError } from "@/lib/api-error";
 import { initializeLastCheckTimes, runHealthChecks } from "@/lib/workers";
-import { adminRouter } from "../admin/route";
-import { alertsRouter } from "../alerts/route";
-import { incidentRouter } from "../incidents/route";
-import { monitorRouter } from "../monitors/route";
+import { adminRouter } from "@/routes/admin/route";
+import { alertsRouter } from "@/routes/alerts/route";
+import { incidentRouter } from "@/routes/incidents/route";
+import { monitorRouter } from "@/routes/monitors/route";
 import { betterAuthPlugin, OpenAPI } from "./auth";
 
 // Initialize last check times on startup

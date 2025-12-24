@@ -1,9 +1,9 @@
+import { desc, eq } from "drizzle-orm";
+import { Elysia, t } from "elysia";
+import { betterAuthPlugin } from "@/app/api/[[...slug]]/auth";
 import { db } from "@/db";
 import { incident, monitor } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
-import { Elysia, t } from "elysia";
-import { betterAuthPlugin } from "../[[...slug]]/auth";
-import { paginationQuery, idParam } from "@/lib/params";
+import { idParam, paginationQuery } from "@/lib/params";
 
 export const incidentRouter = new Elysia({ prefix: "/incidents" })
   .use(betterAuthPlugin)
