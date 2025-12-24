@@ -1,8 +1,9 @@
+import { cron } from "@elysiajs/cron";
 import { openapi } from "@elysiajs/openapi";
 import { Elysia, NotFoundError } from "elysia";
 import { notFound } from "next/navigation";
 import { APIError } from "@/lib/api-error";
-import { initializeLastCheckTimes } from "@/lib/workers";
+import { initializeLastCheckTimes, runHealthChecks } from "@/lib/workers";
 import { adminRouter } from "@/routes/admin/route";
 import { alertsRouter } from "@/routes/alerts/route";
 import { incidentRouter } from "@/routes/incidents/route";
@@ -13,7 +14,16 @@ import { betterAuthPlugin, OpenAPI } from "./auth";
 initializeLastCheckTimes().catch(console.error);
 
 const app = new Elysia({ prefix: "/api" })
-  // Note: Health check cron is handled by Vercel's native cron (/api/cron)
+  .use(
+    cron({
+      name: "healthCheck",
+      pattern: "*/10 * * * * *", // Every 10 seconds
+      catch: true,
+      async run() {
+        await runHealthChecks();
+      },
+    }),
+  )
   .use(
     openapi({
       documentation: {
@@ -55,7 +65,6 @@ const app = new Elysia({ prefix: "/api" })
   });
 
 export type App = typeof app;
-export default app;
 
 export const GET = app.handle;
 export const POST = app.handle;
