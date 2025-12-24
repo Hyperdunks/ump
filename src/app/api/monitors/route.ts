@@ -5,6 +5,7 @@ import { nanoid } from "@/lib/nanoid";
 import { and, desc, eq, gte, sql } from "drizzle-orm";
 import { betterAuthPlugin } from "../[[...slug]]/auth";
 import { paginationQuery, idParam } from "@/lib/params";
+import { getUptimeAllPeriods } from "@/lib/workers";
 
 const createMonitorBody = t.Object({
   name: t.String(),
@@ -233,6 +234,26 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
         totalChecks: Number(totalChecks),
         avgResponseTime: Math.round(avgResponseTime ?? 0),
         period: "24h",
+      };
+    },
+    { auth: true, params: idParam },
+  )
+  .get(
+    "/:id/uptime",
+    async ({ user, params, status }) => {
+      const [mon] = await db
+        .select()
+        .from(monitor)
+        .where(and(eq(monitor.id, params.id), eq(monitor.userId, user.id)));
+
+      if (!mon) return status(404, { message: "Monitor not found" });
+
+      const uptimeStats = await getUptimeAllPeriods(params.id);
+
+      return {
+        monitorId: params.id,
+        monitorName: mon.name,
+        ...uptimeStats,
       };
     },
     { auth: true, params: idParam },

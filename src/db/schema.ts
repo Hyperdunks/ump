@@ -1,13 +1,13 @@
 import { relations } from "drizzle-orm";
 import {
-  pgTable,
-  pgEnum,
-  text,
-  timestamp,
   boolean,
+  index,
   integer,
   jsonb,
-  index,
+  pgEnum,
+  pgTable,
+  text,
+  timestamp,
 } from "drizzle-orm/pg-core";
 
 // ============================================================================
@@ -331,10 +331,6 @@ export const notificationRelations = relations(notification, ({ one }) => ({
     references: [incident.id],
   }),
 }));
-
-// ============================================================================
-// TYPE EXPORTS
-// ============================================================================
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
