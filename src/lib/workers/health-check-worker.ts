@@ -138,7 +138,8 @@ interface CheckResult {
 async function checkHttp(mon: Monitor): Promise<CheckResult> {
   const startTime = Date.now();
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), mon.timeout);
+  const timeoutMs = mon.timeout * 1000; // Convert seconds to ms
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
     const response = await fetch(mon.url, {
@@ -157,8 +158,8 @@ async function checkHttp(mon: Monitor): Promise<CheckResult> {
       statusCode.toString(),
     );
 
-    // Check for degraded (slow response)
-    const isDegraded = responseTime > mon.timeout * 0.8;
+    // Check for degraded (slow response > 80% of timeout)
+    const isDegraded = responseTime > timeoutMs * 0.8;
 
     if (!isExpectedStatus) {
       return {
@@ -181,7 +182,7 @@ async function checkHttp(mon: Monitor): Promise<CheckResult> {
     let error = "Unknown error";
     if (err instanceof Error) {
       if (err.name === "AbortError") {
-        error = `Timeout after ${mon.timeout}ms`;
+        error = `Timeout after ${mon.timeout}s`;
       } else {
         error = err.message;
       }
@@ -205,7 +206,8 @@ async function checkTcp(mon: Monitor): Promise<CheckResult> {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), mon.timeout);
+    const timeoutMs = mon.timeout * 1000; // Convert seconds to ms
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     // Try a HEAD request as a proxy for TCP connectivity
     const response = await fetch(mon.url, {
@@ -238,7 +240,8 @@ async function checkPing(mon: Monitor): Promise<CheckResult> {
 
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), mon.timeout);
+    const timeoutMs = mon.timeout * 1000; // Convert seconds to ms
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     const response = await fetch(mon.url, {
       method: "HEAD",
