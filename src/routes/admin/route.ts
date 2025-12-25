@@ -1,9 +1,9 @@
-import { db } from "@/db";
-import { monitor, user as userTable, incident } from "@/db/schema";
-import { paginationQuery, idParam, updateRoleBody } from "@/lib/params";
 import { desc, eq, sql } from "drizzle-orm";
 import { Elysia } from "elysia";
 import { betterAuthPlugin } from "@/app/api/[[...slug]]/auth";
+import { db } from "@/db";
+import { incident, monitor, user as userTable } from "@/db/schema";
+import { idParam, paginationQuery, updateRoleBody } from "@/lib/params";
 
 export const adminRouter = new Elysia({ prefix: "/admin" })
   .use(betterAuthPlugin)
