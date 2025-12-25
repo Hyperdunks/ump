@@ -1,9 +1,9 @@
-import { db } from "@/db";
-import { monitor, alertConfig } from "@/db/schema";
-import { nanoid } from "@/lib/nanoid";
 import { and, eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { betterAuthPlugin } from "@/app/api/[[...slug]]/auth";
+import { db } from "@/db";
+import { alertConfig, monitor } from "@/db/schema";
+import { nanoid } from "@/lib/nanoid";
 import { idParam } from "@/lib/params";
 
 const monitorIdParam = t.Object({
