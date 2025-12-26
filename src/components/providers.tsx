@@ -29,6 +29,23 @@ export function Providers({ children }: { children: ReactNode }) {
           social={{
             providers: ["google"],
           }}
+          avatar={{
+            upload: async (file: File) => {
+              const formData = new FormData();
+              formData.append("file", file);
+              const res = await fetch("/api/user/image", {
+                method: "POST",
+                body: formData,
+              });
+              const result = await res.json();
+              return result.blob?.url || result.data?.image;
+            },
+            delete: async () => {
+              await fetch("/api/user/image", {
+                method: "DELETE",
+              });
+            },
+          }}
         >
           <ThemeProvider
             attribute="class"
