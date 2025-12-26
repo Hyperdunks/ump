@@ -20,6 +20,7 @@
     "@elysiajs/eden": "^1.4.6",
     "@elysiajs/openapi": "^1.4.12",
     "@react-email/components": "^1.0.2",
+    "@tabler/icons-react": "^3.36.0",
     "@tanstack/react-query": "^5.90.12",
     "@vercel/blob": "^2.0.0",
     "better-auth": "^1.4.8",
