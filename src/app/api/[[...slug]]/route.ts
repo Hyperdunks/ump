@@ -7,6 +7,7 @@ import { adminRouter } from "@/routes/admin/route";
 import { alertsRouter } from "@/routes/alerts/route";
 import { incidentRouter } from "@/routes/incidents/route";
 import { monitorRouter } from "@/routes/monitors/route";
+import { userRouter } from "@/routes/user/route";
 import { betterAuthPlugin, OpenAPI } from "./auth";
 
 // Initialize last check times on startup (best-effort, may not persist on serverless)
@@ -27,6 +28,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(incidentRouter)
   .use(alertsRouter)
   .use(adminRouter)
+  .use(userRouter)
   .get("/health", () => ({
     status: "ok",
     timestamp: new Date().toISOString(),
