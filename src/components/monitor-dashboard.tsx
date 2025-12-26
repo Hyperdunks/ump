@@ -9,16 +9,16 @@ import {
     AlertCircle,
     CheckCircle2,
     Zap,
-    Search,
 } from "lucide-react";
-import { UserButton } from "@daveyplate/better-auth-ui";
 import { useTheme } from "next-themes";
+import Navbar from "@/components/navbar";
+import Footer from "@/components/footer";
 
 const MonitorDashboard = () => {
     const [activeTab, setActiveTab] = useState("monitors");
     const [bgPattern, setBgPattern] = useState<
-        "vercel" | "dark" | "basic" | "hybrid"
-    >("hybrid");
+        "vercel" | "dark" | "basic" | "hybrid" | "mesh"
+    >("mesh");
     const { theme, setTheme } = useTheme();
     const isDark = theme === "dark";
 
@@ -112,6 +112,17 @@ const MonitorDashboard = () => {
             backgroundSize: "60px 60px",
             opacity: "20",
         },
+        mesh: {
+            backgroundImage: `
+        radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(74, 222, 128, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 40% 20%, rgba(251, 146, 60, 0.06) 0%, transparent 50%),
+        linear-gradient(to right, rgba(75, 85, 99, 0.08) 0.5px, transparent 0.5px),
+        linear-gradient(to bottom, rgba(75, 85, 99, 0.08) 0.5px, transparent 0.5px)
+      `,
+            backgroundSize: "100% 100%, 100% 100%, 100% 100%, 100px 100px, 100px 100px",
+            opacity: "",
+        },
     };
 
     return (
@@ -128,51 +139,14 @@ const MonitorDashboard = () => {
             )}
 
             {/* Top Nav */}
-            <nav className="border-b border-border px-6 py-3 relative z-10">
-                <div className="flex items-center justify-between">
-                    {/* Logo */}
-                    <div className="flex items-center gap-2 font-semibold text-lg">
-                        <Activity className="w-5 h-5" />
-                    </div>
-
-                    {/* Nav Links + Search + UserButton */}
-                    <div className="flex items-center gap-3">
-                        {/* Search */}
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                            <input
-                                type="text"
-                                placeholder="Search..."
-                                className="pl-9 pr-4 py-1.5 rounded-md text-sm bg-card border border-border focus:border-ring outline-none transition-colors w-48"
-                            />
-                        </div>
-
-                        {/* Nav Links */}
-                        {["monitors", "incidents", "alerts"].map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${activeTab === tab
-                                    ? "bg-secondary text-secondary-foreground"
-                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                                    }`}
-                            >
-                                {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                            </button>
-                        ))}
-
-                        {/* User Button */}
-                        <UserButton side="bottom" align="end" size="icon" />
-                    </div>
-                </div>
-            </nav>
+            <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
 
             {/* Main Content */}
             <main className="flex-1 px-6 py-8 max-w-7xl mx-auto w-full relative z-10">
                 {activeTab === "monitors" && (
                     <>
                         {/* Chart at Top */}
-                        <div className="bg-card rounded-lg border border-border p-6 mb-8 shadow-lg">
+                        <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 mb-8 shadow-lg">
                             <div className="h-64 flex items-center justify-center text-muted-foreground text-sm mb-4">
                                 [shadcn area chart goes here]
                             </div>
@@ -181,7 +155,7 @@ const MonitorDashboard = () => {
 
                         {/* Stats Cards Below Chart */}
                         <div className="grid grid-cols-4 gap-4 mb-8">
-                            <div className="bg-card rounded-lg border border-border p-6 shadow-lg">
+                            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 shadow-lg">
                                 <div className="text-3xl font-bold mb-2">{stats.total}</div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-sm text-muted-foreground">
@@ -191,7 +165,7 @@ const MonitorDashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-card rounded-lg border border-border p-6 shadow-lg">
+                            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 shadow-lg">
                                 <div className="text-3xl font-bold text-green-500 mb-2">
                                     {stats.up}
                                 </div>
@@ -201,7 +175,7 @@ const MonitorDashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-card rounded-lg border border-border p-6 shadow-lg">
+                            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 shadow-lg">
                                 <div className="text-3xl font-bold text-red-500 mb-2">
                                     {stats.down}
                                 </div>
@@ -211,7 +185,7 @@ const MonitorDashboard = () => {
                                 </div>
                             </div>
 
-                            <div className="bg-card rounded-lg border border-border p-6 shadow-lg">
+                            <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 shadow-lg">
                                 <div className="text-3xl font-bold mb-2">
                                     {stats.avgResponse}
                                     <span className="text-sm text-muted-foreground ml-1">ms</span>
@@ -234,7 +208,7 @@ const MonitorDashboard = () => {
                             </button>
                         </div>
 
-                        <div className="bg-card rounded-lg border border-border overflow-hidden shadow-lg">
+                        <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border overflow-hidden shadow-lg">
                             <table className="w-full">
                                 <thead className="bg-muted/50">
                                     <tr className="text-left text-sm">
@@ -298,76 +272,14 @@ const MonitorDashboard = () => {
             </main>
 
             {/* Footer */}
-            <footer className="border-t border-border px-6 py-3 mt-auto relative z-10">
-                <div className="flex items-center justify-between max-w-7xl mx-auto">
-                    {/* Left - Nav Links */}
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <button className="hover:text-foreground transition-colors">
-                            Monitors
-                        </button>
-                        <button className="hover:text-foreground transition-colors">
-                            Incidents
-                        </button>
-                        <button className="hover:text-foreground transition-colors">
-                            Alerts
-                        </button>
-                    </div>
-
-                    {/* Center - Pattern Toggle (only in dark mode) */}
-                    {isDark && (
-                        <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground mr-2">
-                                Pattern:
-                            </span>
-                            {(["vercel", "dark", "basic", "hybrid"] as const).map(
-                                (pattern) => (
-                                    <button
-                                        key={pattern}
-                                        onClick={() => setBgPattern(pattern)}
-                                        className={`px-3 py-1 text-xs rounded transition-colors ${bgPattern === pattern
-                                            ? "bg-secondary text-secondary-foreground"
-                                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
-                                            }`}
-                                    >
-                                        {pattern.charAt(0).toUpperCase() + pattern.slice(1)}
-                                    </button>
-                                )
-                            )}
-                        </div>
-                    )}
-
-                    {/* Right - Status Badge + Theme */}
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-card text-sm">
-                            <div
-                                className={`w-2 h-2 rounded-full ${statusColor === "blue" ? "bg-blue-500" : statusColor === "yellow" ? "bg-yellow-500" : "bg-red-500"}`}
-                            />
-                            <span
-                                className={
-                                    statusColor === "blue"
-                                        ? "text-blue-500"
-                                        : statusColor === "yellow"
-                                            ? "text-yellow-500"
-                                            : "text-red-500"
-                                }
-                            >
-                                {statusText}
-                            </span>
-                        </div>
-
-                        <button
-                            onClick={() => setTheme(isDark ? "light" : "dark")}
-                            className="p-2 rounded-md hover:bg-secondary/50 transition-colors"
-                        >
-                            {isDark ? (
-                                <Sun className="w-4 h-4" />
-                            ) : (
-                                <Moon className="w-4 h-4" />
-                            )}
-                        </button>
-                    </div>
-                </div>
-            </footer>
+            <Footer
+                bgPattern={bgPattern}
+                setBgPattern={setBgPattern}
+                statusColor={statusColor}
+                statusText={statusText}
+                isDark={isDark}
+                onThemeToggle={() => setTheme(isDark ? "light" : "dark")}
+            />
         </div>
     );
 };
