@@ -1,10 +1,23 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut } from "@daveyplate/better-auth-ui";
+import { useSession } from "@/lib/auth-client";
 
 export default function LandingPage() {
+    const router = useRouter();
+    const { data: session, isPending } = useSession();
+
+    // Redirect signed-in users to dashboard
+    useEffect(() => {
+        if (!isPending && session?.user) {
+            router.replace("/dashboard");
+        }
+    }, [session, isPending, router]);
+
     return (
         <div className="flex min-h-screen flex-col">
             {/* Header */}
