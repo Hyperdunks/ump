@@ -1,4 +1,4 @@
-import { AccountsCard, AccountSettingsCards, AccountView, OrganizationSwitcher, ProvidersCard, SecuritySettingsCards, UpdateAvatarCard, UpdateFieldCard, UpdateNameCard, UpdateUsernameCard } from "@daveyplate/better-auth-ui"
+import { AccountSettingsCards } from "@daveyplate/better-auth-ui"
 
 export default function SettingsPage() {
     return (
