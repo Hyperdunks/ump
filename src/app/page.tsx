@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut } from "@daveyplate/better-auth-ui";
 import { useSession } from "@/lib/auth-client";
+import Section67 from "@/components/landing-section-3";
+import Section76 from "@/components/landing-section-2";
 
 export default function LandingPage() {
     const router = useRouter();
@@ -45,7 +47,7 @@ export default function LandingPage() {
             </header>
 
             {/* Hero Section */}
-            <main className="flex flex-1 flex-col items-center justify-center px-4">
+            <section className="flex flex-1 flex-col items-center justify-center px-4 py-24">
                 <div className="mx-auto max-w-3xl text-center">
                     <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-6xl">
                         Monitor Your Services
@@ -77,32 +79,13 @@ export default function LandingPage() {
                         </SignedIn>
                     </div>
                 </div>
+            </section>
 
-                {/* Features Section */}
-                <div className="mt-24 grid max-w-5xl grid-cols-1 gap-8 px-4 sm:grid-cols-3">
-                    <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-                        <div className="mb-4 text-3xl">🔔</div>
-                        <h3 className="mb-2 text-lg font-semibold">Instant Alerts</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Get notified immediately when your services experience downtime.
-                        </p>
-                    </div>
-                    <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-                        <div className="mb-4 text-3xl">📊</div>
-                        <h3 className="mb-2 text-lg font-semibold">Uptime Reports</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Track your service reliability with detailed uptime statistics.
-                        </p>
-                    </div>
-                    <div className="rounded-lg border bg-card p-6 text-card-foreground shadow-sm">
-                        <div className="mb-4 text-3xl">🌍</div>
-                        <h3 className="mb-2 text-lg font-semibold">Global Monitoring</h3>
-                        <p className="text-sm text-muted-foreground">
-                            Monitor your services from multiple locations around the world.
-                        </p>
-                    </div>
-                </div>
-            </main>
+            {/* Section 76 - Features Timeline */}
+            <Section76 />
+
+            {/* Section 67 - Integration Tree */}
+            <Section67 />
 
             {/* Footer */}
             <footer className="border-t py-6">
