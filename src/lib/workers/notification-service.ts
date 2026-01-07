@@ -2,10 +2,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { alertConfig, notification } from "@/db/schema";
 import { nanoid } from "@/lib/nanoid";
-import {
-  sendMonitorDownEmail,
-  sendMonitorRecoveredEmail,
-} from "@/lib/resend";
+import { sendMonitorDownEmail, sendMonitorRecoveredEmail } from "@/lib/resend";
 
 export interface AlertPayload {
   monitorId: string;
@@ -176,14 +173,14 @@ async function sendSlack(
             },
             ...(payload.error
               ? [
-                {
-                  type: "section",
-                  text: {
-                    type: "mrkdwn",
-                    text: `*Error:* ${payload.error}`,
+                  {
+                    type: "section",
+                    text: {
+                      type: "mrkdwn",
+                      text: `*Error:* ${payload.error}`,
+                    },
                   },
-                },
-              ]
+                ]
               : []),
           ],
         },
@@ -228,12 +225,12 @@ async function sendDiscord(
             },
             ...(payload.error
               ? [
-                {
-                  name: "Error",
-                  value: payload.error,
-                  inline: false,
-                },
-              ]
+                  {
+                    name: "Error",
+                    value: payload.error,
+                    inline: false,
+                  },
+                ]
               : []),
           ],
         },

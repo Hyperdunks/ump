@@ -24,7 +24,7 @@ export function useMonitors(params: { page?: number; limit?: number } = {}) {
   return useQuery({
     queryKey: queryKeys.monitors.list(params),
     queryFn: async () => {
-      const { data, error } = await api.monitors.index.get({
+      const { data, error } = await api.monitors.get({
         query: {
           page: params.page ?? 1,
           limit: params.limit ?? 20,
@@ -98,7 +98,7 @@ export function useCreateMonitor() {
 
   return useMutation({
     mutationFn: async (data: CreateMonitorData) => {
-      const { data: res, error } = await api.monitors.index.post(data);
+      const { data: res, error } = await api.monitors.post(data);
       if (error) throw error;
       return res;
     },
@@ -117,7 +117,13 @@ export function useUpdateMonitor() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, data }: { id: string; data: UpdateMonitorData }) => {
+    mutationFn: async ({
+      id,
+      data,
+    }: {
+      id: string;
+      data: UpdateMonitorData;
+    }) => {
       const { data: res, error } = await api.monitors({ id }).put(data);
       if (error) throw error;
       return res;

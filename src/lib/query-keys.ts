@@ -7,7 +7,8 @@ export const queryKeys = {
     checks: (id: string, params: { page?: number; limit?: number }) =>
       [...queryKeys.monitors.detail(id), "checks", params] as const,
     stats: (id: string) => [...queryKeys.monitors.detail(id), "stats"] as const,
-    uptime: (id: string) => [...queryKeys.monitors.detail(id), "uptime"] as const,
+    uptime: (id: string) =>
+      [...queryKeys.monitors.detail(id), "uptime"] as const,
   },
   alerts: {
     all: ["alerts"] as const,
@@ -23,5 +24,13 @@ export const queryKeys = {
   },
   user: {
     me: ["user", "me"] as const,
+  },
+  admin: {
+    all: ["admin"] as const,
+    monitors: (params: { page?: number; limit?: number }) =>
+      [...queryKeys.admin.all, "monitors", params] as const,
+    users: (params: { page?: number; limit?: number }) =>
+      [...queryKeys.admin.all, "users", params] as const,
+    stats: () => [...queryKeys.admin.all, "stats"] as const,
   },
 };

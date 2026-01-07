@@ -32,7 +32,10 @@ export function useCreateAlert() {
     mutationFn: async ({
       monitorId,
       data,
-    }: { monitorId: string; data: CreateAlertData }) => {
+    }: {
+      monitorId: string;
+      data: CreateAlertData;
+    }) => {
       const { data: res, error } = await api.alerts
         .monitor({ monitorId })
         .post(data);

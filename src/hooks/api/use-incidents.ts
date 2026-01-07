@@ -13,7 +13,7 @@ export function useIncidents(params: { page?: number; limit?: number } = {}) {
   return useQuery({
     queryKey: queryKeys.incidents.list(params),
     queryFn: async () => {
-      const { data, error } = await api.incidents.index.get({
+      const { data, error } = await api.incidents.get({
         query: {
           page: params.page ?? 1,
           limit: params.limit ?? 20,
@@ -44,7 +44,10 @@ export function useUpdateIncident() {
     mutationFn: async ({
       id,
       data,
-    }: { id: string; data: UpdateIncidentData }) => {
+    }: {
+      id: string;
+      data: UpdateIncidentData;
+    }) => {
       const { data: res, error } = await api.incidents({ id }).put(data);
       if (error) throw error;
       return res;
