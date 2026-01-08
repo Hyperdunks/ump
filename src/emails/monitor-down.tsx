@@ -1,155 +1,155 @@
 import {
-    Body,
-    Container,
-    Head,
-    Heading,
-    Hr,
-    Html,
-    Preview,
-    Section,
-    Text,
+  Body,
+  Container,
+  Head,
+  Heading,
+  Hr,
+  Html,
+  Preview,
+  Section,
+  Text,
 } from "@react-email/components";
 
 interface MonitorDownEmailProps {
-    monitorName: string;
-    monitorUrl: string;
-    error?: string;
-    timestamp: string;
+  monitorName: string;
+  monitorUrl: string;
+  error?: string;
+  timestamp: string;
 }
 
 export function MonitorDownEmail({
-    monitorName = "Example Monitor",
-    monitorUrl = "https://example.com",
-    error = "Connection timeout",
-    timestamp = new Date().toISOString(),
+  monitorName = "Example Monitor",
+  monitorUrl = "https://example.com",
+  error = "Connection timeout",
+  timestamp = new Date().toISOString(),
 }: MonitorDownEmailProps) {
-    return (
-        <Html>
-            <Head />
-            <Preview>🚨 {monitorName} is DOWN</Preview>
-            <Body style={main}>
-                <Container style={container}>
-                    <Section style={alertBanner}>
-                        <Text style={alertEmoji}>🚨</Text>
-                        <Heading style={alertTitle}>Monitor Down</Heading>
-                    </Section>
+  return (
+    <Html>
+      <Head />
+      <Preview>🚨 {monitorName} is DOWN</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Section style={alertBanner}>
+            <Text style={alertEmoji}>🚨</Text>
+            <Heading style={alertTitle}>Monitor Down</Heading>
+          </Section>
 
-                    <Section style={content}>
-                        <Heading as="h2" style={monitorNameStyle}>
-                            {monitorName}
-                        </Heading>
+          <Section style={content}>
+            <Heading as="h2" style={monitorNameStyle}>
+              {monitorName}
+            </Heading>
 
-                        <Text style={label}>URL</Text>
-                        <Text style={value}>{monitorUrl}</Text>
+            <Text style={label}>URL</Text>
+            <Text style={value}>{monitorUrl}</Text>
 
-                        {error && (
-                            <>
-                                <Text style={label}>Error</Text>
-                                <Text style={errorValue}>{error}</Text>
-                            </>
-                        )}
+            {error && (
+              <>
+                <Text style={label}>Error</Text>
+                <Text style={errorValue}>{error}</Text>
+              </>
+            )}
 
-                        <Text style={label}>Detected At</Text>
-                        <Text style={value}>
-                            {new Date(timestamp).toLocaleString("en-US", {
-                                dateStyle: "full",
-                                timeStyle: "long",
-                            })}
-                        </Text>
-                    </Section>
+            <Text style={label}>Detected At</Text>
+            <Text style={value}>
+              {new Date(timestamp).toLocaleString("en-US", {
+                dateStyle: "full",
+                timeStyle: "long",
+              })}
+            </Text>
+          </Section>
 
-                    <Hr style={hr} />
+          <Hr style={hr} />
 
-                    <Text style={footer}>
-                        You're receiving this because you have alerts enabled for this
-                        monitor.
-                    </Text>
-                </Container>
-            </Body>
-        </Html>
-    );
+          <Text style={footer}>
+            You're receiving this because you have alerts enabled for this
+            monitor.
+          </Text>
+        </Container>
+      </Body>
+    </Html>
+  );
 }
 
 export default MonitorDownEmail;
 
 // Styles
 const main = {
-    backgroundColor: "#f6f6f6",
-    fontFamily:
-        '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  backgroundColor: "#f6f6f6",
+  fontFamily:
+    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 };
 
 const container = {
-    margin: "0 auto",
-    padding: "20px 0 48px",
-    maxWidth: "560px",
+  margin: "0 auto",
+  padding: "20px 0 48px",
+  maxWidth: "560px",
 };
 
 const alertBanner = {
-    backgroundColor: "#dc2626",
-    borderRadius: "8px 8px 0 0",
-    padding: "24px",
-    textAlign: "center" as const,
+  backgroundColor: "#dc2626",
+  borderRadius: "8px 8px 0 0",
+  padding: "24px",
+  textAlign: "center" as const,
 };
 
 const alertEmoji = {
-    fontSize: "48px",
-    margin: "0 0 8px 0",
+  fontSize: "48px",
+  margin: "0 0 8px 0",
 };
 
 const alertTitle = {
-    color: "#ffffff",
-    fontSize: "24px",
-    fontWeight: "bold",
-    margin: "0",
+  color: "#ffffff",
+  fontSize: "24px",
+  fontWeight: "bold",
+  margin: "0",
 };
 
 const content = {
-    backgroundColor: "#ffffff",
-    borderRadius: "0 0 8px 8px",
-    padding: "32px",
-    border: "1px solid #e5e5e5",
-    borderTop: "none",
+  backgroundColor: "#ffffff",
+  borderRadius: "0 0 8px 8px",
+  padding: "32px",
+  border: "1px solid #e5e5e5",
+  borderTop: "none",
 };
 
 const monitorNameStyle = {
-    color: "#171717",
-    fontSize: "20px",
-    fontWeight: "600",
-    margin: "0 0 24px 0",
+  color: "#171717",
+  fontSize: "20px",
+  fontWeight: "600",
+  margin: "0 0 24px 0",
 };
 
 const label = {
-    color: "#737373",
-    fontSize: "12px",
-    fontWeight: "600",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.5px",
-    margin: "16px 0 4px 0",
+  color: "#737373",
+  fontSize: "12px",
+  fontWeight: "600",
+  textTransform: "uppercase" as const,
+  letterSpacing: "0.5px",
+  margin: "16px 0 4px 0",
 };
 
 const value = {
-    color: "#171717",
-    fontSize: "14px",
-    margin: "0 0 8px 0",
+  color: "#171717",
+  fontSize: "14px",
+  margin: "0 0 8px 0",
 };
 
 const errorValue = {
-    color: "#dc2626",
-    fontSize: "14px",
-    margin: "0 0 8px 0",
-    backgroundColor: "#fef2f2",
-    padding: "8px 12px",
-    borderRadius: "4px",
+  color: "#dc2626",
+  fontSize: "14px",
+  margin: "0 0 8px 0",
+  backgroundColor: "#fef2f2",
+  padding: "8px 12px",
+  borderRadius: "4px",
 };
 
 const hr = {
-    borderColor: "#e5e5e5",
-    margin: "24px 0",
+  borderColor: "#e5e5e5",
+  margin: "24px 0",
 };
 
 const footer = {
-    color: "#737373",
-    fontSize: "12px",
-    textAlign: "center" as const,
+  color: "#737373",
+  fontSize: "12px",
+  textAlign: "center" as const,
 };

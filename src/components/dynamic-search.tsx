@@ -67,7 +67,10 @@ export default function DynamicSearch() {
                       placeholder="Search..."
                     />
                   </div>
-                  <SearchButton onClick={() => setIsOpen(false)} ariaLabel="Close">
+                  <SearchButton
+                    onClick={() => setIsOpen(false)}
+                    ariaLabel="Close"
+                  >
                     <ArrowRight className="h-4 w-4" />
                   </SearchButton>
                 </div>

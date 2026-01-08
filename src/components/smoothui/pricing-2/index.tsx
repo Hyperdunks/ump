@@ -62,7 +62,7 @@ function PriceFlow({ value, className = "" }: PriceFlowProps) {
             nextOnes.classList.remove("slide-in-up", "slide-in-down");
             prevOnes.removeEventListener(
               "animationend",
-              handleOnesAnimationEnd
+              handleOnesAnimationEnd,
             );
           };
 
@@ -138,8 +138,9 @@ export function PricingModern() {
               >
                 <div
                   aria-hidden="true"
-                  className={`pointer-events-none absolute inset-1 w-1/2 rounded-full border border-transparent bg-brand shadow ring-1 ring-foreground/5 transition-transform duration-500 ease-in-out ${isAnnual ? "translate-x-full" : "translate-x-0"
-                    }`}
+                  className={`pointer-events-none absolute inset-1 w-1/2 rounded-full border border-transparent bg-brand shadow ring-1 ring-foreground/5 transition-transform duration-500 ease-in-out ${
+                    isAnnual ? "translate-x-full" : "translate-x-0"
+                  }`}
                 />
                 <button
                   className="relative duration-500 data-[active=true]:font-medium data-[active=true]:text-white"
