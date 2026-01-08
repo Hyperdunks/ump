@@ -1,148 +1,92 @@
 import {
-  Body,
-  Button,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Preview,
-  Section,
-  Text,
+    Body,
+    Button,
+    Container,
+    Head,
+    Heading,
+    Html,
+    Img,
+    Link,
+    Preview,
+    Section,
+    Tailwind,
+    Text,
 } from "@react-email/components";
+import * as React from "react";
 
-interface ResetPasswordEmailProps {
-  resetUrl: string;
+interface ResetPasswordProps {
+    username?: string;
+    resetUrl?: string;
 }
 
-export function ResetPasswordEmail({
-  resetUrl = "https://example.com/reset-password",
-}: ResetPasswordEmailProps) {
-  return (
-    <Html>
-      <Head />
-      <Preview>Reset your password</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={header}>
-            <Heading style={title}>Reset Your Password</Heading>
-          </Section>
+const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "";
 
-          <Section style={content}>
-            <Text style={paragraph}>
-              We received a request to reset your password. Click the button
-              below to choose a new password.
-            </Text>
+export const ResetPassword = ({
+    username = "Harsh",
+    resetUrl = "https://sentinel.com/reset?token=123",
+}: ResetPasswordProps) => {
+    return (
+        <Html>
+            <Tailwind
+                config={{
+                    theme: {
+                        extend: {
+                            colors: {
+                                brand: "#000000",
+                            },
+                        },
+                    },
+                }}
+            >
+                <Head />
+                <Preview>Reset your Sentinel password</Preview>
+                <Body className="bg-white font-sans text-base antialiased text-[#24292e]">
+                    <Container className="my-10 mx-auto p-5 max-w-[480px]">
+                        <Section className="mb-8">
+                            <Img
+                                src={`${baseUrl}/static/sentinel-logo.png`}
+                                width="40"
+                                height="40"
+                                alt="Sentinel"
+                            />
+                        </Section>
 
-            <Section style={buttonContainer}>
-              <Button style={button} href={resetUrl}>
-                Reset Password
-              </Button>
-            </Section>
+                        <Heading className="text-[24px] font-semibold text-[#000000] p-0 my-6 mx-0">
+                            Reset your password
+                        </Heading>
 
-            <Text style={paragraph}>
-              If you didn't request a password reset, you can safely ignore this
-              email. Your password will remain unchanged.
-            </Text>
+                        <Text className="text-[14px] leading-6 text-[#52525b] mb-4">
+                            Hello {username},
+                        </Text>
+                        <Text className="text-[14px] leading-6 text-[#52525b] mb-6">
+                            Someone recently requested a password change for your Sentinel
+                            account. If this was you, you can set a new password here:
+                        </Text>
 
-            <Text style={smallText}>
-              If the button doesn't work, copy and paste this link into your
-              browser:
-            </Text>
-            <Text style={linkText}>{resetUrl}</Text>
-          </Section>
+                        <Section className="my-8 text-center">
+                            <Button
+                                className="bg-[#000000] rounded text-white text-[14px] font-medium no-underline text-center px-6 py-3 inline-block min-w-[150px] border border-solid border-black hover:bg-[#27272a]"
+                                href={resetUrl}
+                            >
+                                Reset password
+                            </Button>
+                        </Section>
 
-          <Hr style={hr} />
+                        <Text className="text-[14px] leading-6 text-[#52525b] mb-6">
+                            If you don't want to change your password or didn't request this,
+                            just ignore and delete this message.
+                        </Text>
 
-          <Text style={footer}>
-            This link will expire in 1 hour for security reasons.
-          </Text>
-        </Container>
-      </Body>
-    </Html>
-  );
-}
-
-export default ResetPasswordEmail;
-
-// Styles
-const main = {
-  backgroundColor: "#f6f6f6",
-  fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        <Text className="text-[12px] text-[#a1a1aa] mt-8 text-center">
+                            © 2026 Sentinel Inc.
+                        </Text>
+                    </Container>
+                </Body>
+            </Tailwind>
+        </Html>
+    );
 };
 
-const container = {
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  maxWidth: "560px",
-};
-
-const header = {
-  backgroundColor: "#f59e0b",
-  borderRadius: "8px 8px 0 0",
-  padding: "32px 24px",
-  textAlign: "center" as const,
-};
-
-const title = {
-  color: "#ffffff",
-  fontSize: "24px",
-  fontWeight: "bold",
-  margin: "0",
-};
-
-const content = {
-  backgroundColor: "#ffffff",
-  borderRadius: "0 0 8px 8px",
-  padding: "32px",
-  border: "1px solid #e5e5e5",
-  borderTop: "none",
-};
-
-const paragraph = {
-  color: "#374151",
-  fontSize: "16px",
-  lineHeight: "24px",
-  margin: "0 0 16px 0",
-};
-
-const buttonContainer = {
-  textAlign: "center" as const,
-  margin: "32px 0",
-};
-
-const button = {
-  backgroundColor: "#f59e0b",
-  borderRadius: "8px",
-  color: "#ffffff",
-  fontSize: "16px",
-  fontWeight: "600",
-  textDecoration: "none",
-  padding: "12px 32px",
-  display: "inline-block",
-};
-
-const smallText = {
-  color: "#6b7280",
-  fontSize: "12px",
-  margin: "16px 0 4px 0",
-};
-
-const linkText = {
-  color: "#f59e0b",
-  fontSize: "12px",
-  wordBreak: "break-all" as const,
-  margin: "0",
-};
-
-const hr = {
-  borderColor: "#e5e5e5",
-  margin: "24px 0",
-};
-
-const footer = {
-  color: "#9ca3af",
-  fontSize: "12px",
-  textAlign: "center" as const,
-};
+export default ResetPassword;

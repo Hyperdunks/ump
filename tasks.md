@@ -127,7 +127,6 @@
 ### Completed
 - Resend integration configured
 
-### Remaining
 - **Redesign All Email Templates**
   - **monitor-down.tsx** - Alert notification when monitor goes down
     - Use Tailwind CSS for styling
@@ -145,6 +144,8 @@
     - Use Tailwind CSS for styling
     - Remove all emojis
     - Professional, clean design
+
+### Remaining
 - **Additional Templates (Future)**
   - Welcome email for new users
   - Account activity/security alerts
