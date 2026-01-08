@@ -13,15 +13,12 @@
 - **Auth**: better-auth integration (email/password, verification, password reset, roles)
 - **UI Components**: 57 shadcn components, landing page, dashboard layout, account settings
 - **Infrastructure**: TanStack Query installed, Eden treaty client configured, QueryClient configured
-- **DFL Layer with TanStack Query** ✅
-  - `src/hooks/api/use-monitors.ts` - useMonitors, useMonitor, useMonitorChecks, useMonitorStats, useMonitorUptime, useCreateMonitor, useUpdateMonitor, useDeleteMonitor
-  - `src/hooks/api/use-alerts.ts` - useAlerts, useCreateAlert, useUpdateAlert, useDeleteAlert
-  - `src/hooks/api/use-incidents.ts` - useIncidents, useIncident, useUpdateIncident
-  - `src/hooks/api/use-user.ts` - useUserProfile, useUpdateProfile, useUploadImage, useDeleteImage
-  - `src/hooks/api/use-admin.ts` - useAdminMonitors, useAdminUsers, useAdminStats, useUpdateUserRole
-  - `src/lib/query-keys.ts` - Query key factory with hierarchical keys for all domains
 
 ### Remaining
+- **DFL Layer with TanStack Query**
+  - Create custom hooks: `useMonitors`, `useIncidents`, `useAlerts`, `useHealthChecks`, `useStats`
+  - Implement caching strategies and optimistic updates
+  - Connect Eden treaty client to TanStack Query
 - **UI - Replace Mock Data**
   - Dashboard monitors with real API data
   - Uptime charts (24h/7d/30d)
