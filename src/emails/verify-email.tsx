@@ -16,7 +16,7 @@ import * as React from "react";
 
 interface VerifyEmailProps {
     username?: string;
-    verifyUrl?: string;
+    verificationUrl?: string;
 }
 
 const baseUrl = process.env.VERCEL_URL
@@ -25,7 +25,7 @@ const baseUrl = process.env.VERCEL_URL
 
 export const VerifyEmail = ({
     username = "Harsh",
-    verifyUrl = "https://sentinel.com/verify?token=123",
+    verificationUrl = "https://sentinel.com/verify?token=123",
 }: VerifyEmailProps) => {
     return (
         <Html>
@@ -69,7 +69,7 @@ export const VerifyEmail = ({
                         <Section className="my-8 text-center">
                             <Button
                                 className="bg-[#000000] rounded text-white text-[14px] font-medium no-underline text-center px-6 py-3 inline-block min-w-[150px] border border-solid border-black hover:bg-[#27272a]"
-                                href={verifyUrl}
+                                href={verificationUrl}
                             >
                                 Verify email address
                             </Button>
@@ -77,8 +77,8 @@ export const VerifyEmail = ({
 
                         <Text className="text-[14px] leading-6 text-[#52525b] mb-4">
                             Or copy and paste this URL into your browser:{" "}
-                            <Link href={verifyUrl} className="text-blue-600 underline">
-                                {verifyUrl}
+                            <Link href={verificationUrl} className="text-blue-600 underline">
+                                {verificationUrl}
                             </Link>
                         </Text>
 

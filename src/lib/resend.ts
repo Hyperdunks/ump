@@ -1,8 +1,8 @@
 import { Resend } from "resend";
 
-import { MonitorDownEmail } from "@/emails/monitor-down";
-import { MonitorRecoveredEmail } from "@/emails/monitor-recovered";
-import { ResetPasswordEmail } from "@/emails/reset-password";
+import { MonitorDown } from "@/emails/monitor-down";
+import { MonitorRecovered } from "@/emails/monitor-recovered";
+import { ResetPassword } from "@/emails/reset-password";
 import { VerifyEmail } from "@/emails/verify-email";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
@@ -34,10 +34,10 @@ export async function sendMonitorDownEmail(
     from: FROM_EMAIL,
     to: options.to,
     subject: `🚨 Monitor Down: ${options.monitorName}`,
-    react: MonitorDownEmail({
+    react: MonitorDown({
       monitorName: options.monitorName,
       monitorUrl: options.monitorUrl,
-      error: options.error,
+      reason: options.error,
       timestamp: options.timestamp.toISOString(),
     }),
   });
@@ -60,7 +60,7 @@ export async function sendMonitorRecoveredEmail(
     from: FROM_EMAIL,
     to: options.to,
     subject: `✅ Monitor Recovered: ${options.monitorName}`,
-    react: MonitorRecoveredEmail({
+    react: MonitorRecovered({
       monitorName: options.monitorName,
       monitorUrl: options.monitorUrl,
       timestamp: options.timestamp.toISOString(),
@@ -113,7 +113,7 @@ export async function sendPasswordResetEmail(
     from: FROM_EMAIL,
     to,
     subject: "Reset your password",
-    react: ResetPasswordEmail({ resetUrl }),
+    react: ResetPassword({ resetUrl }),
   });
 
   if (error) {
