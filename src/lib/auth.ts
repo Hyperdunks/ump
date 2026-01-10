@@ -6,6 +6,12 @@ import * as schema from "@/db/schema";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/resend";
 
 export const auth = betterAuth({
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
