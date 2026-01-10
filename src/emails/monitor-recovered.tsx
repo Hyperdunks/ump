@@ -1,155 +1,129 @@
 import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Preview,
-  Section,
-  Text,
+    Body,
+    Button,
+    Container,
+    Head,
+    Heading,
+    Html,
+    Img,
+    Link,
+    Preview,
+    Section,
+    Tailwind,
+    Text,
+    Column,
+    Row,
 } from "@react-email/components";
+import * as React from "react";
 
-interface MonitorRecoveredEmailProps {
-  monitorName: string;
-  monitorUrl: string;
-  timestamp: string;
-  downtimeDuration?: string;
+interface MonitorRecoveredProps {
+    monitorName?: string;
+    monitorUrl?: string;
+    incidentId?: string;
+    downtimeDuration?: string;
+    timestamp?: string;
+    viewMonitorUrl?: string;
 }
 
-export function MonitorRecoveredEmail({
-  monitorName = "Example Monitor",
-  monitorUrl = "https://example.com",
-  timestamp = new Date().toISOString(),
-  downtimeDuration,
-}: MonitorRecoveredEmailProps) {
-  return (
-    <Html>
-      <Head />
-      <Preview>✅ {monitorName} is back UP</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={successBanner}>
-            <Text style={successEmoji}>✅</Text>
-            <Heading style={successTitle}>Monitor Recovered</Heading>
-          </Section>
+const baseUrl = process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "";
 
-          <Section style={content}>
-            <Heading as="h2" style={monitorNameStyle}>
-              {monitorName}
-            </Heading>
+export const MonitorRecovered = ({
+    monitorName = "Production API",
+    monitorUrl = "https://api.sentinel.com",
+    incidentId = "inc_123",
+    downtimeDuration = "12 mins 30 secs",
+    timestamp = "Jan 08, 2026 10:57 PM UTC",
+    viewMonitorUrl = "https://sentinel.com/monitors/123",
+}: MonitorRecoveredProps) => {
+    return (
+        <Html>
+            <Tailwind
+                config={{
+                    theme: {
+                        extend: {
+                            colors: {
+                                brand: "#000000",
+                                success: "#059669",
+                            },
+                        },
+                    },
+                }}
+            >
+                <Head />
+                <Preview>RECOVERED: {monitorName} is back online</Preview>
+                <Body className="bg-white font-sans text-base antialiased text-[#24292e]">
+                    <Container className="my-10 mx-auto p-5 max-w-[480px]">
+                        <Section className="mb-8">
+                            <Img
+                                src={`${baseUrl}/static/sentinel-logo.png`}
+                                width="32"
+                                height="32"
+                                alt="Sentinel"
+                            />
+                        </Section>
 
-            <Text style={label}>URL</Text>
-            <Text style={value}>{monitorUrl}</Text>
+                        <Section className="bg-[#ecfdf5] rounded-lg border border-solid border-[#d1fae5] p-6 mb-6">
+                            <Row>
+                                <Column width="24" valign="middle">
+                                    <div className="w-3 h-3 rounded-full bg-[#059669]" />
+                                </Column>
+                                <Column>
+                                    <Heading className="text-[18px] font-semibold text-[#065f46] p-0 m-0">
+                                        Monitor Recovered
+                                    </Heading>
+                                </Column>
+                            </Row>
+                            <Text className="text-[14px] text-[#047857] mt-2 mb-0">
+                                <strong>{monitorName}</strong> is back online and reachable.
+                            </Text>
+                        </Section>
 
-            {downtimeDuration && (
-              <>
-                <Text style={label}>Downtime Duration</Text>
-                <Text style={durationValue}>{downtimeDuration}</Text>
-              </>
-            )}
+                        <Section className="bg-[#fafafa] rounded border border-solid border-[#eaeaea] p-4 mb-6">
+                            <Row className="mb-2">
+                                <Column width="30%">
+                                    <Text className="m-0 text-[12px] font-bold text-[#71717a] uppercase tracking-wide">URL</Text>
+                                </Column>
+                                <Column>
+                                    <Link href={monitorUrl} className="text-[14px] text-[#09090b] underline">{monitorUrl}</Link>
+                                </Column>
+                            </Row>
+                            <Row className="mb-2">
+                                <Column width="30%">
+                                    <Text className="m-0 text-[12px] font-bold text-[#71717a] uppercase tracking-wide">Total Downtime</Text>
+                                </Column>
+                                <Column>
+                                    <Text className="m-0 text-[14px] text-[#09090b]">{downtimeDuration}</Text>
+                                </Column>
+                            </Row>
+                            <Row>
+                                <Column width="30%">
+                                    <Text className="m-0 text-[12px] font-bold text-[#71717a] uppercase tracking-wide">Recovered At</Text>
+                                </Column>
+                                <Column>
+                                    <Text className="m-0 text-[14px] text-[#09090b]">{timestamp}</Text>
+                                </Column>
+                            </Row>
+                        </Section>
 
-            <Text style={label}>Recovered At</Text>
-            <Text style={value}>
-              {new Date(timestamp).toLocaleString("en-US", {
-                dateStyle: "full",
-                timeStyle: "long",
-              })}
-            </Text>
-          </Section>
+                        <Section className="mb-6 text-center">
+                            <Button
+                                className="bg-white rounded text-[#000000] text-[14px] font-medium no-underline text-center px-6 py-3 inline-block min-w-[150px] border border-solid border-[#e5e7eb] hover:bg-[#f4f4f5]"
+                                href={viewMonitorUrl}
+                            >
+                                View Monitor
+                            </Button>
+                        </Section>
 
-          <Hr style={hr} />
-
-          <Text style={footer}>
-            You're receiving this because you have alerts enabled for this
-            monitor.
-          </Text>
-        </Container>
-      </Body>
-    </Html>
-  );
-}
-
-export default MonitorRecoveredEmail;
-
-// Styles
-const main = {
-  backgroundColor: "#f6f6f6",
-  fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                        <Text className="text-[12px] text-[#a1a1aa] mt-8 text-center">
+                            © 2026 Sentinel Inc.
+                        </Text>
+                    </Container>
+                </Body>
+            </Tailwind>
+        </Html>
+    );
 };
 
-const container = {
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  maxWidth: "560px",
-};
-
-const successBanner = {
-  backgroundColor: "#16a34a",
-  borderRadius: "8px 8px 0 0",
-  padding: "24px",
-  textAlign: "center" as const,
-};
-
-const successEmoji = {
-  fontSize: "48px",
-  margin: "0 0 8px 0",
-};
-
-const successTitle = {
-  color: "#ffffff",
-  fontSize: "24px",
-  fontWeight: "bold",
-  margin: "0",
-};
-
-const content = {
-  backgroundColor: "#ffffff",
-  borderRadius: "0 0 8px 8px",
-  padding: "32px",
-  border: "1px solid #e5e5e5",
-  borderTop: "none",
-};
-
-const monitorNameStyle = {
-  color: "#171717",
-  fontSize: "20px",
-  fontWeight: "600",
-  margin: "0 0 24px 0",
-};
-
-const label = {
-  color: "#737373",
-  fontSize: "12px",
-  fontWeight: "600",
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.5px",
-  margin: "16px 0 4px 0",
-};
-
-const value = {
-  color: "#171717",
-  fontSize: "14px",
-  margin: "0 0 8px 0",
-};
-
-const durationValue = {
-  color: "#16a34a",
-  fontSize: "14px",
-  margin: "0 0 8px 0",
-  backgroundColor: "#f0fdf4",
-  padding: "8px 12px",
-  borderRadius: "4px",
-};
-
-const hr = {
-  borderColor: "#e5e5e5",
-  margin: "24px 0",
-};
-
-const footer = {
-  color: "#737373",
-  fontSize: "12px",
-  textAlign: "center" as const,
-};
+export default MonitorRecovered;
