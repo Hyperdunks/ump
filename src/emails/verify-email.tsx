@@ -24,8 +24,8 @@ const baseUrl = process.env.VERCEL_URL
     : "";
 
 export const VerifyEmail = ({
-    username = "Harsh",
-    verificationUrl = "https://sentinel.com/verify?token=123",
+    username = "there",
+    verificationUrl = "https://sentinel.harzh.xyz/verify?token=123",
 }: VerifyEmailProps) => {
     return (
         <Html>

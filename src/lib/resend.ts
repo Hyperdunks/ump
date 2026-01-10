@@ -86,12 +86,13 @@ export async function sendMonitorRecoveredEmail(
 export async function sendVerificationEmail(
   to: string,
   verificationUrl: string,
+  username?: string,
 ): Promise<void> {
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
     to,
     subject: "Verify your email address",
-    react: VerifyEmail({ verificationUrl }),
+    react: VerifyEmail({ verificationUrl, username }),
   });
 
   if (error) {
@@ -108,12 +109,13 @@ export async function sendVerificationEmail(
 export async function sendPasswordResetEmail(
   to: string,
   resetUrl: string,
+  username?: string,
 ): Promise<void> {
   const { data, error } = await resend.emails.send({
     from: FROM_EMAIL,
     to,
     subject: "Reset your password",
-    react: ResetPassword({ resetUrl }),
+    react: ResetPassword({ resetUrl, username }),
   });
 
   if (error) {
@@ -123,3 +125,4 @@ export async function sendPasswordResetEmail(
 
   console.log(`[Resend] Password reset email sent: ${data?.id}`);
 }
+

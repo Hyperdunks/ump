@@ -11,7 +11,7 @@ export const auth = betterAuth({
     requireEmailVerification: true,
     sendResetPassword: async ({ user, url }) => {
       // Fire and forget with error handling
-      sendPasswordResetEmail(user.email, url).catch((err) => {
+      sendPasswordResetEmail(user.email, url, user.name).catch((err) => {
         console.error("[Auth] Failed to send password reset email:", err);
       });
     },
@@ -20,7 +20,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
       // Fire and forget with error handling
-      sendVerificationEmail(user.email, url).catch((err) => {
+      sendVerificationEmail(user.email, url, user.name).catch((err) => {
         console.error("[Auth] Failed to send verification email:", err);
       });
     },

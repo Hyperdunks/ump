@@ -24,8 +24,8 @@ const baseUrl = process.env.VERCEL_URL
     : "";
 
 export const ResetPassword = ({
-    username = "Harsh",
-    resetUrl = "https://sentinel.com/reset?token=123",
+    username = "there",
+    resetUrl = "https://sentinel.harzh.xyz/api/auth/reset?token=123",
 }: ResetPasswordProps) => {
     return (
         <Html>
