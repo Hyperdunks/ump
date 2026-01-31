@@ -14,7 +14,7 @@ Database: PostgreSQL with Drizzle ORM
 Auth: Better-Auth (email/password + Google OAuth)
 Data Fetching: TanStack Query + Eden Treaty Client
 Emails: React Email + Resend
-Current State (70% Complete)
+Current State (85% Complete)
 ✅ Completed Components
 Component	Status	Key Files
 Database Schema	✅ 100%	
@@ -37,28 +37,25 @@ emails/
 Workers	✅ 100%	
 lib/workers/
  - 5 services
-Remaining Work
-Priority 1: Dashboard Real Data Integration
-Goal: Replace mock data in dashboard with real API calls.
-
-[MODIFY] 
+Dashboard Data	✅ 100%	
 monitor-dashboard.tsx
-Current issues:
+ - Real API hooks
+Public Status	✅ 100%	
+app/status/[monitorId]/
+ - Public page
+Testing	✅ 100%	
+bun test
+ - 11 tests
+Remaining Work
+✅ Priority 1: Dashboard Real Data Integration (COMPLETE)
+Completed: Replaced mock data with real API calls.
 
-Uses hardcoded mock data (lines 26-63)
-Chart placeholder on line 152
-Incidents/Alerts tabs are empty placeholders (lines 262-272)
-Changes needed:
-
-Import and use 
-useMonitors
- hook from @/hooks/api/use-monitors
-Import and use 
-useIncidents
- hook from @/hooks/api/use-incidents
-Add loading states using <Skeleton /> component
-Add error handling with error boundaries
-Implement empty states when no data
+[MODIFIED] monitor-dashboard.tsx
+- Imported useMonitors and useIncidents hooks
+- Added loading states with <Skeleton /> component
+- Added error states with ServerCrash icon
+- Added empty states with Inbox icon
+- Computed stats from real API data
 Priority 2: Uptime Charts Implementation
 Goal: Add real-time visualizations for uptime and response times.
 
@@ -144,35 +141,25 @@ useMonitorUptime(id)
 Active incidents
 Alert configurations
 Edit/delete actions
-Priority 7: Public Status Pages
-Goal: Public-facing status page for monitors marked as public.
+✅ Priority 7: Public Status Pages (COMPLETE)
+Completed: Public-facing status page for monitors marked as public.
 
-[NEW] src/app/status/[monitorId]/page.tsx
-Features needed:
+[CREATED] src/app/status/[monitorId]/page.tsx
+- Shows current status (Operational/Down)
+- Displays 24h uptime percentage
+- Shows average response time
+- Lists recent health checks
+- No auth required for isPublic=true monitors
+✅ Priority 8: Testing Framework (COMPLETE)
+Completed: Set up Bun's built-in test runner.
 
-Utilize existing isPublic field in monitor schema
-Public API endpoint (no auth required)
-Uptime charts visible to public
-Current status display
-Priority 8: Testing Framework
-Goal: Set up testing infrastructure.
+[CREATED] src/test/setup.ts - HappyDOM registration
+[CREATED] src/routes/monitors/route.test.ts - API validation tests
+[CREATED] src/lib/nanoid.test.ts - Utility tests
+[MODIFIED] package.json - Added test scripts
 
-Setup Commands
-bun add -d vitest @testing-library/react @testing-library/jest-dom
-[NEW] vitest.config.ts
-import { defineConfig } from 'vitest/config'
-import react from '@vitejs/plugin-react'
-export default defineConfig({
-  plugins: [react()],
-  test: {
-    environment: 'jsdom',
-    setupFiles: ['./src/test/setup.ts'],
-  },
-})
-Test Files to Create
-src/routes/**/*.test.ts - API route tests
-src/hooks/api/*.test.ts - Hook tests
-src/components/*.test.tsx - Component tests
+Installed: @happy-dom/global-registrator
+Run: bun test (11 tests passing)
 File Structure Reference
 src/
 ├── app/
@@ -206,14 +193,16 @@ bun run db:migrate       # Apply migrations
 bun run db:push          # Push schema directly (dev only)
 bun run db:studio        # Open Drizzle Studio
 bun run mail             # Preview email templates on port 6767
+bun test                 # Run all tests
+bun test --watch         # Run tests in watch mode
 Estimated Effort
-Task	Hours
-Dashboard real data	2-3
-Uptime charts	1-2
-Create monitor flow	2-3
-Incidents page	2-3
-Alerts page	2-3
-Monitor details	1-2
-Public status pages	2-3
-Testing setup	4-6
-Total	16-25
+Task	Status	Hours
+Dashboard real data	✅ Done	-
+Uptime charts	Pending	1-2
+Create monitor flow	Pending	2-3
+Incidents page	Pending	2-3
+Alerts page	Pending	2-3
+Monitor details	Pending	1-2
+Public status pages	✅ Done	-
+Testing setup	✅ Done	-
+Remaining		9-15
