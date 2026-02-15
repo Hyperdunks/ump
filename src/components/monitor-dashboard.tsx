@@ -1,18 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
   Activity,
   Plus,
-  Moon,
-  Sun,
   AlertCircle,
   CheckCircle2,
-  Zap,
+  ServerCrash,
+  Inbox,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+import { useMonitors } from "@/hooks/api/use-monitors";
+import { useIncidents } from "@/hooks/api/use-incidents";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const MonitorDashboard = () => {
   const [activeTab, setActiveTab] = useState("monitors");
@@ -22,52 +24,37 @@ const MonitorDashboard = () => {
   const { theme, setTheme } = useTheme();
   const isDark = theme === "dark";
 
-  // Mock data
-  const monitors = [
-    {
-      id: 1,
-      name: "API Gateway",
-      url: "https://api.example.com",
-      status: "up",
-      uptime: 99.9,
-      responseTime: 145,
-      lastChecked: "30s ago",
-    },
-    {
-      id: 2,
-      name: "Web Application",
-      url: "https://app.example.com",
-      status: "up",
-      uptime: 99.8,
-      responseTime: 230,
-      lastChecked: "45s ago",
-    },
-    {
-      id: 3,
-      name: "Database",
-      url: "db.example.com:5432",
-      status: "down",
-      uptime: 98.2,
-      responseTime: null,
-      lastChecked: "2m ago",
-    },
-    {
-      id: 4,
-      name: "CDN Endpoint",
-      url: "https://cdn.example.com",
-      status: "up",
-      uptime: 100,
-      responseTime: 89,
-      lastChecked: "15s ago",
-    },
-  ];
+  // Fetch real data from API
+  const {
+    data: monitorsData,
+    isLoading: monitorsLoading,
+    error: monitorsError,
+  } = useMonitors();
 
-  const stats = {
-    total: 4,
-    up: 3,
-    down: 1,
-    avgResponse: 155,
-  };
+  const {
+    data: incidentsData,
+    isLoading: incidentsLoading,
+    error: incidentsError,
+  } = useIncidents();
+
+  // Extract monitors array from API response
+  const monitors = monitorsData?.data ?? [];
+
+  // Compute stats from real data
+  const stats = useMemo(() => {
+    if (!monitors.length) {
+      return { total: 0, up: 0, down: 0 };
+    }
+
+    const upCount = monitors.filter((m) => m.isActive).length;
+    const downCount = monitors.filter((m) => !m.isActive).length;
+
+    return {
+      total: monitors.length,
+      up: upCount,
+      down: downCount,
+    };
+  }, [monitors]);
 
   const statusColor =
     stats.down > 1 ? "red" : stats.down === 1 ? "yellow" : "blue";
@@ -155,7 +142,7 @@ const MonitorDashboard = () => {
             </div>
 
             {/* Stats Cards Below Chart */}
-            <div className="grid grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-3 gap-4 mb-8">
               <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 shadow-lg">
                 <div className="text-3xl font-bold mb-2">{stats.total}</div>
                 <div className="flex items-center justify-between">
@@ -186,18 +173,6 @@ const MonitorDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border p-6 shadow-lg">
-                <div className="text-3xl font-bold mb-2">
-                  {stats.avgResponse}
-                  <span className="text-sm text-muted-foreground ml-1">ms</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Avg Response
-                  </span>
-                  <Zap className="w-4 h-4 text-muted-foreground" />
-                </div>
-              </div>
             </div>
 
             {/* Monitor Table */}
@@ -210,51 +185,122 @@ const MonitorDashboard = () => {
             </div>
 
             <div className="bg-card/50 backdrop-blur-sm rounded-lg border border-border overflow-hidden shadow-lg">
-              <table className="w-full">
-                <thead className="bg-muted/50">
-                  <tr className="text-left text-sm">
-                    <th className="px-6 py-3 font-medium">Status</th>
-                    <th className="px-6 py-3 font-medium">Name</th>
-                    <th className="px-6 py-3 font-medium">URL</th>
-                    <th className="px-6 py-3 font-medium text-right">Uptime</th>
-                    <th className="px-6 py-3 font-medium text-right">
-                      Response Time
-                    </th>
-                    <th className="px-6 py-3 font-medium text-right">
-                      Last Checked
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {monitors.map((monitor) => (
-                    <tr
-                      key={monitor.id}
-                      className="border-t border-border hover:bg-muted/30 cursor-pointer transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div
-                          className={`w-2 h-2 rounded-full ${monitor.status === "up" ? "bg-green-500" : "bg-red-500"}`}
-                        />
-                      </td>
-                      <td className="px-6 py-4 font-medium">{monitor.name}</td>
-                      <td className="px-6 py-4 text-sm text-muted-foreground">
-                        {monitor.url}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {monitor.uptime}%
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        {monitor.responseTime
-                          ? `${monitor.responseTime}ms`
-                          : "—"}
-                      </td>
-                      <td className="px-6 py-4 text-right text-muted-foreground text-sm">
-                        {monitor.lastChecked}
-                      </td>
+              {/* Error State */}
+              {monitorsError && (
+                <div className="p-12 text-center">
+                  <ServerCrash className="w-12 h-12 mx-auto mb-4 text-destructive" />
+                  <h3 className="text-lg font-semibold mb-2">Failed to load monitors</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Please check your connection and try again.
+                  </p>
+                </div>
+              )}
+
+              {/* Loading State */}
+              {monitorsLoading && !monitorsError && (
+                <table className="w-full">
+                  <thead className="bg-muted/50">
+                    <tr className="text-left text-sm">
+                      <th className="px-6 py-3 font-medium">Status</th>
+                      <th className="px-6 py-3 font-medium">Name</th>
+                      <th className="px-6 py-3 font-medium">URL</th>
+                      <th className="px-6 py-3 font-medium text-right">Type</th>
+                      <th className="px-6 py-3 font-medium text-right">
+                        Interval
+                      </th>
+                      <th className="px-6 py-3 font-medium text-right">
+                        Updated
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {[1, 2, 3, 4].map((i) => (
+                      <tr key={i} className="border-t border-border">
+                        <td className="px-6 py-4">
+                          <Skeleton className="w-2 h-2 rounded-full" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <Skeleton className="h-4 w-32" />
+                        </td>
+                        <td className="px-6 py-4">
+                          <Skeleton className="h-4 w-48" />
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Skeleton className="h-4 w-12 ml-auto" />
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Skeleton className="h-4 w-16 ml-auto" />
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <Skeleton className="h-4 w-20 ml-auto" />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {/* Empty State */}
+              {!monitorsLoading && !monitorsError && monitors.length === 0 && (
+                <div className="p-12 text-center">
+                  <Inbox className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                  <h3 className="text-lg font-semibold mb-2">No monitors yet</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Create your first monitor to start tracking uptime.
+                  </p>
+                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:opacity-90 shadow-lg">
+                    <Plus className="w-4 h-4" />
+                    Add Monitor
+                  </button>
+                </div>
+              )}
+
+              {/* Monitors Table */}
+              {!monitorsLoading && !monitorsError && monitors.length > 0 && (
+                <table className="w-full">
+                  <thead className="bg-muted/50">
+                    <tr className="text-left text-sm">
+                      <th className="px-6 py-3 font-medium">Status</th>
+                      <th className="px-6 py-3 font-medium">Name</th>
+                      <th className="px-6 py-3 font-medium">URL</th>
+                      <th className="px-6 py-3 font-medium text-right">Type</th>
+                      <th className="px-6 py-3 font-medium text-right">
+                        Interval
+                      </th>
+                      <th className="px-6 py-3 font-medium text-right">
+                        Updated
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {monitors.map((monitor) => (
+                      <tr
+                        key={monitor.id}
+                        className="border-t border-border hover:bg-muted/30 cursor-pointer transition-colors"
+                      >
+                        <td className="px-6 py-4">
+                          <div
+                            className={`w-2 h-2 rounded-full ${monitor.isActive ? "bg-green-500" : "bg-red-500"}`}
+                          />
+                        </td>
+                        <td className="px-6 py-4 font-medium">{monitor.name}</td>
+                        <td className="px-6 py-4 text-sm text-muted-foreground">
+                          {monitor.url}
+                        </td>
+                        <td className="px-6 py-4 text-right text-sm uppercase">
+                          {monitor.type}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          {monitor.checkInterval}s
+                        </td>
+                        <td className="px-6 py-4 text-right text-muted-foreground text-sm">
+                          {new Date(monitor.updatedAt).toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </>
         )}
