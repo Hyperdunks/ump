@@ -123,7 +123,7 @@ Build the main dashboard overview page with summary cards and empty-state sectio
 ---
 
 ## Phase 3: Monitors List Page
-- [ ] **Completed**
+- [x] **Completed**
 
 ### Goal
 Build the monitors list page with status cards, filters, data table, and pagination.
@@ -146,6 +146,7 @@ Build the monitors list page with status cards, filters, data table, and paginat
 
 2. **Verify**:
    ```bash
+   bun run typecheck
    bun run build
    ```
 
@@ -184,16 +185,18 @@ Build the individual monitor detail page with stats, charts, and time filters.
 
 4. **Verify**:
    ```bash
+   bun run typecheck
    bun run build
    ```
 
 ---
 
 ## Phase 5: Settings Page
-- [ ] **Completed**
+- [x] **Completed**
 
 ### Goal
 Build the settings page with workspace config, slug, and team management.
+Make sure only implement those components whose features actually exist in the project not just random junk ui.
 
 ### Reference
 - Mock: `ui-mock/pages/Settings.tsx`
@@ -220,10 +223,11 @@ Build the settings page with workspace config, slug, and team management.
 ---
 
 ## Phase 6: Notifications Page
-- [ ] **Completed**
+- [x] **Completed**
 
 ### Goal
 Build the notifications page with tab filters and notification list.
+Make sure only implement those components whose features actually exist in the project not just random junk ui.
 
 ### Reference
 - Mock: `ui-mock/pages/Notifications.tsx`
@@ -244,6 +248,7 @@ Build the notifications page with tab filters and notification list.
 
 2. **Verify**:
    ```bash
+   bun run typecheck
    bun run build
    ```
 
