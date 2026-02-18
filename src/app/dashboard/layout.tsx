@@ -57,9 +57,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <span className="ml-3 font-semibold">Sentinel</span>
             </header>
             <main className="flex-1 overflow-y-auto p-6 md:p-8">
-              <div className="mx-auto w-full max-w-[1600px]">
-                {children}
-              </div>
+              <div className="mx-auto w-full max-w-[1600px]">{children}</div>
             </main>
           </SidebarInset>
         </SidebarProvider>

@@ -205,9 +205,15 @@ export default function NotificationsPage() {
             </p>
           </div>
           <TabsList className="h-9 p-1 bg-muted/50">
-            <TabsTrigger value="all" className="h-7 text-xs px-3">All</TabsTrigger>
-            <TabsTrigger value="unread" className="h-7 text-xs px-3">Unread</TabsTrigger>
-            <TabsTrigger value="archived" className="h-7 text-xs px-3">Archived</TabsTrigger>
+            <TabsTrigger value="all" className="h-7 text-xs px-3">
+              All
+            </TabsTrigger>
+            <TabsTrigger value="unread" className="h-7 text-xs px-3">
+              Unread
+            </TabsTrigger>
+            <TabsTrigger value="archived" className="h-7 text-xs px-3">
+              Archived
+            </TabsTrigger>
           </TabsList>
         </div>
 
