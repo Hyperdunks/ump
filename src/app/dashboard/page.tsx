@@ -1,9 +1,4 @@
-import {
-  Activity,
-  FileText,
-  AlertTriangle,
-  Wrench,
-} from "lucide-react";
+import { Activity, FileText, AlertTriangle, Wrench } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   Empty,
@@ -48,7 +43,7 @@ const sections = [
 
 export default function DashboardPage() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-xl font-semibold">Overview</h1>
@@ -79,9 +74,7 @@ export default function DashboardPage() {
         <div key={section.title} className="space-y-3">
           <div>
             <h2 className="text-sm font-semibold">{section.title}</h2>
-            <p className="text-xs text-muted-foreground">
-              {section.subtitle}
-            </p>
+            <p className="text-xs text-muted-foreground">{section.subtitle}</p>
           </div>
           <Empty>
             <EmptyHeader>

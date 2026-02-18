@@ -291,7 +291,7 @@ Build/update the account page and create the reusable modals (incident analysis,
 ---
 
 ## Phase 8: Polish, Auth Page Styling, Final Verification
-- [ ] **Completed**
+- [x] **Completed**
 
 ### Goal
 Final polish pass — ensure auth pages match the mock's aesthetic, responsive design works, and everything builds clean.

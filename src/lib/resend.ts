@@ -125,4 +125,3 @@ export async function sendPasswordResetEmail(
 
   console.log(`[Resend] Password reset email sent: ${data?.id}`);
 }
-

@@ -1,66 +1,66 @@
 import { describe, expect, test } from "bun:test";
 
 describe("Monitor API Validators", () => {
-    test("validates monitor type enum values", () => {
-        const validTypes = ["http", "https", "tcp", "ping"];
-        const invalidType = "ftp";
+  test("validates monitor type enum values", () => {
+    const validTypes = ["http", "https", "tcp", "ping"];
+    const invalidType = "ftp";
 
-        expect(validTypes).toContain("http");
-        expect(validTypes).toContain("https");
-        expect(validTypes).toContain("tcp");
-        expect(validTypes).toContain("ping");
-        expect(validTypes).not.toContain(invalidType);
-    });
+    expect(validTypes).toContain("http");
+    expect(validTypes).toContain("https");
+    expect(validTypes).toContain("tcp");
+    expect(validTypes).toContain("ping");
+    expect(validTypes).not.toContain(invalidType);
+  });
 
-    test("validates HTTP method enum values", () => {
-        const validMethods = ["GET", "POST", "HEAD"];
-        const invalidMethod = "DELETE";
+  test("validates HTTP method enum values", () => {
+    const validMethods = ["GET", "POST", "HEAD"];
+    const invalidMethod = "DELETE";
 
-        expect(validMethods).toContain("GET");
-        expect(validMethods).toContain("POST");
-        expect(validMethods).toContain("HEAD");
-        expect(validMethods).not.toContain(invalidMethod);
-    });
+    expect(validMethods).toContain("GET");
+    expect(validMethods).toContain("POST");
+    expect(validMethods).toContain("HEAD");
+    expect(validMethods).not.toContain(invalidMethod);
+  });
 
-    test("validates default check interval is reasonable", () => {
-        const defaultCheckInterval = 60; // seconds
-        expect(defaultCheckInterval).toBeGreaterThanOrEqual(10);
-        expect(defaultCheckInterval).toBeLessThanOrEqual(3600);
-    });
+  test("validates default check interval is reasonable", () => {
+    const defaultCheckInterval = 60; // seconds
+    expect(defaultCheckInterval).toBeGreaterThanOrEqual(10);
+    expect(defaultCheckInterval).toBeLessThanOrEqual(3600);
+  });
 
-    test("validates default timeout is reasonable", () => {
-        const defaultTimeout = 30000; // ms
-        expect(defaultTimeout).toBeGreaterThanOrEqual(1000);
-        expect(defaultTimeout).toBeLessThanOrEqual(60000);
-    });
+  test("validates default timeout is reasonable", () => {
+    const defaultTimeout = 30000; // ms
+    expect(defaultTimeout).toBeGreaterThanOrEqual(1000);
+    expect(defaultTimeout).toBeLessThanOrEqual(60000);
+  });
 
-    test("validates expected status codes format", () => {
-        const expectedStatusCodes = ["200", "201", "204"];
+  test("validates expected status codes format", () => {
+    const expectedStatusCodes = ["200", "201", "204"];
 
-        for (const code of expectedStatusCodes) {
-            expect(code).toMatch(/^\d{3}$/);
-        }
-    });
+    for (const code of expectedStatusCodes) {
+      expect(code).toMatch(/^\d{3}$/);
+    }
+  });
 });
 
 describe("URL Validation", () => {
-    test("validates valid HTTP URLs", () => {
-        const validUrls = [
-            "https://example.com",
-            "http://api.example.com/health",
-            "https://sub.domain.example.com:8080/path",
-        ];
+  test("validates valid HTTP URLs", () => {
+    const validUrls = [
+      "https://example.com",
+      "http://api.example.com/health",
+      "https://sub.domain.example.com:8080/path",
+    ];
 
-        for (const url of validUrls) {
-            expect(() => new URL(url)).not.toThrow();
-        }
-    });
+    for (const url of validUrls) {
+      expect(() => new URL(url)).not.toThrow();
+    }
+  });
 
-    test("rejects invalid URLs", () => {
-        const invalidUrls = ["not-a-url", "://missing-protocol.com"];
+  test("rejects invalid URLs", () => {
+    const invalidUrls = ["not-a-url", "://missing-protocol.com"];
 
-        for (const url of invalidUrls) {
-            expect(() => new URL(url)).toThrow();
-        }
-    });
+    for (const url of invalidUrls) {
+      expect(() => new URL(url)).toThrow();
+    }
+  });
 });
