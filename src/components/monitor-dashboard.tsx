@@ -172,7 +172,6 @@ const MonitorDashboard = () => {
                   <AlertCircle className="w-4 h-4 text-red-500" />
                 </div>
               </div>
-
             </div>
 
             {/* Monitor Table */}
@@ -189,7 +188,9 @@ const MonitorDashboard = () => {
               {monitorsError && (
                 <div className="p-12 text-center">
                   <ServerCrash className="w-12 h-12 mx-auto mb-4 text-destructive" />
-                  <h3 className="text-lg font-semibold mb-2">Failed to load monitors</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    Failed to load monitors
+                  </h3>
                   <p className="text-sm text-muted-foreground">
                     Please check your connection and try again.
                   </p>
@@ -244,7 +245,9 @@ const MonitorDashboard = () => {
               {!monitorsLoading && !monitorsError && monitors.length === 0 && (
                 <div className="p-12 text-center">
                   <Inbox className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-                  <h3 className="text-lg font-semibold mb-2">No monitors yet</h3>
+                  <h3 className="text-lg font-semibold mb-2">
+                    No monitors yet
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-4">
                     Create your first monitor to start tracking uptime.
                   </p>
@@ -283,7 +286,9 @@ const MonitorDashboard = () => {
                             className={`w-2 h-2 rounded-full ${monitor.isActive ? "bg-green-500" : "bg-red-500"}`}
                           />
                         </td>
-                        <td className="px-6 py-4 font-medium">{monitor.name}</td>
+                        <td className="px-6 py-4 font-medium">
+                          {monitor.name}
+                        </td>
                         <td className="px-6 py-4 text-sm text-muted-foreground">
                           {monitor.url}
                         </td>
