@@ -7,23 +7,27 @@ import {
   SignedIn,
 } from "@daveyplate/better-auth-ui";
 import { Skeleton } from "@/components/ui/skeleton";
-import TopNav from "@/components/top-nav";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar";
+import AppSidebar from "@/components/app-sidebar";
 
 function DashboardSkeleton() {
   return (
-    <div className="flex min-h-screen flex-col">
-      <div className="sticky top-0 z-50 w-full border-b bg-background">
-        <div className="mx-auto flex h-14 max-w-[1600px] items-center justify-between px-6">
-          <Skeleton className="h-6 w-28" />
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-8 w-20" />
-            <Skeleton className="h-8 w-20" />
-            <Skeleton className="h-8 w-20" />
-          </div>
-          <Skeleton className="size-8 rounded-full" />
+    <div className="flex min-h-screen">
+      {/* Sidebar skeleton */}
+      <div className="hidden w-64 border-r bg-sidebar p-4 md:block">
+        <Skeleton className="mb-6 h-8 w-32" />
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
         </div>
       </div>
-      <div className="mx-auto w-full max-w-[1600px] flex-1 px-6 py-8">
+      {/* Content skeleton */}
+      <div className="flex-1 p-6">
         <div className="space-y-4">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-32 w-full" />
@@ -44,12 +48,21 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       <RedirectToSignIn />
 
       <SignedIn>
-        <div className="flex min-h-screen flex-col">
-          <TopNav />
-          <main className="mx-auto w-full max-w-[1600px] flex-1 px-6 py-8">
-            {children}
-          </main>
-        </div>
+        <SidebarProvider>
+          <AppSidebar />
+          <SidebarInset>
+            {/* Mobile header with sidebar trigger */}
+            <header className="flex h-14 shrink-0 items-center border-b px-4 md:hidden">
+              <SidebarTrigger className="-ml-1" />
+              <span className="ml-3 font-semibold">Sentinel</span>
+            </header>
+            <main className="flex-1 overflow-y-auto p-6 md:p-8">
+              <div className="mx-auto w-full max-w-[1600px]">
+                {children}
+              </div>
+            </main>
+          </SidebarInset>
+        </SidebarProvider>
       </SignedIn>
     </>
   );
