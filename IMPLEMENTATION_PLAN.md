@@ -153,7 +153,7 @@ Build the monitors list page with status cards, filters, data table, and paginat
 ---
 
 ## Phase 4: Monitor Detail Page
-- [ ] **Completed**
+- [x] **Completed**
 
 ### Goal
 Build the individual monitor detail page with stats, charts, and time filters.
@@ -255,7 +255,7 @@ Make sure only implement those components whose features actually exist in the p
 ---
 
 ## Phase 7: Account Page + Feature Modals
-- [ ] **Completed**
+- [x] **Completed**
 
 ### Goal
 Build/update the account page and create the reusable modals (incident analysis, threshold settings).
