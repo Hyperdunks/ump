@@ -195,46 +195,47 @@ export default function NotificationsPage() {
   const archived = notifications.filter((n) => n.archived);
 
   return (
-    <div className="max-w-4xl space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold">Notifications</h1>
-        <p className="text-sm text-muted-foreground">
-          Stay updated with system alerts and activities.
-        </p>
-      </div>
+    <div className="w-full space-y-6">
+      <Tabs defaultValue="all" className="w-full flex-col">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h1 className="text-xl font-semibold">Notifications</h1>
+            <p className="text-sm text-muted-foreground">
+              Stay updated with system alerts and activities.
+            </p>
+          </div>
+          <TabsList className="h-9 p-1 bg-muted/50">
+            <TabsTrigger value="all" className="h-7 text-xs px-3">All</TabsTrigger>
+            <TabsTrigger value="unread" className="h-7 text-xs px-3">Unread</TabsTrigger>
+            <TabsTrigger value="archived" className="h-7 text-xs px-3">Archived</TabsTrigger>
+          </TabsList>
+        </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="all">
-        <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="unread">Unread</TabsTrigger>
-          <TabsTrigger value="archived">Archived</TabsTrigger>
-        </TabsList>
-
-        <Card className="min-h-64 p-0">
-          <TabsContent value="all">
-            <NotificationList
-              items={active}
-              onMarkRead={markAsRead}
-              onArchive={archiveNotification}
-            />
-          </TabsContent>
-          <TabsContent value="unread">
-            <NotificationList
-              items={unread}
-              onMarkRead={markAsRead}
-              onArchive={archiveNotification}
-            />
-          </TabsContent>
-          <TabsContent value="archived">
-            <NotificationList
-              items={archived}
-              onMarkRead={markAsRead}
-              onArchive={archiveNotification}
-            />
-          </TabsContent>
-        </Card>
+        <div className="mt-6">
+          <Card className="min-h-64 p-0 overflow-hidden">
+            <TabsContent value="all" className="m-0">
+              <NotificationList
+                items={active}
+                onMarkRead={markAsRead}
+                onArchive={archiveNotification}
+              />
+            </TabsContent>
+            <TabsContent value="unread" className="m-0">
+              <NotificationList
+                items={unread}
+                onMarkRead={markAsRead}
+                onArchive={archiveNotification}
+              />
+            </TabsContent>
+            <TabsContent value="archived" className="m-0">
+              <NotificationList
+                items={archived}
+                onMarkRead={markAsRead}
+                onArchive={archiveNotification}
+              />
+            </TabsContent>
+          </Card>
+        </div>
       </Tabs>
     </div>
   );
