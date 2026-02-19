@@ -1,21 +1,16 @@
-import { Activity, FileText, AlertTriangle, Wrench } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+"use client";
+
+import { Activity, AlertTriangle, FileText, Wrench } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  EmptyDescription,
 } from "@/components/ui/empty";
-
-// TODO: Replace with TanStack Query hook
-const summaryCards = [
-  { label: "Monitors", value: "1", icon: Activity },
-  { label: "Status Pages", value: "0", icon: FileText },
-  { label: "Recent Incidents", value: "None", icon: AlertTriangle },
-  { label: "Last Report", value: "None", icon: FileText },
-  { label: "Last Maintenance", value: "None", icon: Wrench },
-] as const;
+import { Skeleton } from "@/components/ui/skeleton";
+import { useIncidents, useMonitors } from "@/hooks/api";
 
 const sections = [
   {
@@ -42,6 +37,27 @@ const sections = [
 ] as const;
 
 export default function DashboardPage() {
+  const { data: monitorsData, isLoading: monitorsLoading } = useMonitors();
+  const { data: incidentsData, isLoading: incidentsLoading } = useIncidents();
+
+  const isLoading = monitorsLoading || incidentsLoading;
+
+  const summaryCards = [
+    {
+      label: "Monitors",
+      value: monitorsData?.pagination?.total?.toString() ?? "0",
+      icon: Activity,
+    },
+    { label: "Status Pages", value: "0", icon: FileText },
+    {
+      label: "Recent Incidents",
+      value: incidentsData?.data?.length?.toString() ?? "0",
+      icon: AlertTriangle,
+    },
+    { label: "Last Report", value: "None", icon: FileText },
+    { label: "Last Maintenance", value: "None", icon: Wrench },
+  ] as const;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -63,7 +79,11 @@ export default function DashboardPage() {
               <card.icon className="size-3.5 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <span className="text-lg font-semibold">{card.value}</span>
+              {isLoading ? (
+                <Skeleton className="h-6 w-12" />
+              ) : (
+                <span className="text-lg font-semibold">{card.value}</span>
+              )}
             </CardContent>
           </Card>
         ))}

@@ -2,18 +2,26 @@
 
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
+  type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-  type ChartConfig,
 } from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMonitorChecks } from "@/hooks/api";
 
-// TODO: Replace with TanStack Query hook
-const latencyData = Array.from({ length: 48 }, (_, i) => ({
-  time: `${i}`,
-  p50: Math.round(30 + Math.random() * 20),
-  p99: Math.round(80 + Math.random() * 100),
-}));
+function calculatePercentile(values: number[], percentile: number): number {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((a, b) => a - b);
+  const index = Math.ceil((percentile / 100) * sorted.length) - 1;
+  return sorted[Math.max(0, index)];
+}
+
+function getBucketKey(date: Date): string {
+  const bucketMinutes = 30;
+  const minutes = Math.floor(date.getMinutes() / bucketMinutes) * bucketMinutes;
+  return `${date.getHours().toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+}
 
 const chartConfig = {
   p50: {
@@ -26,7 +34,47 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function LatencyChart() {
+export default function LatencyChart({ monitorId }: { monitorId: string }) {
+  const { data, isLoading } = useMonitorChecks(monitorId, { limit: 500 });
+
+  const checks = data?.data ?? [];
+  const validChecks = checks.filter((c) => c.responseTime !== null);
+
+  const buckets = new Map<string, number[]>();
+  for (const check of validChecks) {
+    const date = new Date(check.checkedAt);
+    const bucketKey = getBucketKey(date);
+    const times = buckets.get(bucketKey) ?? [];
+    times.push(check.responseTime as number);
+    buckets.set(bucketKey, times);
+  }
+
+  const latencyData = Array.from(buckets.entries())
+    .map(([time, times]) => ({
+      time,
+      p50: calculatePercentile(times, 50),
+      p99: calculatePercentile(times, 99),
+    }))
+    .sort((a, b) => a.time.localeCompare(b.time));
+
+  if (isLoading) {
+    return (
+      <div className="space-y-3">
+        <Skeleton className="h-64 w-full rounded-xl" />
+      </div>
+    );
+  }
+
+  if (latencyData.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-xl border bg-background">
+        <p className="text-sm text-muted-foreground">
+          No latency data available
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-3">
       <ChartContainer

@@ -1,30 +1,32 @@
 "use client";
 
-import { useState } from "react";
 import {
+  AlertTriangle,
+  Archive,
   Bell,
   CheckCircle2,
-  AlertTriangle,
-  XCircle,
   Clock,
-  Archive,
+  XCircle,
 } from "lucide-react";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Card } from "@/components/ui/card";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
-  TooltipProvider,
-} from "@/components/ui/tooltip";
+import { Card } from "@/components/ui/card";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  EmptyDescription,
 } from "@/components/ui/empty";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { useIncidents } from "@/hooks/api";
 import { cn } from "@/lib/utils";
 
 type NotificationType = "error" | "warning" | "success" | "info";
@@ -39,45 +41,46 @@ interface Notification {
   archived: boolean;
 }
 
-// TODO: Replace with TanStack Query hook
-const initialNotifications: Notification[] = [
-  {
-    id: "1",
-    title: "Monitor Failed: Harsh Website",
-    message: "Harsh Website is down. Response code: 500.",
-    type: "error",
-    timestamp: "2 minutes ago",
-    read: false,
-    archived: false,
-  },
-  {
-    id: "2",
-    title: "High Latency Detected",
-    message: "Payment Gateway latency is > 200ms (Current: 450ms).",
-    type: "warning",
-    timestamp: "1 hour ago",
-    read: false,
-    archived: false,
-  },
-  {
-    id: "3",
-    title: "Scheduled Maintenance",
-    message: "Database maintenance scheduled for Feb 15, 02:00 AM UTC.",
-    type: "info",
-    timestamp: "1 day ago",
-    read: true,
-    archived: false,
-  },
-  {
-    id: "4",
-    title: "Monitor Recovered: Harsh Website",
-    message: "Harsh Website is back online.",
-    type: "success",
-    timestamp: "2 days ago",
-    read: true,
-    archived: true,
-  },
-];
+function formatRelativeTime(date: Date | string): string {
+  const now = new Date();
+  const then = new Date(date);
+  const diffMs = now.getTime() - then.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return "Just now";
+  if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? "s" : ""} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+  return `${diffDays} day${diffDays > 1 ? "s" : ""} ago`;
+}
+
+function mapStateToType(
+  state: "detected" | "investigating" | "resolved",
+): NotificationType {
+  switch (state) {
+    case "detected":
+      return "error";
+    case "investigating":
+      return "warning";
+    case "resolved":
+      return "success";
+  }
+}
+
+function mapStateToTitle(
+  state: "detected" | "investigating" | "resolved",
+  monitorName: string,
+): string {
+  switch (state) {
+    case "detected":
+      return `Incident Detected: ${monitorName}`;
+    case "investigating":
+      return `Investigating: ${monitorName}`;
+    case "resolved":
+      return `Resolved: ${monitorName}`;
+  }
+}
 
 const typeIcons: Record<NotificationType, React.ReactNode> = {
   error: <XCircle className="size-5 text-red-500" />,
@@ -175,24 +178,76 @@ function NotificationList({
 }
 
 export default function NotificationsPage() {
-  const [notifications, setNotifications] =
-    useState<Notification[]>(initialNotifications);
+  const { data: incidentsData, isLoading } = useIncidents();
+  const [localState, setLocalState] = useState<
+    Record<string, { read: boolean; archived: boolean }>
+  >({});
+
+  const notifications = useMemo<Notification[]>(() => {
+    if (!incidentsData?.data) return [];
+
+    return incidentsData.data.map((incident) => {
+      const local = localState[incident.id] || {
+        read: incident.state === "resolved",
+        archived: incident.state === "resolved",
+      };
+
+      return {
+        id: incident.id,
+        title: mapStateToTitle(incident.state, incident.monitorName),
+        message: incident.cause || "Monitor incident",
+        type: mapStateToType(incident.state),
+        timestamp: formatRelativeTime(incident.detectedAt),
+        read: local.read,
+        archived: local.archived,
+      };
+    });
+  }, [incidentsData, localState]);
 
   function markAsRead(id: string) {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, read: true } : n)),
-    );
+    setLocalState((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], read: true },
+    }));
   }
 
   function archiveNotification(id: string) {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, archived: true } : n)),
-    );
+    setLocalState((prev) => ({
+      ...prev,
+      [id]: { ...prev[id], archived: true },
+    }));
   }
 
   const active = notifications.filter((n) => !n.archived);
   const unread = notifications.filter((n) => !n.read && !n.archived);
   const archived = notifications.filter((n) => n.archived);
+
+  if (isLoading) {
+    return (
+      <div className="w-full space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <Skeleton className="h-6 w-32" />
+            <Skeleton className="mt-2 h-4 w-64" />
+          </div>
+          <Skeleton className="h-9 w-48" />
+        </div>
+        <Card className="min-h-64 p-0 overflow-hidden">
+          <div className="divide-y">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-start gap-4 p-4">
+                <Skeleton className="size-5 rounded-full" />
+                <div className="flex-1 space-y-2">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-3 w-full" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full space-y-6">
