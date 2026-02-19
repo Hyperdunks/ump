@@ -209,7 +209,8 @@ export function EditMonitorModal({
                 </FieldLabel>
                 <Input
                   type="number"
-                  min={10}
+                  min={300}
+                  max={3600}
                   value={formData.checkInterval}
                   onChange={(e) =>
                     handleChange("checkInterval", Number(e.target.value))
@@ -225,6 +226,7 @@ export function EditMonitorModal({
                 <Input
                   type="number"
                   min={1000}
+                  max={60000}
                   value={formData.timeout}
                   onChange={(e) =>
                     handleChange("timeout", Number(e.target.value))
