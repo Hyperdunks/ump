@@ -1,57 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { ExternalLink, MoreHorizontal } from "lucide-react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
+import LatencyChart from "@/components/monitors/latency-chart";
+import UptimeChart from "@/components/monitors/uptime-chart";
+import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
-  BreadcrumbList,
   BreadcrumbItem,
   BreadcrumbLink,
-  BreadcrumbSeparator,
+  BreadcrumbList,
   BreadcrumbPage,
+  BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { useMonitor, useMonitorUptime } from "@/hooks/api";
 import { cn } from "@/lib/utils";
-import UptimeChart from "@/components/monitors/uptime-chart";
-import LatencyChart from "@/components/monitors/latency-chart";
-
-// TODO: Replace with TanStack Query hook
-const monitor = {
-  name: "Harsh Website",
-  url: "https://www.harzh.xyz/",
-};
-
-const statCards = [
-  {
-    label: "UPTIME",
-    value: "100.00%",
-    subValue: "0%",
-    color: "green" as const,
-  },
-  {
-    label: "DEGRADED",
-    value: "0",
-    subValue: "0%",
-    color: "yellow" as const,
-  },
-  {
-    label: "FAILING",
-    value: "0",
-    subValue: "0%",
-    color: "red" as const,
-  },
-];
-
-const latencyCards = [
-  { label: "P50", value: "46 ms", change: "2.1%" },
-  { label: "P75", value: "61 ms", change: "4.7%" },
-  { label: "P90", value: "72 ms", change: "12.2%" },
-  { label: "P95", value: "94 ms", change: "11.3%" },
-  { label: "P99", value: "287 ms", change: "12.8%" },
-];
 
 const colorMap = {
   green: {
@@ -71,7 +39,98 @@ const colorMap = {
   },
 } as const;
 
+function formatRelativeTime(date: Date | string | undefined): string {
+  if (!date) return "—";
+  const d = typeof date === "string" ? new Date(date) : date;
+  const now = new Date();
+  const diffMs = now.getTime() - d.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60)
+    return `${diffMins} minute${diffMins === 1 ? "" : "s"} ago`;
+  if (diffHours < 24)
+    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+}
+
+function formatPercent(value: number | undefined): string {
+  if (value === undefined) return "—";
+  return `${value.toFixed(2)}%`;
+}
+
 export default function MonitorDetailPage() {
+  const params = useParams();
+  const monitorId = params.id as string;
+
+  const {
+    data: monitorData,
+    isLoading: isLoadingMonitor,
+    error: monitorError,
+  } = useMonitor(monitorId);
+  const { data: uptimeData, isLoading: isLoadingUptime } =
+    useMonitorUptime(monitorId);
+
+  const isLoading = isLoadingMonitor || isLoadingUptime;
+  const stats24h = uptimeData?.["24h"];
+
+  if (monitorError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-16">
+        <h2 className="text-xl font-semibold">Monitor not found</h2>
+        <p className="text-muted-foreground mt-2">
+          This monitor may have been deleted or you don't have access to it.
+        </p>
+        <Link
+          href="/dashboard/monitors"
+          className="mt-4 inline-flex items-center justify-center rounded-md bg-primary px-2.5 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary/80"
+        >
+          Back to Monitors
+        </Link>
+      </div>
+    );
+  }
+
+  const statCards = [
+    {
+      label: "UPTIME",
+      value: formatPercent(stats24h?.uptimePercent),
+      subValue: stats24h
+        ? `${(100 - stats24h.uptimePercent).toFixed(2)}%`
+        : "—",
+      color: "green" as const,
+    },
+    {
+      label: "DEGRADED",
+      value: stats24h?.degradedChecks?.toString() ?? "—",
+      subValue:
+        stats24h && stats24h.totalChecks > 0
+          ? `${((stats24h.degradedChecks / stats24h.totalChecks) * 100).toFixed(1)}%`
+          : "—",
+      color: "yellow" as const,
+    },
+    {
+      label: "FAILING",
+      value: stats24h?.downChecks?.toString() ?? "—",
+      subValue:
+        stats24h && stats24h.totalChecks > 0
+          ? `${((stats24h.downChecks / stats24h.totalChecks) * 100).toFixed(1)}%`
+          : "—",
+      color: "red" as const,
+    },
+  ];
+
+  // P50-P99 percentiles not available from API
+  const latencyCards = [
+    { label: "P50", value: "—", change: "—" },
+    { label: "P75", value: "—", change: "—" },
+    { label: "P90", value: "—", change: "—" },
+    { label: "P95", value: "—", change: "—" },
+    { label: "P99", value: "—", change: "—" },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Breadcrumb */}
@@ -85,7 +144,11 @@ export default function MonitorDetailPage() {
           <BreadcrumbSeparator />
           <BreadcrumbItem>
             <BreadcrumbLink render={<Link href="#" />}>
-              {monitor.name}
+              {isLoading ? (
+                <Skeleton className="h-4 w-24" />
+              ) : (
+                monitorData?.name
+              )}
             </BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
@@ -98,16 +161,22 @@ export default function MonitorDetailPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">{monitor.name}</h1>
-          <a
-            href={monitor.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
-          >
-            {monitor.url}
-            <ExternalLink className="size-3" />
-          </a>
+          <h1 className="text-2xl font-semibold">
+            {isLoading ? <Skeleton className="h-8 w-40" /> : monitorData?.name}
+          </h1>
+          {isLoading ? (
+            <Skeleton className="mt-1 h-4 w-48" />
+          ) : (
+            <a
+              href={monitorData?.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
+            >
+              {monitorData?.url}
+              <ExternalLink className="size-3" />
+            </a>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <ToggleGroup defaultValue={["1d"]} variant="outline">
@@ -129,64 +198,88 @@ export default function MonitorDetailPage() {
 
       {/* Main Stats */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        {statCards.map((card) => (
-          <Card
-            key={card.label}
-            size="sm"
-            className={cn(
-              "ring-1",
-              colorMap[card.color].bg,
-              colorMap[card.color].ring,
-            )}
-          >
-            <CardHeader>
-              <CardTitle
+        {isLoading ? (
+          <>
+            {[...Array(5)].map((_, i) => (
+              <Card key={i} size="sm">
+                <CardHeader>
+                  <Skeleton className="h-3 w-16" />
+                </CardHeader>
+                <CardContent>
+                  <Skeleton className="h-6 w-20" />
+                </CardContent>
+              </Card>
+            ))}
+          </>
+        ) : (
+          <>
+            {statCards.map((card) => (
+              <Card
+                key={card.label}
+                size="sm"
                 className={cn(
-                  "text-xs font-semibold uppercase tracking-wider",
-                  colorMap[card.color].text,
+                  "ring-1",
+                  colorMap[card.color].bg,
+                  colorMap[card.color].ring,
                 )}
               >
-                {card.label}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-end gap-2">
-                <span
-                  className={cn("text-xl font-bold", colorMap[card.color].text)}
-                >
-                  {card.value}
-                </span>
-                <span className="mb-0.5 rounded bg-background/50 px-1 text-xs opacity-70">
-                  {card.subValue}
-                </span>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                <CardHeader>
+                  <CardTitle
+                    className={cn(
+                      "text-xs font-semibold uppercase tracking-wider",
+                      colorMap[card.color].text,
+                    )}
+                  >
+                    {card.label}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-end gap-2">
+                    <span
+                      className={cn(
+                        "text-xl font-bold",
+                        colorMap[card.color].text,
+                      )}
+                    >
+                      {card.value}
+                    </span>
+                    <span className="mb-0.5 rounded bg-background/50 px-1 text-xs opacity-70">
+                      {card.subValue}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
 
-        {/* Requests card */}
-        <Card size="sm">
-          <CardHeader>
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              REQUESTS
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-xl font-bold">192</span>
-          </CardContent>
-        </Card>
+            {/* Requests card */}
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  REQUESTS
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <span className="text-xl font-bold">
+                  {stats24h?.totalChecks ?? "—"}
+                </span>
+              </CardContent>
+            </Card>
 
-        {/* Last Checked card */}
-        <Card size="sm">
-          <CardHeader>
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              LAST CHECKED
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <span className="text-lg font-medium">12 minutes ago</span>
-          </CardContent>
-        </Card>
+            {/* Last Checked card */}
+            <Card size="sm">
+              <CardHeader>
+                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  LAST CHECKED
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <span className="text-lg font-medium">
+                  {formatRelativeTime(monitorData?.latestCheck?.checkedAt)}
+                </span>
+              </CardContent>
+            </Card>
+          </>
+        )}
       </div>
 
       {/* Latency Stats */}
@@ -201,12 +294,14 @@ export default function MonitorDetailPage() {
             <CardContent>
               <div className="flex items-center gap-2">
                 <span className="text-lg font-bold">{card.value}</span>
-                <Badge
-                  variant="secondary"
-                  className="bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400"
-                >
-                  -{card.change}
-                </Badge>
+                {card.change !== "—" && (
+                  <Badge
+                    variant="secondary"
+                    className="bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400"
+                  >
+                    -{card.change}
+                  </Badge>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -221,7 +316,7 @@ export default function MonitorDetailPage() {
             Uptime across all the selected regions
           </p>
         </div>
-        <UptimeChart />
+        <UptimeChart monitorId={monitorId} />
       </div>
 
       {/* Latency Chart */}
@@ -245,7 +340,7 @@ export default function MonitorDetailPage() {
             <span className="text-sm text-muted-foreground">resolution</span>
           </div>
         </div>
-        <LatencyChart />
+        <LatencyChart monitorId={monitorId} />
       </div>
     </div>
   );

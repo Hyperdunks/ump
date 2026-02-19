@@ -2,21 +2,15 @@
 
 import { Bar, BarChart, XAxis } from "recharts";
 import {
+  type ChartConfig,
   ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
   ChartLegend,
   ChartLegendContent,
-  type ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
 } from "@/components/ui/chart";
-
-// TODO: Replace with TanStack Query hook
-const uptimeData = Array.from({ length: 48 }, (_, i) => ({
-  time: `${i}`,
-  success: 1,
-  error: 0,
-  degraded: 0,
-}));
+import { Skeleton } from "@/components/ui/skeleton";
+import { useMonitorChecks } from "@/hooks/api";
 
 const chartConfig = {
   success: {
@@ -33,7 +27,63 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function UptimeChart() {
+function bucketChecksByTime(
+  checks: Array<{ status: string; checkedAt: string | Date }>,
+  bucketMinutes = 30,
+) {
+  const buckets = new Map<
+    string,
+    { success: number; error: number; degraded: number }
+  >();
+
+  const now = new Date();
+  const bucketMs = bucketMinutes * 60 * 1000;
+
+  // Initialize buckets for last 24 hours (48 buckets of 30 min)
+  for (let i = 47; i >= 0; i--) {
+    const bucketTime = new Date(now.getTime() - i * bucketMs);
+    const bucketKey = bucketTime.toISOString();
+    buckets.set(bucketKey, { success: 0, error: 0, degraded: 0 });
+  }
+
+  // Populate buckets with check data
+  for (const check of checks) {
+    const checkTime = new Date(check.checkedAt);
+    const bucketTime = new Date(
+      Math.floor(checkTime.getTime() / bucketMs) * bucketMs,
+    );
+    const bucketKey = bucketTime.toISOString();
+
+    if (buckets.has(bucketKey)) {
+      const bucket = buckets.get(bucketKey)!;
+      if (check.status === "up") bucket.success++;
+      else if (check.status === "down") bucket.error++;
+      else if (check.status === "degraded") bucket.degraded++;
+    }
+  }
+
+  // Convert to array and format time labels
+  return Array.from(buckets.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([time, counts]) => ({
+      time: new Date(time).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      ...counts,
+    }));
+}
+
+export default function UptimeChart({ monitorId }: { monitorId: string }) {
+  const { data, isLoading } = useMonitorChecks(monitorId, { limit: 500 });
+
+  const checks = data?.data ?? [];
+  const uptimeData = bucketChecksByTime(checks);
+
+  if (isLoading) {
+    return <Skeleton className="h-48 w-full" />;
+  }
+
   return (
     <ChartContainer config={chartConfig} className="h-48 w-full">
       <BarChart data={uptimeData} barGap={2}>
