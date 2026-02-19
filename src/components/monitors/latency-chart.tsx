@@ -131,19 +131,11 @@ export default function LatencyChart({ monitorId }: { monitorId: string }) {
       {/* Legend */}
       <div className="flex items-center justify-center gap-4 text-xs font-medium">
         <span className="flex items-center gap-1 text-muted-foreground">
-          <span className="size-2 rounded-sm bg-red-400" /> DNS
+          <span className="size-2 rounded-sm bg-blue-500" /> P50 (Median)
         </span>
         <span className="flex items-center gap-1 text-muted-foreground">
-          <span className="size-2 rounded-sm bg-green-500" /> Connect
-        </span>
-        <span className="flex items-center gap-1 text-muted-foreground">
-          <span className="size-2 rounded-sm bg-blue-500" /> TLS
-        </span>
-        <span className="flex items-center gap-1 text-muted-foreground">
-          <span className="size-2 rounded-sm bg-yellow-500" /> TTFB
-        </span>
-        <span className="flex items-center gap-1 text-muted-foreground">
-          <span className="size-2 rounded-sm bg-orange-400" /> Transfer
+          <span className="size-2 rounded-sm bg-amber-500" /> P99 (99th
+          percentile)
         </span>
       </div>
     </div>

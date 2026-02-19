@@ -199,18 +199,16 @@ export default function MonitorDetailPage() {
       {/* Main Stats */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {isLoading ? (
-          <>
-            {[...Array(5)].map((_, i) => (
-              <Card key={i} size="sm">
-                <CardHeader>
-                  <Skeleton className="h-3 w-16" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-6 w-20" />
-                </CardContent>
-              </Card>
-            ))}
-          </>
+          [...Array(5)].map((_, i) => (
+            <Card key={i} size="sm">
+              <CardHeader>
+                <Skeleton className="h-3 w-16" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-6 w-20" />
+              </CardContent>
+            </Card>
+          ))
         ) : (
           <>
             {statCards.map((card) => (

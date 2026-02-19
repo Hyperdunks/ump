@@ -1,17 +1,10 @@
 "use client";
 
+import { UserButton } from "@daveyplate/better-auth-ui";
+import { Activity, Bell, Files, LayoutGrid, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import {
-  LayoutGrid,
-  Activity,
-  Files,
-  Bell,
-  Settings,
-  Plus,
-  HelpCircle,
-} from "lucide-react";
-import { UserButton } from "@daveyplate/better-auth-ui";
+import { Button } from "@/components/ui/button";
 import {
   Sidebar,
   SidebarContent,
@@ -25,14 +18,12 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutGrid },
   { href: "/dashboard/monitors", label: "Monitors", icon: Activity },
   { href: "/dashboard/status-pages", label: "Status Pages", icon: Files },
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export default function AppSidebar(

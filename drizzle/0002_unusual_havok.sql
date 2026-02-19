@@ -1,0 +1,1 @@
+CREATE INDEX "monitor_isPublic_idx" ON "monitor" USING btree ("is_public");

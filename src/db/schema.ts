@@ -155,6 +155,7 @@ export const monitor = pgTable(
   (table) => [
     index("monitor_userId_idx").on(table.userId),
     index("monitor_isActive_idx").on(table.isActive),
+    index("monitor_isPublic_idx").on(table.isPublic),
   ],
 );
 
