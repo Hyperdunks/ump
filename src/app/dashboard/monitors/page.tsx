@@ -3,6 +3,7 @@
 import { MoreHorizontal, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -66,6 +67,7 @@ export default function MonitorsListPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
 
   const { data, isLoading, isError } = useMonitors({ page, limit: 20 });
 
@@ -216,7 +218,7 @@ export default function MonitorsListPage() {
             Create and manage your monitors.
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setCreateModalOpen(true)}>
           <Plus className="size-4" data-icon="inline-start" />
           Create Monitor
         </Button>
@@ -273,7 +275,7 @@ export default function MonitorsListPage() {
               Get started by creating your first monitor to track uptime and
               performance.
             </p>
-            <Button>
+            <Button onClick={() => setCreateModalOpen(true)}>
               <Plus className="size-4" data-icon="inline-start" />
               Create Monitor
             </Button>
@@ -426,6 +428,11 @@ export default function MonitorsListPage() {
           )}
         </Card>
       )}
+
+      <CreateMonitorModal
+        open={createModalOpen}
+        onOpenChange={setCreateModalOpen}
+      />
     </div>
   );
 }

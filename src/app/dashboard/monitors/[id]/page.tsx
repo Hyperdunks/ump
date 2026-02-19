@@ -1,8 +1,11 @@
 "use client";
 
-import { ExternalLink, MoreHorizontal } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog";
+import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
 import LatencyChart from "@/components/monitors/latency-chart";
 import UptimeChart from "@/components/monitors/uptime-chart";
 import { Badge } from "@/components/ui/badge";
@@ -75,6 +78,9 @@ export default function MonitorDetailPage() {
 
   const isLoading = isLoadingMonitor || isLoadingUptime;
   const stats24h = uptimeData?.["24h"];
+
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   if (monitorError) {
     return (
@@ -190,6 +196,22 @@ export default function MonitorDetailPage() {
               30 days
             </ToggleGroupItem>
           </ToggleGroup>
+          <Button
+            variant="outline"
+            onClick={() => setEditModalOpen(true)}
+            disabled={isLoading || !monitorData}
+          >
+            <Pencil className="mr-2 size-4" />
+            Edit
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => setDeleteDialogOpen(true)}
+            disabled={isLoading || !monitorData}
+          >
+            <Trash className="mr-2 size-4" />
+            Delete
+          </Button>
           <Button variant="ghost" size="icon">
             <MoreHorizontal className="size-4" />
           </Button>
@@ -340,6 +362,21 @@ export default function MonitorDetailPage() {
         </div>
         <LatencyChart monitorId={monitorId} />
       </div>
+
+      {monitorData && (
+        <>
+          <EditMonitorModal
+            open={editModalOpen}
+            onOpenChange={setEditModalOpen}
+            monitor={monitorData}
+          />
+          <DeleteMonitorDialog
+            open={deleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
+            monitor={{ id: monitorData.id, name: monitorData.name }}
+          />
+        </>
+      )}
     </div>
   );
 }
