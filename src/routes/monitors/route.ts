@@ -23,8 +23,8 @@ const createMonitorBody = t.Object({
   ),
   checkInterval: t.Optional(
     t.Number({
-      minimum: 10,
-      description: "Check interval in seconds (min: 10)",
+      minimum: 300,
+      description: "Check interval in seconds (min: 300)",
     }),
   ),
   timeout: t.Optional(
