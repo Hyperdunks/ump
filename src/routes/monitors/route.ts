@@ -21,8 +21,18 @@ const createMonitorBody = t.Object({
   method: t.Optional(
     t.Union([t.Literal("GET"), t.Literal("POST"), t.Literal("HEAD")]),
   ),
-  checkInterval: t.Optional(t.Number()),
-  timeout: t.Optional(t.Number()),
+  checkInterval: t.Optional(
+    t.Number({
+      minimum: 10,
+      description: "Check interval in seconds (min: 10)",
+    }),
+  ),
+  timeout: t.Optional(
+    t.Number({
+      minimum: 1000,
+      description: "Timeout in milliseconds (min: 1000ms)",
+    }),
+  ),
   expectedStatusCodes: t.Optional(t.Array(t.String())),
   headers: t.Optional(t.Record(t.String(), t.String())),
   body: t.Optional(t.String()),

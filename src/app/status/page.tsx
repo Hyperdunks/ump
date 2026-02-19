@@ -1,4 +1,4 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray } from "drizzle-orm";
 import { CheckCircle2, ExternalLink, Globe, XCircle } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/db";
@@ -16,20 +16,30 @@ async function getPublicMonitors() {
 async function getLatestCheckForMonitors(monitorIds: string[]) {
   if (monitorIds.length === 0) return new Map();
 
-  // Get latest check for each monitor
+  // Get all checks for all monitors in a single query, ordered by most recent first
+  const checks = await db
+    .select()
+    .from(healthCheck)
+    .where(inArray(healthCheck.monitorId, monitorIds))
+    .orderBy(desc(healthCheck.checkedAt));
+
+  // Take first (most recent) check for each monitor
   const latestChecks = new Map<
     string,
     typeof healthCheck.$inferSelect | null
   >();
 
+  for (const check of checks) {
+    if (!latestChecks.has(check.monitorId)) {
+      latestChecks.set(check.monitorId, check);
+    }
+  }
+
+  // Ensure all monitor IDs have an entry (null if no checks)
   for (const monId of monitorIds) {
-    const [check] = await db
-      .select()
-      .from(healthCheck)
-      .where(eq(healthCheck.monitorId, monId))
-      .orderBy(desc(healthCheck.checkedAt))
-      .limit(1);
-    latestChecks.set(monId, check || null);
+    if (!latestChecks.has(monId)) {
+      latestChecks.set(monId, null);
+    }
   }
 
   return latestChecks;

@@ -138,7 +138,7 @@ interface CheckResult {
 async function checkHttp(mon: Monitor): Promise<CheckResult> {
   const startTime = Date.now();
   const controller = new AbortController();
-  const timeoutMs = mon.timeout * 1000; // Convert seconds to ms
+  const timeoutMs = mon.timeout; // Already in milliseconds
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
   try {
@@ -182,7 +182,7 @@ async function checkHttp(mon: Monitor): Promise<CheckResult> {
     let error = "Unknown error";
     if (err instanceof Error) {
       if (err.name === "AbortError") {
-        error = `Timeout after ${mon.timeout}s`;
+        error = `Timeout after ${mon.timeout}ms`;
       } else {
         error = err.message;
       }
@@ -206,7 +206,7 @@ async function checkTcp(mon: Monitor): Promise<CheckResult> {
 
   try {
     const controller = new AbortController();
-    const timeoutMs = mon.timeout * 1000; // Convert seconds to ms
+    const timeoutMs = mon.timeout; // Already in milliseconds
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     // Try a HEAD request as a proxy for TCP connectivity
@@ -240,7 +240,7 @@ async function checkPing(mon: Monitor): Promise<CheckResult> {
 
   try {
     const controller = new AbortController();
-    const timeoutMs = mon.timeout * 1000; // Convert seconds to ms
+    const timeoutMs = mon.timeout; // Already in milliseconds
     const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
 
     const response = await fetch(mon.url, {
