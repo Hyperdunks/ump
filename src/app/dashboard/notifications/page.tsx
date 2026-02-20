@@ -6,8 +6,10 @@ import {
   Bell,
   CheckCircle2,
   Clock,
+  ExternalLink,
   XCircle,
 } from "lucide-react";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -149,7 +151,30 @@ function NotificationList({
             </p>
           </div>
           {!notification.archived && (
-            <div className="opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        render={
+                          <Link
+                            href={`/dashboard/incidents/${notification.id}`}
+                          />
+                        }
+                      />
+                    }
+                  >
+                    <ExternalLink className="size-4" />
+                  </TooltipTrigger>
+                  <TooltipContent>View Details</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger
