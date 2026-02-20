@@ -37,7 +37,7 @@ const defaultFormData = {
   url: "",
   type: "https" as const,
   method: "GET" as const,
-  checkInterval: 60,
+  checkInterval: 300,
   timeout: 30000,
   expectedStatusCodes: ["200"],
   headers: undefined as Record<string, string> | undefined,
