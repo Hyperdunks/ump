@@ -95,7 +95,7 @@ export default function LandingPage() {
       <footer className="border-t py-6">
         <div className="container mx-auto flex justify-center px-4">
           <p className="text-sm text-muted-foreground">
-            © 2025 Sentinel. All rights reserved.
+            © 2026 Sentinel. All rights reserved.
           </p>
         </div>
       </footer>
