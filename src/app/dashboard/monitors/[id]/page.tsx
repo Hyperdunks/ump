@@ -4,6 +4,10 @@ import { ExternalLink, MoreHorizontal, Pencil, Trash } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { type Alert, AlertList } from "@/components/alerts/alert-list";
+import { CreateAlertModal } from "@/components/alerts/create-alert-modal";
+import { DeleteAlertDialog } from "@/components/alerts/delete-alert-dialog";
+import { EditAlertModal } from "@/components/alerts/edit-alert-modal";
 import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog";
 import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
 import LatencyChart from "@/components/monitors/latency-chart";
@@ -81,6 +85,20 @@ export default function MonitorDetailPage() {
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [createAlertModalOpen, setCreateAlertModalOpen] = useState(false);
+  const [editAlertModalOpen, setEditAlertModalOpen] = useState(false);
+  const [deleteAlertDialogOpen, setDeleteAlertDialogOpen] = useState(false);
+  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+
+  const handleEditAlert = (alert: Alert) => {
+    setSelectedAlert(alert);
+    setEditAlertModalOpen(true);
+  };
+
+  const handleDeleteAlert = (alert: Alert) => {
+    setSelectedAlert(alert);
+    setDeleteAlertDialogOpen(true);
+  };
 
   if (monitorError) {
     return (
@@ -328,6 +346,16 @@ export default function MonitorDetailPage() {
         ))}
       </div>
 
+      {/* Alerts Section */}
+      <div className="space-y-4">
+        <AlertList
+          monitorId={monitorId}
+          onAddAlert={() => setCreateAlertModalOpen(true)}
+          onEditAlert={handleEditAlert}
+          onDeleteAlert={handleDeleteAlert}
+        />
+      </div>
+
       {/* Uptime Chart */}
       <div className="space-y-4">
         <div>
@@ -374,6 +402,21 @@ export default function MonitorDetailPage() {
             open={deleteDialogOpen}
             onOpenChange={setDeleteDialogOpen}
             monitor={{ id: monitorData.id, name: monitorData.name }}
+          />
+          <CreateAlertModal
+            open={createAlertModalOpen}
+            onOpenChange={setCreateAlertModalOpen}
+            monitorId={monitorId}
+          />
+          <EditAlertModal
+            open={editAlertModalOpen}
+            onOpenChange={setEditAlertModalOpen}
+            alert={selectedAlert}
+          />
+          <DeleteAlertDialog
+            open={deleteAlertDialogOpen}
+            onOpenChange={setDeleteAlertDialogOpen}
+            alert={selectedAlert}
           />
         </>
       )}
