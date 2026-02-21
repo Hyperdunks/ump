@@ -39,7 +39,7 @@ export function CreateStatusPageModal({
   onOpenChange,
   monitors,
 }: CreateStatusPageModalProps) {
-  const [selectedMonitorId, setSelectedMonitorId] = useState<string>();
+  const [selectedMonitorId, setSelectedMonitorId] = useState<string>("");
   const updateMonitor = useUpdateMonitor();
 
   async function handleCreate() {
@@ -50,13 +50,13 @@ export function CreateStatusPageModal({
       data: { isPublic: true },
     });
 
-    setSelectedMonitorId(undefined);
+    setSelectedMonitorId("");
     onOpenChange(false);
   }
 
   function handleOpenChange(newOpen: boolean) {
     if (!newOpen) {
-      setSelectedMonitorId(undefined);
+      setSelectedMonitorId("");
     }
     onOpenChange(newOpen);
   }
@@ -85,9 +85,7 @@ export function CreateStatusPageModal({
             </FieldLabel>
             <Select
               value={selectedMonitorId}
-              onValueChange={(value) =>
-                setSelectedMonitorId(value ?? undefined)
-              }
+              onValueChange={(value) => setSelectedMonitorId(value ?? "")}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a monitor..." />
