@@ -1,8 +1,8 @@
+import { and, desc, eq, gte } from "drizzle-orm";
+import { Activity, CheckCircle2, Clock, Globe, XCircle } from "lucide-react";
 import { notFound } from "next/navigation";
 import { db } from "@/db";
-import { eq, and, desc, gte } from "drizzle-orm";
-import { monitor, healthCheck } from "@/db/schema";
-import { CheckCircle2, XCircle, Clock, Activity, Globe } from "lucide-react";
+import { healthCheck, monitor } from "@/db/schema";
 
 interface PageProps {
   params: Promise<{ monitorId: string }>;

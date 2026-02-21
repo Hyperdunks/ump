@@ -1,10 +1,21 @@
 "use client";
 
 import { UserButton } from "@daveyplate/better-auth-ui";
-import { Activity, Bell, Files, LayoutGrid, Plus } from "lucide-react";
+import {
+  Activity,
+  AlertTriangle,
+  Bell,
+  Files,
+  LayoutGrid,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
+import { CreateStatusPageModal } from "@/components/status-pages/create-status-page-modal";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Sidebar,
   SidebarContent,
@@ -18,18 +29,26 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { useMonitors } from "@/hooks/api";
+import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutGrid },
   { href: "/dashboard/monitors", label: "Monitors", icon: Activity },
-  { href: "/dashboard/status-pages", label: "Status Pages", icon: Files },
+  { href: "/dashboard/incidents", label: "Incidents", icon: AlertTriangle },
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
+  { href: "/status", label: "Status Pages", icon: Files },
 ] as const;
 
 export default function AppSidebar(
   props: React.ComponentProps<typeof Sidebar>,
 ) {
   const pathname = usePathname();
+  const { data: monitorsData } = useMonitors();
+  const monitors = monitorsData?.data ?? [];
+  const publicMonitors = monitors.filter((m) => m.isPublic);
+  const [createMonitorOpen, setCreateMonitorOpen] = useState(false);
+  const [createStatusPageOpen, setCreateStatusPageOpen] = useState(false);
 
   function isActive(href: string) {
     if (href === "/dashboard") {
@@ -86,31 +105,87 @@ export default function AppSidebar(
         <SidebarGroup>
           <div className="flex items-center justify-between px-2">
             <SidebarGroupLabel className="p-0">
-              Status Pages (0)
+              Status Pages ({publicMonitors.length})
             </SidebarGroupLabel>
-            <Button variant="ghost" size="icon-sm" className="size-6">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="size-6"
+              onClick={() => setCreateStatusPageOpen(true)}
+            >
               <Plus className="size-3" />
             </Button>
           </div>
           <SidebarGroupContent>
-            <p className="px-3 py-2 text-sm text-muted-foreground">
-              No status pages found
-            </p>
+            <ScrollArea className="max-h-32">
+              {publicMonitors.slice(0, 4).map((monitor) => (
+                <SidebarMenuButton
+                  key={monitor.id}
+                  render={<Link href={`/status/${monitor.id}`} />}
+                >
+                  <span
+                    className={cn(
+                      "size-2 rounded-full",
+                      monitor.latestCheck?.status === "up" && "bg-green-500",
+                      monitor.latestCheck?.status === "degraded" &&
+                        "bg-yellow-500",
+                      monitor.latestCheck?.status === "down" &&
+                        "bg-red-500 animate-pulse",
+                    )}
+                  />
+                  <span className="truncate">{monitor.name}</span>
+                </SidebarMenuButton>
+              ))}
+              {publicMonitors.length === 0 && (
+                <p className="px-3 py-2 text-sm text-muted-foreground">
+                  No public status pages
+                </p>
+              )}
+            </ScrollArea>
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Monitors Section */}
         <SidebarGroup>
           <div className="flex items-center justify-between px-2">
-            <SidebarGroupLabel className="p-0">Monitors (0)</SidebarGroupLabel>
-            <Button variant="ghost" size="icon-sm" className="size-6">
+            <SidebarGroupLabel className="p-0">
+              Monitors ({monitors.length})
+            </SidebarGroupLabel>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="size-6"
+              onClick={() => setCreateMonitorOpen(true)}
+            >
               <Plus className="size-3" />
             </Button>
           </div>
           <SidebarGroupContent>
-            <p className="px-3 py-2 text-sm text-muted-foreground">
-              No monitors found
-            </p>
+            <ScrollArea className="max-h-32">
+              {monitors.slice(0, 4).map((monitor) => (
+                <SidebarMenuButton
+                  key={monitor.id}
+                  render={<Link href={`/dashboard/monitors/${monitor.id}`} />}
+                >
+                  <span
+                    className={cn(
+                      "size-2 rounded-full",
+                      monitor.latestCheck?.status === "up" && "bg-green-500",
+                      monitor.latestCheck?.status === "degraded" &&
+                        "bg-yellow-500",
+                      monitor.latestCheck?.status === "down" &&
+                        "bg-red-500 animate-pulse",
+                    )}
+                  />
+                  <span className="truncate">{monitor.name}</span>
+                </SidebarMenuButton>
+              ))}
+              {monitors.length === 0 && (
+                <p className="px-3 py-2 text-sm text-muted-foreground">
+                  No monitors found
+                </p>
+              )}
+            </ScrollArea>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -130,6 +205,16 @@ export default function AppSidebar(
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <CreateMonitorModal
+        open={createMonitorOpen}
+        onOpenChange={setCreateMonitorOpen}
+      />
+      <CreateStatusPageModal
+        open={createStatusPageOpen}
+        onOpenChange={setCreateStatusPageOpen}
+        monitors={monitors}
+      />
     </Sidebar>
   );
 }

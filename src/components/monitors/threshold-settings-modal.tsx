@@ -1,17 +1,18 @@
 "use client";
 
+import { BellRing, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Plus, Trash2, BellRing } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -21,7 +22,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 
 const METRICS = ["Latency", "Uptime", "Error Rate", "TTFB"] as const;
 const OPERATORS = [

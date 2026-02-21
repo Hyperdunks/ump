@@ -1,7 +1,7 @@
 "use client";
 
-import { motion } from "motion/react";
 import { Globe, Mail, Webhook } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function landingSection3() {
   return (

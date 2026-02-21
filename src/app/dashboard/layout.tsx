@@ -1,18 +1,18 @@
 "use client";
 
-import type { ReactNode } from "react";
 import {
   AuthLoading,
   RedirectToSignIn,
   SignedIn,
 } from "@daveyplate/better-auth-ui";
-import { Skeleton } from "@/components/ui/skeleton";
+import type { ReactNode } from "react";
+import AppSidebar from "@/components/app-sidebar";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import AppSidebar from "@/components/app-sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 function DashboardSkeleton() {
   return (

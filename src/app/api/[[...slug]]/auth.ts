@@ -1,8 +1,8 @@
-import { auth } from "@/lib/auth";
-import { db } from "@/db";
-import { user as userTable } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { Elysia } from "elysia";
+import { db } from "@/db";
+import { user as userTable } from "@/db/schema";
+import { auth } from "@/lib/auth";
 
 // User type with role from our database
 export type AuthUser = {

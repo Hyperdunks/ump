@@ -1,7 +1,7 @@
-import { api } from "@/lib/client";
-import { queryKeys } from "@/lib/query-keys";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { api } from "@/lib/client";
+import { queryKeys } from "@/lib/query-keys";
 
 export function useUserProfile() {
   return useQuery({

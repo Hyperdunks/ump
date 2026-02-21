@@ -187,8 +187,7 @@ export default function IncidentDetailPage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {isLoading ? (
-          <>
-            {[1, 2, 3].map((i) => (
+            [1, 2, 3].map((i) => (
               <Card key={i} size="sm">
                 <CardHeader>
                   <Skeleton className="h-3 w-24" />
@@ -198,8 +197,7 @@ export default function IncidentDetailPage() {
                   <Skeleton className="mt-1 h-3 w-40" />
                 </CardContent>
               </Card>
-            ))}
-          </>
+            ))
         ) : (
           <>
             <Card
