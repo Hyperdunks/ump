@@ -101,51 +101,6 @@ export default function AppSidebar(
 
         <SidebarSeparator />
 
-        {/* Status Pages Section */}
-        <SidebarGroup>
-          <div className="flex items-center justify-between px-2">
-            <SidebarGroupLabel className="p-0">
-              Status Pages ({publicMonitors.length})
-            </SidebarGroupLabel>
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              className="size-6"
-              onClick={() => setCreateStatusPageOpen(true)}
-            >
-              <Plus className="size-3" />
-            </Button>
-          </div>
-          <SidebarGroupContent>
-            <ScrollArea className="max-h-32">
-              {publicMonitors.slice(0, 4).map((monitor) => (
-                <SidebarMenuButton
-                  key={monitor.id}
-                  render={<Link href={`/status/${monitor.id}`} />}
-                  className="flex w-full items-center justify-between"
-                >
-                  <span className="truncate">{monitor.name}</span>
-                  <span
-                    className={cn(
-                      "size-2 shrink-0 rounded-full",
-                      monitor.latestCheck?.status === "up" && "bg-green-500",
-                      monitor.latestCheck?.status === "degraded" &&
-                        "bg-yellow-500",
-                      monitor.latestCheck?.status === "down" &&
-                        "bg-red-500 animate-pulse",
-                    )}
-                  />
-                </SidebarMenuButton>
-              ))}
-              {publicMonitors.length === 0 && (
-                <p className="px-3 py-2 text-sm text-muted-foreground">
-                  No public status pages
-                </p>
-              )}
-            </ScrollArea>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
         {/* Monitors Section */}
         <SidebarGroup>
           <div className="flex items-center justify-between px-2">
@@ -167,7 +122,7 @@ export default function AppSidebar(
                 <SidebarMenuButton
                   key={monitor.id}
                   render={<Link href={`/dashboard/monitors/${monitor.id}`} />}
-                  className="flex w-full items-center justify-between"
+                  className="flex w-full items-center justify-between pr-3"
                 >
                   <span className="truncate">{monitor.name}</span>
                   <span
@@ -185,6 +140,51 @@ export default function AppSidebar(
               {monitors.length === 0 && (
                 <p className="px-3 py-2 text-sm text-muted-foreground">
                   No monitors found
+                </p>
+              )}
+            </ScrollArea>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Status Pages Section */}
+        <SidebarGroup>
+          <div className="flex items-center justify-between px-2">
+            <SidebarGroupLabel className="p-0">
+              Status Pages ({publicMonitors.length})
+            </SidebarGroupLabel>
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              className="size-6"
+              onClick={() => setCreateStatusPageOpen(true)}
+            >
+              <Plus className="size-3" />
+            </Button>
+          </div>
+          <SidebarGroupContent>
+            <ScrollArea className="max-h-32">
+              {publicMonitors.slice(0, 4).map((monitor) => (
+                <SidebarMenuButton
+                  key={monitor.id}
+                  render={<Link href={`/status/${monitor.id}`} />}
+                  className="flex w-full items-center justify-between pr-3"
+                >
+                  <span className="truncate">{monitor.name}</span>
+                  <span
+                    className={cn(
+                      "size-2 shrink-0 rounded-full",
+                      monitor.latestCheck?.status === "up" && "bg-green-500",
+                      monitor.latestCheck?.status === "degraded" &&
+                        "bg-yellow-500",
+                      monitor.latestCheck?.status === "down" &&
+                        "bg-red-500 animate-pulse",
+                    )}
+                  />
+                </SidebarMenuButton>
+              ))}
+              {publicMonitors.length === 0 && (
+                <p className="px-3 py-2 text-sm text-muted-foreground">
+                  No public status pages
                 </p>
               )}
             </ScrollArea>
