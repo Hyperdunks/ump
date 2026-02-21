@@ -19,13 +19,14 @@ interface VerifyEmailProps {
   verificationUrl?: string;
 }
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://sentinel.harsh.xyz";
 const baseUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "";
 
 export const VerifyEmail = ({
   username = "there",
-  verificationUrl = "https://sentinel.harzh.xyz/verify?token=123",
+  verificationUrl = `${appUrl}/verify?token=123`,
 }: VerifyEmailProps) => {
   return (
     <Html>

@@ -1,9 +1,9 @@
 "use client";
 
-import { Activity } from "lucide-react";
 import { UserButton } from "@daveyplate/better-auth-ui";
-import { AnimatedBackground } from "./ui/animated-background";
+import { Activity } from "lucide-react";
 import DynamicSearch from "./dynamic-search";
+import { AnimatedBackground } from "./ui/animated-background";
 
 type NavbarProps = {
   activeTab: string;

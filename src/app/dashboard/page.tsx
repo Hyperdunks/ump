@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, AlertTriangle, FileText, Wrench } from "lucide-react";
+import { Activity, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Empty,
@@ -20,20 +20,6 @@ const sections = [
     emptyDescription: "You have no incidents recorded in the last 7 days.",
     icon: AlertTriangle,
   },
-  {
-    title: "Reports",
-    subtitle: "Reports over the last 7 days.",
-    emptyText: "No reports found",
-    emptyDescription: "You have no reports recorded in the last 7 days.",
-    icon: FileText,
-  },
-  {
-    title: "Maintenance",
-    subtitle: "Maintenance over the last 7 days.",
-    emptyText: "No maintenances found",
-    emptyDescription: "You have no maintenance windows in the last 7 days.",
-    icon: Wrench,
-  },
 ] as const;
 
 export default function DashboardPage() {
@@ -48,14 +34,11 @@ export default function DashboardPage() {
       value: monitorsData?.pagination?.total?.toString() ?? "0",
       icon: Activity,
     },
-    { label: "Status Pages", value: "0", icon: FileText },
     {
       label: "Recent Incidents",
       value: incidentsData?.data?.length?.toString() ?? "0",
       icon: AlertTriangle,
     },
-    { label: "Last Report", value: "None", icon: FileText },
-    { label: "Last Maintenance", value: "None", icon: Wrench },
   ] as const;
 
   return (
@@ -69,7 +52,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         {summaryCards.map((card) => (
           <Card key={card.label} size="sm">
             <CardHeader className="flex-row items-center justify-between">

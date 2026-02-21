@@ -1,14 +1,4 @@
-import {
-  ArrowUpRightIcon,
-  EqualApproximatelyIcon,
-  Icon,
-  Monitor,
-  MonitorCog,
-  MonitorDotIcon,
-  MonitorDownIcon,
-} from "lucide-react";
 import { IconHeartRateMonitor } from "@tabler/icons-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Empty,

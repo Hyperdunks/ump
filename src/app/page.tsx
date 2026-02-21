@@ -1,13 +1,13 @@
 "use client";
 
+import { SignedIn, SignedOut } from "@daveyplate/better-auth-ui";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut } from "@daveyplate/better-auth-ui";
-import { useSession } from "@/lib/auth-client";
-import Section67 from "@/components/landing-section-3";
 import Section76 from "@/components/landing-section-2";
+import Section67 from "@/components/landing-section-3";
+import { Button } from "@/components/ui/button";
+import { useSession } from "@/lib/auth-client";
 
 export default function LandingPage() {
   const router = useRouter();

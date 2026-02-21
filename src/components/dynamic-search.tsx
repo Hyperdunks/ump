@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { ArrowRight, Search } from "lucide-react";
 import { motion } from "motion/react";
-import { ArrowLeft, ArrowRight, Search } from "lucide-react";
+import { useRef, useState } from "react";
 import useClickOutside from "@/hooks/useClickOutside";
 
 const transition = {

@@ -2,13 +2,13 @@
 
 import { AuthQueryProvider } from "@daveyplate/better-auth-tanstack";
 import { AuthUIProviderTanstack } from "@daveyplate/better-auth-ui/tanstack";
+import { QueryClientProvider } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ThemeProvider } from "@/components/theme-provider";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
 import { authClient } from "@/lib/auth-client";
 import { queryClient } from "@/lib/query-client";
-import { QueryClientProvider } from "@tanstack/react-query";
 
 export function Providers({ children }: { children: ReactNode }) {
   const router = useRouter();

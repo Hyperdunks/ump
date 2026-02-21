@@ -1,20 +1,20 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import {
   Activity,
-  Plus,
   AlertCircle,
   CheckCircle2,
-  ServerCrash,
   Inbox,
+  Plus,
+  ServerCrash,
 } from "lucide-react";
 import { useTheme } from "next-themes";
-import Navbar from "@/components/navbar";
+import { useMemo, useState } from "react";
 import Footer from "@/components/footer";
-import { useMonitors } from "@/hooks/api/use-monitors";
-import { useIncidents } from "@/hooks/api/use-incidents";
+import Navbar from "@/components/navbar";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useIncidents } from "@/hooks/api/use-incidents";
+import { useMonitors } from "@/hooks/api/use-monitors";
 
 const MonitorDashboard = () => {
   const [activeTab, setActiveTab] = useState("monitors");

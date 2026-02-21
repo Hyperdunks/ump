@@ -59,13 +59,27 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
         .limit(limit)
         .offset(offset);
 
+      // Get latest check for each monitor
+      const monitorsWithLatestCheck = await Promise.all(
+        monitors.map(async (mon) => {
+          const [latestCheck] = await db
+            .select()
+            .from(healthCheck)
+            .where(eq(healthCheck.monitorId, mon.id))
+            .orderBy(desc(healthCheck.checkedAt))
+            .limit(1);
+
+          return { ...mon, latestCheck };
+        }),
+      );
+
       const [{ count }] = await db
         .select({ count: sql<number>`count(*)` })
         .from(monitor)
         .where(eq(monitor.userId, user.id));
 
       return {
-        data: monitors,
+        data: monitorsWithLatestCheck,
         pagination: {
           page,
           limit,

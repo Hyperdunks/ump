@@ -19,13 +19,14 @@ interface ResetPasswordProps {
   resetUrl?: string;
 }
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://sentinel.harsh.xyz";
 const baseUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "";
 
 export const ResetPassword = ({
   username = "there",
-  resetUrl = "https://sentinel.harzh.xyz/api/auth/reset?token=123",
+  resetUrl = `${appUrl}/api/auth/reset?token=123`,
 }: ResetPasswordProps) => {
   return (
     <Html>
