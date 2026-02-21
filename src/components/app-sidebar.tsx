@@ -194,18 +194,14 @@ export default function AppSidebar(
 
       {/* Footer */}
       <SidebarFooter>
-        <SidebarMenu>
-          {/* Do we really need a help button ??
+        {/* Do we really need a help button ??
           <SidebarMenuItem>
                         <SidebarMenuButton>
                             <HelpCircle />
                             <span>Get Help</span>
                         </SidebarMenuButton>
                     </SidebarMenuItem>*/}
-          <SidebarMenuItem>
-            <UserButton side="top" />
-          </SidebarMenuItem>
-        </SidebarMenu>
+        <UserButton side="right" />
       </SidebarFooter>
 
       <CreateMonitorModal

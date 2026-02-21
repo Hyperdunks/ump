@@ -56,8 +56,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <SidebarTrigger className="-ml-1" />
               <span className="ml-3 font-semibold">Sentinel</span>
             </header>
-            <main className="flex-1 overflow-y-auto p-6 md:p-8">
-              <div className="mx-auto w-full max-w-[1600px]">{children}</div>
+            <main className="flex-1 p-6 md:p-8">
+              <div className="mx-auto w-full">{children}</div>
             </main>
           </SidebarInset>
         </SidebarProvider>
