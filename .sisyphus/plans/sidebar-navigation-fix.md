@@ -67,15 +67,15 @@ Transform sidebar into a live, functional navigation hub with real-time status i
    - Proper order: Overview, Monitors, Incidents, Status Pages
 
 ### Definition of Done
-- [ ] Sidebar shows live monitors with status colors (max 4, scrollable)
-- [ ] Sidebar shows live status pages (max 4, scrollable)
-- [ ] Monitors "+" opens CreateMonitorModal
-- [ ] Status Pages "+" opens CreateStatusPageModal
-- [ ] Incidents nav item added
-- [ ] `/dashboard/incidents` page created
-- [ ] Notifications kept as global center
-- [ ] Status Pages nav links to `/status`
-- [ ] Build passes without errors
+- [x] Sidebar shows live monitors with status colors (max 4, scrollable)
+- [x] Sidebar shows live status pages (max 4, scrollable)
+- [x] Monitors "+" opens CreateMonitorModal
+- [x] Status Pages "+" opens CreateStatusPageModal
+- [x] Incidents nav item added
+- [x] `/dashboard/incidents` page created
+- [x] Notifications kept as global center
+- [x] Status Pages nav links to `/status`
+- [x] Build passes without errors
 
 ### Must Have
 - Use existing `useMonitors()` hook
@@ -471,7 +471,7 @@ Max Concurrent: 3 (Wave 1)
 
 ---
 
-- [ ] 8. Final Verification
+- [x] 8. Final Verification
 
   **What to do**:
   - Run `bun run build`
@@ -498,11 +498,11 @@ Max Concurrent: 3 (Wave 1)
 
 ## Final Verification Wave
 
-- [ ] F1. **Build Verification** — `quick`
+- [x] F1. **Build Verification** — `quick`
   Run `bun run build` + `bun run lint`
   Output: `Build [PASS/FAIL] | Lint [PASS/FAIL] | VERDICT`
 
-- [ ] F2. **Navigation Verification** — `unspecified-high`
+- [x] F2. **Navigation Verification** — `unspecified-high`
   Test all sidebar functionality
   Output: `Nav [5/5] | Modals [2/2] | Sections [live] | VERDICT`
 
@@ -519,16 +519,16 @@ Max Concurrent: 3 (Wave 1)
 ## Success Criteria
 
 ### Final Checklist
-- [ ] Sidebar shows live monitors with status colors
-- [ ] Sidebar shows live status pages
-- [ ] Monitors "+" opens CreateMonitorModal
-- [ ] Status Pages "+" opens CreateStatusPageModal
-- [ ] Incidents nav item works
-- [ ] Incidents page created
-- [ ] Notifications kept
-- [ ] Status Pages nav links to /status
-- [ ] Build passes
-- [ ] Lint passes
+- [x] Sidebar shows live monitors with status colors
+- [x] Sidebar shows live status pages
+- [x] Monitors "+" opens CreateMonitorModal
+- [x] Status Pages "+" opens CreateStatusPageModal
+- [x] Incidents nav item works
+- [x] Incidents page created
+- [x] Notifications kept
+- [x] Status Pages nav links to /status
+- [x] Build passes
+- [x] Lint passes
 
 ---
 

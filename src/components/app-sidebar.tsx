@@ -122,10 +122,12 @@ export default function AppSidebar(
                 <SidebarMenuButton
                   key={monitor.id}
                   render={<Link href={`/status/${monitor.id}`} />}
+                  className="flex w-full items-center justify-between"
                 >
+                  <span className="truncate">{monitor.name}</span>
                   <span
                     className={cn(
-                      "size-2 rounded-full",
+                      "size-2 shrink-0 rounded-full",
                       monitor.latestCheck?.status === "up" && "bg-green-500",
                       monitor.latestCheck?.status === "degraded" &&
                         "bg-yellow-500",
@@ -133,7 +135,6 @@ export default function AppSidebar(
                         "bg-red-500 animate-pulse",
                     )}
                   />
-                  <span className="truncate">{monitor.name}</span>
                 </SidebarMenuButton>
               ))}
               {publicMonitors.length === 0 && (
@@ -166,10 +167,12 @@ export default function AppSidebar(
                 <SidebarMenuButton
                   key={monitor.id}
                   render={<Link href={`/dashboard/monitors/${monitor.id}`} />}
+                  className="flex w-full items-center justify-between"
                 >
+                  <span className="truncate">{monitor.name}</span>
                   <span
                     className={cn(
-                      "size-2 rounded-full",
+                      "size-2 shrink-0 rounded-full",
                       monitor.latestCheck?.status === "up" && "bg-green-500",
                       monitor.latestCheck?.status === "degraded" &&
                         "bg-yellow-500",
@@ -177,7 +180,6 @@ export default function AppSidebar(
                         "bg-red-500 animate-pulse",
                     )}
                   />
-                  <span className="truncate">{monitor.name}</span>
                 </SidebarMenuButton>
               ))}
               {monitors.length === 0 && (

@@ -59,49 +59,35 @@
 
 ---
 
-## 🔴 P0: Sidebar Navigation Fixes
+## ✅ P0: Sidebar Navigation Fixes (COMPLETED 2026-02-21)
 
-**Problem**: Sidebar has missing navigation items and broken functionality.
+**Problem**: Sidebar had missing navigation items and broken functionality.
 
 ### Tasks
 
-- [ ] **S1. Add Incidents Navigation Item**
-  - Location: `src/components/app-sidebar.tsx` lines 22-27
-  - The `/dashboard/incidents/[id]` route exists but is NOT accessible from sidebar
-  - Add to `navItems` array:
-    ```tsx
-    { href: "/dashboard/incidents", label: "Incidents", icon: AlertTriangle }
-    ```
-  - Move Monitors above Status Pages in order
+- [x] **S1. Add Incidents Navigation Item**
+  - Added to `navItems` array with AlertTriangle icon
+  - Links to `/dashboard/incidents`
 
-- [ ] **S2. Fix Monitors "+" Button**
-  - Location: `src/components/app-sidebar.tsx` lines 106-108
-  - Current code has NO click handler:
-    ```tsx
-    <Button variant="ghost" size="icon-sm" className="size-6">
-      <Plus className="size-3" />
-    </Button>
-    ```
-  - Fix: Add click handler to open CreateMonitorModal or navigate to create page
+- [x] **S2. Fix Monitors "+" Button**
+  - Connected to CreateMonitorModal
+  - Opens modal on click
 
-- [ ] **S3. Fix or Remove Status Pages "+" Button**
-  - Location: `src/components/app-sidebar.tsx` lines 91-93
-  - Same issue as Monitors - no click handler
-  - Option A: Link to public status pages
-  - Option B: Remove the button entirely
+- [x] **S3. Fix Status Pages "+" Button**
+  - Created CreateStatusPageModal component
+  - Opens modal to make monitors public
 
-- [ ] **S4. Fix Status Pages Navigation Link**
-  - Location: `src/components/app-sidebar.tsx` line 25
-  - Links to `/dashboard/status-pages` which does NOT exist
-  - Option A: Create a dashboard status-pages management page
-  - Option B: Change link to `/status` (public status pages)
-  - Option C: Remove from navigation entirely
+- [x] **S4. Fix Status Pages Navigation Link**
+  - Changed href from `/dashboard/status-pages` to `/status`
+  - Links to public status page
 
-**Acceptance Criteria**:
-- [ ] Incidents accessible from sidebar
-- [ ] "+" buttons functional (open modals or navigate)
-- [ ] All navigation links point to existing pages
-- [ ] Monitors appears before Status Pages
+**Additional Deliverables**:
+- Live monitors section with status colors (green/yellow/red pulse)
+- Live status pages section showing public monitors
+- New `/dashboard/incidents` page for incident listing
+- CreateStatusPageModal component for making monitors public
+
+**Commit**: `bd38023 feat(sidebar): add live monitor status, incidents page, and modal functionality`
 
 ---
 

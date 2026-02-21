@@ -85,7 +85,9 @@ export function CreateStatusPageModal({
             </FieldLabel>
             <Select
               value={selectedMonitorId}
-              onValueChange={setSelectedMonitorId}
+              onValueChange={(value) =>
+                setSelectedMonitorId(value ?? undefined)
+              }
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Choose a monitor..." />
