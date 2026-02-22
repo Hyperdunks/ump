@@ -29,6 +29,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIncidents } from "@/hooks/api";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 
 type NotificationType = "error" | "warning" | "success" | "info";
@@ -250,13 +251,13 @@ export default function NotificationsPage() {
   if (isLoading) {
     return (
       <div className="w-full space-y-6">
-        <div className="flex items-center justify-between mb-6">
+        <DashboardHeader>
           <div>
             <Skeleton className="h-6 w-32" />
             <Skeleton className="mt-2 h-4 w-64" />
           </div>
           <Skeleton className="h-9 w-48" />
-        </div>
+        </DashboardHeader>
         <Card className="min-h-64 p-0 overflow-hidden">
           <div className="divide-y">
             {[1, 2, 3].map((i) => (
@@ -277,7 +278,7 @@ export default function NotificationsPage() {
   return (
     <div className="w-full space-y-6">
       <Tabs defaultValue="all" className="w-full flex-col">
-        <div className="flex items-center justify-between mb-6">
+        <DashboardHeader>
           <div>
             <h1 className="text-xl font-semibold">Notifications</h1>
             <p className="text-sm text-muted-foreground">
@@ -295,7 +296,7 @@ export default function NotificationsPage() {
               Archived
             </TabsTrigger>
           </TabsList>
-        </div>
+        </DashboardHeader>
 
         <div className="mt-6">
           <Card className="min-h-64 p-0 overflow-hidden">

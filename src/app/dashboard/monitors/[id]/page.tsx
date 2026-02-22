@@ -183,7 +183,7 @@ export default function MonitorDetailPage() {
       </Breadcrumb>
 
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold">
             {isLoading ? <Skeleton className="h-8 w-40" /> : monitorData?.name}
@@ -202,7 +202,7 @@ export default function MonitorDetailPage() {
             </a>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <ToggleGroup defaultValue={["1d"]} variant="outline">
             <ToggleGroupItem value="1d" className="text-xs">
               Last day

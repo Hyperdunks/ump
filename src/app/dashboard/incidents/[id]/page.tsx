@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIncident } from "@/hooks/api";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 
 function formatRelativeTime(date: Date | string | null | undefined): string {
@@ -148,7 +149,7 @@ export default function IncidentDetailPage() {
         </BreadcrumbList>
       </Breadcrumb>
 
-      <div className="flex items-start justify-between">
+      <DashboardHeader>
         <div className="flex items-center gap-3">
           <h1 className="text-2xl font-semibold">
             {isLoading ? (
@@ -183,7 +184,7 @@ export default function IncidentDetailPage() {
             </>
           )}
         </div>
-      </div>
+      </DashboardHeader>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {isLoading ? (

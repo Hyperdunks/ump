@@ -1,9 +1,6 @@
-import { AccountSettingsCards } from "@daveyplate/better-auth-ui";
+import { redirect } from "next/navigation";
 
 export default function SettingsPage() {
-  return (
-    <div className="flex justify-center py-12 px-4 flex-1">
-      <AccountSettingsCards className="max-w-xl" />
-    </div>
-  );
+  redirect("/dashboard/settings");
+  return null;
 }
