@@ -1,12 +1,12 @@
 "use client";
 
 import {
-  Copy,
   ExternalLink,
   MoreHorizontal,
   Pencil,
   Plus,
   Search,
+  Share,
   Trash,
   X,
 } from "lucide-react";
@@ -78,7 +78,6 @@ const statusCardConfig = [
 ] as const;
 
 export default function MonitorsListPage() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<
@@ -587,16 +586,19 @@ function MonitorRow({
               <Pencil className="mr-2 size-4" />
               Edit monitor
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                navigator.clipboard.writeText(monitor.id);
-                toast.success("Monitor ID copied to clipboard");
-              }}
-            >
-              <Copy className="mr-2 size-4" />
-              Copy ID
-            </DropdownMenuItem>
+            {monitor.isPublic && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const url = `${window.location.origin}/status/${monitor.id}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success("Public link copied to clipboard");
+                }}
+              >
+                <Share className="mr-2 size-4" />
+                Copy Public Link
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"

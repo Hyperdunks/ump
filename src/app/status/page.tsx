@@ -1,14 +1,25 @@
-import { desc, eq, inArray } from "drizzle-orm";
+import { desc, eq, inArray, and } from "drizzle-orm";
 import { CheckCircle2, ExternalLink, Globe, XCircle } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/db";
 import { healthCheck, monitor } from "@/db/schema";
+import { MonitorLookup } from "@/components/status/monitor-lookup";
 
-async function getPublicMonitors() {
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+
+async function getPublicMonitors(userId?: string) {
+  if (!userId) return [];
+
   const monitors = await db
     .select()
     .from(monitor)
-    .where(eq(monitor.isPublic, true));
+    .where(
+      and(
+        eq(monitor.isPublic, true),
+        eq(monitor.userId, userId)
+      )
+    );
 
   return monitors;
 }
@@ -46,7 +57,10 @@ async function getLatestCheckForMonitors(monitorIds: string[]) {
 }
 
 export default async function PublicStatusListPage() {
-  const monitors = await getPublicMonitors();
+  const session = await auth.api.getSession({ headers: await headers() });
+  const userId = session?.user?.id;
+
+  const monitors = await getPublicMonitors(userId);
   const monitorIds = monitors.map((m) => m.id);
   const latestChecks = await getLatestCheckForMonitors(monitorIds);
 
@@ -54,13 +68,18 @@ export default async function PublicStatusListPage() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto px-6 py-6">
-          <div className="flex items-center gap-3">
-            <Globe className="w-6 h-6 text-muted-foreground" />
-            <h1 className="text-2xl font-bold">Public Status Pages</h1>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <Globe className="w-6 h-6 text-muted-foreground" />
+                <h1 className="text-2xl font-bold">Public Status Pages</h1>
+              </div>
+              <p className="text-sm text-muted-foreground mt-1">
+                {session ? "View the status of your publicly available monitors" : "Look up the status of publicly available monitors"}
+              </p>
+            </div>
+            <MonitorLookup />
           </div>
-          <p className="text-sm text-muted-foreground mt-1">
-            View the status of publicly available monitors
-          </p>
         </div>
       </header>
 
@@ -69,10 +88,10 @@ export default async function PublicStatusListPage() {
           <div className="bg-card rounded-lg border border-border p-12 text-center">
             <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-lg font-semibold mb-2">
-              No public monitors available
+              {session ? "No public monitors available" : "Sign in to view your public monitors"}
             </h2>
-            <p className="text-muted-foreground">
-              There are no public monitors to display at this time.
+            <p className="text-muted-foreground mb-6">
+              {session ? "You don't have any public monitors to display at this time." : "You can still use the search bar above to look up public monitors by ID or URL."}
             </p>
           </div>
         ) : (
@@ -120,9 +139,8 @@ export default async function PublicStatusListPage() {
                             )}
                           </div>
                           <div
-                            className={`w-3 h-3 rounded-full animate-pulse ${
-                              isUp ? "bg-green-500" : "bg-red-500"
-                            }`}
+                            className={`w-3 h-3 rounded-full animate-pulse ${isUp ? "bg-green-500" : "bg-red-500"
+                              }`}
                           />
                         </>
                       ) : (
@@ -149,8 +167,16 @@ export default async function PublicStatusListPage() {
           </div>
         )}
 
-        <footer className="mt-8 text-center text-sm text-muted-foreground">
+        <footer className="mt-8 mb-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-4">
           <p>Powered by Sentinel Uptime Monitoring</p>
+          {session && (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors mt-4"
+            >
+              Go to Dashboard
+            </Link>
+          )}
         </footer>
       </main>
     </div>

@@ -2,10 +2,10 @@
 
 import {
   ChevronDown,
-  Copy,
   ExternalLink,
   MoreHorizontal,
   Pencil,
+  Share,
   Trash,
 } from "lucide-react";
 import Link from "next/link";
@@ -276,18 +276,21 @@ export default function MonitorDetailPage() {
                 <Pencil className="mr-2 size-4" />
                 Edit monitor
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => {
-                  if (monitorData) {
-                    navigator.clipboard.writeText(monitorData.id);
-                    toast.success("Monitor ID copied to clipboard");
-                  }
-                }}
-              >
-                <Copy className="mr-2 size-4" />
-                Copy ID
-              </DropdownMenuItem>
               <DropdownMenuSeparator />
+              {monitorData?.isPublic && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (monitorData) {
+                      const url = `${window.location.origin}/status/${monitorData.id}`;
+                      navigator.clipboard.writeText(url);
+                      toast.success("Public link copied to clipboard");
+                    }
+                  }}
+                >
+                  <Share className="mr-2 size-4" />
+                  Copy Public Link
+                </DropdownMenuItem>
+              )}
               <DropdownMenuItem
                 variant="destructive"
                 onClick={() => setDeleteDialogOpen(true)}
