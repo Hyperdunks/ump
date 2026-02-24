@@ -39,9 +39,12 @@ function bucketChecksByTime(
   const now = new Date();
   const bucketMs = bucketMinutes * 60 * 1000;
 
+  // Align 'now' to the nearest bucket to ensure precise matching
+  const alignedNow = new Date(Math.floor(now.getTime() / bucketMs) * bucketMs);
+
   // Initialize buckets for last 24 hours (48 buckets of 30 min)
   for (let i = 47; i >= 0; i--) {
-    const bucketTime = new Date(now.getTime() - i * bucketMs);
+    const bucketTime = new Date(alignedNow.getTime() - i * bucketMs);
     const bucketKey = bucketTime.toISOString();
     buckets.set(bucketKey, { success: 0, error: 0, degraded: 0 });
   }
