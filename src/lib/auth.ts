@@ -5,7 +5,10 @@ import { db } from "@/db";
 import * as schema from "@/db/schema";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/resend";
 
+const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+
 export const auth = betterAuth({
+  baseURL: appUrl,
   socialProviders: {
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID as string,
@@ -15,9 +18,9 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    sendResetPassword: async ({ user, url }) => {
-      // Fire and forget with error handling
-      sendPasswordResetEmail(user.email, url, user.name).catch((err) => {
+    sendResetPassword: async ({ user, url, token }) => {
+      const resetUrl = `${appUrl}/auth/reset-password?token=${token}`;
+      sendPasswordResetEmail(user.email, resetUrl, user.name).catch((err) => {
         console.error("[Auth] Failed to send password reset email:", err);
       });
     },
@@ -25,7 +28,6 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     sendVerificationEmail: async ({ user, url }) => {
-      // Fire and forget with error handling
       sendVerificationEmail(user.email, url, user.name).catch((err) => {
         console.error("[Auth] Failed to send verification email:", err);
       });

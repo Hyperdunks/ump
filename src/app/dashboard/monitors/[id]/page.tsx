@@ -1,8 +1,14 @@
 "use client";
 
-import { ExternalLink, MoreHorizontal, Pencil, Trash } from "lucide-react";
+import {
+  ChevronDown,
+  ExternalLink,
+  MoreHorizontal,
+  Pencil,
+  Trash,
+} from "lucide-react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { type Alert, AlertList } from "@/components/alerts/alert-list";
 import { CreateAlertModal } from "@/components/alerts/create-alert-modal";
@@ -12,7 +18,6 @@ import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog
 import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
 import LatencyChart from "@/components/monitors/latency-chart";
 import UptimeChart from "@/components/monitors/uptime-chart";
-import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -23,10 +28,23 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { useMonitor, useMonitorUptime } from "@/hooks/api";
+import {
+  useMonitor,
+  useMonitorChecks,
+  useMonitors,
+  useMonitorUptime,
+} from "@/hooks/api";
 import { cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/utils/format";
+import { calculatePercentiles } from "@/lib/utils/percentile";
 
 const colorMap = {
   green: {
@@ -46,23 +64,6 @@ const colorMap = {
   },
 } as const;
 
-function formatRelativeTime(date: Date | string | undefined): string {
-  if (!date) return "—";
-  const d = typeof date === "string" ? new Date(date) : date;
-  const now = new Date();
-  const diffMs = now.getTime() - d.getTime();
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
-
-  if (diffMins < 1) return "just now";
-  if (diffMins < 60)
-    return `${diffMins} minute${diffMins === 1 ? "" : "s"} ago`;
-  if (diffHours < 24)
-    return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
-  return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
-}
-
 function formatPercent(value: number | undefined): string {
   if (value === undefined) return "—";
   return `${value.toFixed(2)}%`;
@@ -70,6 +71,7 @@ function formatPercent(value: number | undefined): string {
 
 export default function MonitorDetailPage() {
   const params = useParams();
+  const router = useRouter();
   const monitorId = params.id as string;
 
   const {
@@ -79,9 +81,22 @@ export default function MonitorDetailPage() {
   } = useMonitor(monitorId);
   const { data: uptimeData, isLoading: isLoadingUptime } =
     useMonitorUptime(monitorId);
+  const { data: checksData } = useMonitorChecks(monitorId, { limit: 500 });
+  const { data: monitorsData } = useMonitors({ limit: 50 });
 
   const isLoading = isLoadingMonitor || isLoadingUptime;
   const stats24h = uptimeData?.["24h"];
+
+  const activeMonitors =
+    monitorsData?.data?.filter((m) => m.isActive).slice(0, 50) ?? [];
+
+  const responseTimes =
+    checksData?.data
+      ?.filter((c) => c.responseTime !== null)
+      .map((c) => c.responseTime as number) ?? [];
+
+  const percentiles =
+    responseTimes.length >= 3 ? calculatePercentiles(responseTimes) : null;
 
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -146,13 +161,12 @@ export default function MonitorDetailPage() {
     },
   ];
 
-  // P50-P99 percentiles not available from API
   const latencyCards = [
-    { label: "P50", value: "—", change: "—" },
-    { label: "P75", value: "—", change: "—" },
-    { label: "P90", value: "—", change: "—" },
-    { label: "P95", value: "—", change: "—" },
-    { label: "P99", value: "—", change: "—" },
+    { label: "P50", value: percentiles ? `${percentiles.p50}ms` : "—" },
+    { label: "P75", value: percentiles ? `${percentiles.p75}ms` : "—" },
+    { label: "P90", value: percentiles ? `${percentiles.p90}ms` : "—" },
+    { label: "P95", value: percentiles ? `${percentiles.p95}ms` : "—" },
+    { label: "P99", value: percentiles ? `${percentiles.p99}ms` : "—" },
   ];
 
   return (
@@ -167,13 +181,32 @@ export default function MonitorDetailPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="#" />}>
-              {isLoading ? (
-                <Skeleton className="h-4 w-24" />
-              ) : (
-                monitorData?.name
-              )}
-            </BreadcrumbLink>
+            <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
+                {isLoading ? (
+                  <Skeleton className="h-4 w-24" />
+                ) : (
+                  <>
+                    {monitorData?.name}
+                    <ChevronDown className="size-3" />
+                  </>
+                )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="start"
+                className="max-h-64 overflow-y-auto"
+              >
+                {activeMonitors.map((m) => (
+                  <DropdownMenuItem
+                    key={m.id}
+                    onSelect={() => router.push(`/dashboard/monitors/${m.id}`)}
+                    className={m.id === monitorId ? "bg-accent" : ""}
+                  >
+                    <span className="truncate">{m.name}</span>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
@@ -330,30 +363,10 @@ export default function MonitorDetailPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-2">
-                <span className="text-lg font-bold">{card.value}</span>
-                {card.change !== "—" && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400"
-                  >
-                    -{card.change}
-                  </Badge>
-                )}
-              </div>
+              <span className="text-lg font-bold">{card.value}</span>
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      {/* Alerts Section */}
-      <div className="space-y-4">
-        <AlertList
-          monitorId={monitorId}
-          onAddAlert={() => setCreateAlertModalOpen(true)}
-          onEditAlert={handleEditAlert}
-          onDeleteAlert={handleDeleteAlert}
-        />
       </div>
 
       {/* Uptime Chart */}
@@ -389,6 +402,16 @@ export default function MonitorDetailPage() {
           </div>
         </div>
         <LatencyChart monitorId={monitorId} />
+      </div>
+
+      {/* Alerts Section */}
+      <div className="space-y-4">
+        <AlertList
+          monitorId={monitorId}
+          onAddAlert={() => setCreateAlertModalOpen(true)}
+          onEditAlert={handleEditAlert}
+          onDeleteAlert={handleDeleteAlert}
+        />
       </div>
 
       {monitorData && (

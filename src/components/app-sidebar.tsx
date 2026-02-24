@@ -141,11 +141,11 @@ export default function AppSidebar(
                         className={cn(
                           "size-2 shrink-0 rounded-full",
                           monitor.latestCheck?.status === "up" &&
-                            "bg-green-500",
+                          "bg-green-500",
                           monitor.latestCheck?.status === "degraded" &&
-                            "bg-yellow-500",
+                          "bg-yellow-500",
                           monitor.latestCheck?.status === "down" &&
-                            "bg-red-500 animate-pulse",
+                          "bg-red-500 animate-pulse",
                         )}
                       />
                     </SidebarMenuButton>
@@ -187,11 +187,11 @@ export default function AppSidebar(
                         className={cn(
                           "size-2 shrink-0 rounded-full",
                           monitor.latestCheck?.status === "up" &&
-                            "bg-green-500",
+                          "bg-green-500",
                           monitor.latestCheck?.status === "degraded" &&
-                            "bg-yellow-500",
+                          "bg-yellow-500",
                           monitor.latestCheck?.status === "down" &&
-                            "bg-red-500 animate-pulse",
+                          "bg-red-500 animate-pulse",
                         )}
                       />
                     </SidebarMenuButton>
@@ -211,9 +211,9 @@ export default function AppSidebar(
       {/* Footer */}
       <SidebarFooter>
         {state === "expanded" ? (
-          <UserButton side="right" className="" />
+          <UserButton side="right" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
         ) : (
-          <UserAvatar user={session?.user} />
+          <UserButton size="icon" side="right" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
         )}
       </SidebarFooter>
 

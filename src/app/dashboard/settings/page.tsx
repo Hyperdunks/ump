@@ -1,7 +1,17 @@
 "use client";
 
-import { Lock, MoreHorizontal } from "lucide-react";
+import {
+  ChangeEmailCard,
+  ChangePasswordCard,
+  DeleteAccountCard,
+  SessionsCard,
+  UpdateAvatarCard,
+  UpdateNameCard,
+} from "@daveyplate/better-auth-ui";
+import { Link2, Lock, User, Webhook } from "lucide-react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useState } from "react";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -15,22 +25,27 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
+  CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSession } from "@/lib/auth-client";
 
 export default function DashboardSettingsPage() {
-  const { data: session } = useSession();
-  const user = session?.user;
-  const displayName = user?.name || "User";
-  const displayEmail = user?.email || "user@example.com";
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+  const [activeTab, setActiveTab] = useState(tabParam || "account");
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    const url = new URL(window.location.href);
+    url.searchParams.set("tab", value);
+    window.history.pushState({}, "", url.toString());
+  };
 
   return (
     <div className="max-w-4xl space-y-8">
-      {/* Breadcrumb */}
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -40,128 +55,124 @@ export default function DashboardSettingsPage() {
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>General</BreadcrumbPage>
+            <BreadcrumbPage className="capitalize">{activeTab}</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
 
-      {/* Header */}
-      <div>
-        <h1 className="text-xl font-semibold">General</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage your workspace settings.
-        </p>
-      </div>
+      <Tabs
+        value={activeTab}
+        onValueChange={handleTabChange}
+        orientation="horizontal"
+      >
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="account" className="gap-2">
+            <User className="size-4" />
+            Account
+          </TabsTrigger>
+          <TabsTrigger value="security" className="gap-2">
+            <Lock className="size-4" />
+            Security
+          </TabsTrigger>
+          <TabsTrigger value="integrations" className="gap-2">
+            <Link2 className="size-4" />
+            Integrations
+          </TabsTrigger>
+        </TabsList>
 
-      {/* Workspace Section */}
-      <Card className="overflow-hidden">
-        <CardContent className="border-b p-6">
-          <CardTitle className="text-sm">Workspace</CardTitle>
-          <CardDescription className="mt-1">
-            Manage your workspace name.
-          </CardDescription>
-          <div className="mt-4">
-            <label className="mb-1.5 block text-xs font-medium">Name</label>
-            <Input defaultValue="My Workspace" />
+        <TabsContent value="account" className="space-y-6">
+          <div className="grid grid-cols-1 gap-6 w-full">
+            <UpdateAvatarCard />
+            <UpdateNameCard />
+            <ChangeEmailCard />
           </div>
-        </CardContent>
-        <CardFooter className="justify-end bg-muted/30 px-6 py-3">
-          <Button>Submit</Button>
-        </CardFooter>
-      </Card>
+          <DeleteAccountCard />
+        </TabsContent>
 
-      {/* Slug Section */}
-      <Card>
-        <CardContent className="p-6">
-          <CardTitle className="text-sm">Slug</CardTitle>
-          <CardDescription className="mt-1">
-            The unique slug for your workspace.
-          </CardDescription>
-          <div className="mt-4 flex items-center gap-2">
-            <div className="flex items-center rounded-lg border bg-muted/20 px-3.5 py-2.5 text-sm font-medium">
-              my-workspace
-              <button className="ml-2 text-muted-foreground hover:text-foreground">
-                ❐
-              </button>
-            </div>
-          </div>
-          <p className="mt-4 text-xs text-muted-foreground">
-            Used when interacting with the API or for help on Discord.{" "}
-            <span className="font-medium text-foreground">Let us know</span> if
-            you&apos;d like to change it.
-          </p>
-        </CardContent>
-      </Card>
+        <TabsContent value="security" className="space-y-6">
+          <ChangePasswordCard />
+          <SessionsCard />
+        </TabsContent>
 
-      {/* Team Section */}
-      <Card className="overflow-hidden">
-        <CardContent className="p-6">
-          <CardTitle className="text-sm">Team</CardTitle>
-          <CardDescription className="mb-4 mt-1">
-            Manage your team members.
-          </CardDescription>
-
-          {/* Tabs */}
-          <Tabs defaultValue="members">
-            <TabsList>
-              <TabsTrigger value="members">Members</TabsTrigger>
-              <TabsTrigger value="pending">Pending</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="members" className="mt-4">
-              {/* Table Header */}
-              <div className="mb-4 grid grid-cols-4 px-2 text-xs font-medium text-muted-foreground">
-                <div>Name</div>
-                <div>Email</div>
-                <div>Role</div>
-                <div>Created</div>
+        <TabsContent value="integrations" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Webhook className="size-5" />
+                Webhook
+              </CardTitle>
+              <CardDescription>
+                Configure a global webhook for all monitors.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid gap-2">
+                <Label htmlFor="webhook-url">Webhook URL</Label>
+                <Input
+                  id="webhook-url"
+                  type="url"
+                  placeholder="https://your-webhook-url.com/endpoint"
+                />
               </div>
-
-              {/* Team Member Row */}
-              <div className="grid grid-cols-4 items-center rounded-md px-2 py-2 text-sm hover:bg-muted/30">
-                <div className="font-medium">{displayName}</div>
-                <div className="text-xs text-muted-foreground">
-                  {displayEmail}
-                </div>
-                <div className="text-muted-foreground">owner</div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">
-                    February 15, 2026
-                  </span>
-                  <MoreHorizontal className="size-4 cursor-pointer text-muted-foreground" />
-                </div>
-              </div>
-
-              {/* Add Member Input */}
-              <div className="mt-6 border-t border-dashed pt-4">
-                <label className="mb-1.5 block text-xs font-medium">
-                  Add member
-                </label>
-                <Input type="email" placeholder="Email" />
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Send an invitation to join the team.
-                </p>
-              </div>
-            </TabsContent>
-
-            <TabsContent value="pending" className="mt-4">
-              <p className="py-8 text-center text-sm text-muted-foreground">
-                No pending invitations.
+              <p className="text-xs text-muted-foreground">
+                When any monitor changes status, a POST request will be sent to
+                this URL with the monitor details.
               </p>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
+              <Button disabled variant="secondary">
+                Coming Soon
+              </Button>
+            </CardContent>
+          </Card>
 
-        <CardFooter className="items-center justify-between border-t bg-muted/30 px-6 py-3">
-          <span className="text-xs font-medium">
-            This feature is available on the Pro plan.
-          </span>
-          <Button size="sm">
-            <Lock className="size-3" data-icon="inline-start" />
-            Upgrade
-          </Button>
-        </CardFooter>
-      </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg
+                  className="size-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M6 15a2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2h2v2zm1 0a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-5zm2-8a2 2 0 0 1-2-2 2 2 0 0 1 2-2 2 2 0 0 1 2 2v2H9zm0 1a2 2 0 0 1 2 2 2 2 0 0 1-2 2H4a2 2 0 0 1-2-2 2 2 0 0 1 2-2h5zm8 2a2 2 0 0 1 2-2 2 2 0 0 1 2 2 2 2 0 0 1-2 2h-2v-2zm-1 0a2 2 0 0 1-2 2 2 2 0 0 1-2-2V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v5zm-2 8a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2v-2h2zm0-1a2 2 0 0 1-2-2 2 2 0 0 1 2-2h5a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-5z" />
+                </svg>
+                Discord
+              </CardTitle>
+              <CardDescription>
+                Connect Discord for notifications.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button disabled variant="secondary">
+                Coming Soon
+              </Button>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <svg
+                  className="size-5"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden="true"
+                >
+                  <path d="M5.042 15.165a2.528 2.528 0 0 1-2.52 2.523A2.528 2.528 0 0 1 0 15.165a2.527 2.527 0 0 1 2.522-2.52h2.52v2.52zM6.313 15.165a2.527 2.527 0 0 1 2.521-2.52 2.527 2.527 0 0 1 2.521 2.52v6.313A2.528 2.528 0 0 1 8.834 24a2.528 2.528 0 0 1-2.521-2.522v-6.313zM8.834 5.042a2.528 2.528 0 0 1-2.521-2.52A2.528 2.528 0 0 1 8.834 0a2.528 2.528 0 0 1 2.521 2.522v2.52H8.834zM8.834 6.313a2.528 2.528 0 0 1 2.521 2.521 2.528 2.528 0 0 1-2.521 2.521H2.522A2.528 2.528 0 0 1 0 8.834a2.528 2.528 0 0 1 2.522-2.521h6.312zM18.956 8.834a2.528 2.528 0 0 1 2.522-2.521A2.528 2.528 0 0 1 24 8.834a2.528 2.528 0 0 1-2.522 2.521h-2.522V8.834zM17.688 8.834a2.528 2.528 0 0 1-2.523 2.521 2.527 2.527 0 0 1-2.52-2.521V2.522A2.527 2.527 0 0 1 15.165 0a2.528 2.528 0 0 1 2.523 2.522v6.312zM15.165 18.956a2.528 2.528 0 0 1 2.523 2.522A2.528 2.528 0 0 1 15.165 24a2.527 2.527 0 0 1-2.52-2.522v-2.522h2.52zM15.165 17.688a2.527 2.527 0 0 1-2.52-2.523 2.526 2.526 0 0 1 2.52-2.52h6.313A2.527 2.527 0 0 1 24 15.165a2.528 2.528 0 0 1-2.522 2.523h-6.313z" />
+                </svg>
+                Slack
+              </CardTitle>
+              <CardDescription>
+                Connect Slack for notifications.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button disabled variant="secondary">
+                Coming Soon
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
