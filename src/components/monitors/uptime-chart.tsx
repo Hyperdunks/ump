@@ -15,15 +15,12 @@ import { useMonitorChecks } from "@/hooks/api";
 const chartConfig = {
   success: {
     label: "Success",
-    color: "#22c55e",
   },
   error: {
     label: "Error",
-    color: "#ef4444",
   },
   degraded: {
     label: "Degraded",
-    color: "#eab308",
   },
 } satisfies ChartConfig;
 
