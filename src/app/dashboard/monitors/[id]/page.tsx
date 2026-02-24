@@ -374,7 +374,7 @@ export default function MonitorDetailPage() {
         <div>
           <h3 className="text-lg font-semibold">Uptime</h3>
           <p className="text-sm text-muted-foreground">
-            Uptime across all the selected regions
+            Uptime of 24hours
           </p>
         </div>
         <UptimeChart monitorId={monitorId} />

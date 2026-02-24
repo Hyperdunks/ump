@@ -1,8 +1,9 @@
 "use client";
 
-import { MoreHorizontal, Plus, Search } from "lucide-react";
+import { MoreHorizontal, Plus, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog";
 import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
@@ -71,6 +72,9 @@ export default function MonitorsListPage() {
   const router = useRouter();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<
+    "normal" | "degraded" | "failing" | "inactive" | null
+  >(null);
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [editingMonitor, setEditingMonitor] = useState<any | null>(null);
   const [deletingMonitor, setDeletingMonitor] = useState<{
@@ -112,11 +116,39 @@ export default function MonitorsListPage() {
   const monitors = data?.data ?? [];
   const pagination = data?.pagination;
 
-  const filtered = monitors.filter(
-    (m) =>
+  const filtered = monitors.filter((m) => {
+    const matchesSearch =
       m.name.toLowerCase().includes(search.toLowerCase()) ||
-      m.url.toLowerCase().includes(search.toLowerCase()),
-  );
+      m.url.toLowerCase().includes(search.toLowerCase());
+
+    if (!matchesSearch) return false;
+
+    if (statusFilter) {
+      if (statusFilter === "inactive" && m.isActive) return false;
+      if (statusFilter !== "inactive" && !m.isActive) return false;
+
+      if (m.isActive) {
+        if (statusFilter === "failing" && m.latestCheck?.status !== "down") {
+          return false;
+        }
+        if (
+          statusFilter === "degraded" &&
+          m.latestCheck?.status !== "degraded"
+        ) {
+          return false;
+        }
+        if (
+          statusFilter === "normal" &&
+          (m.latestCheck?.status === "down" ||
+            m.latestCheck?.status === "degraded")
+        ) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  });
 
   if (isLoading) {
     return (
@@ -246,7 +278,20 @@ export default function MonitorsListPage() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
         {statusCardConfig.map((card) => (
-          <Card key={card.label} size="sm" className={cn("ring-1", card.color)}>
+          <Card
+            key={card.label}
+            size="sm"
+            className={cn(
+              "cursor-pointer transition-all hover:ring-2",
+              statusFilter === card.key
+                ? "ring-2 ring-offset-1 dark:ring-offset-background"
+                : "ring-1",
+              card.color
+            )}
+            onClick={() =>
+              setStatusFilter((prev) => (prev === card.key ? null : card.key))
+            }
+          >
             <CardHeader>
               <CardTitle className="text-xs font-medium opacity-80">
                 {card.label}
@@ -281,11 +326,25 @@ export default function MonitorsListPage() {
           <Search className="pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             className="pl-8"
-            placeholder="Filter by name, url, type..."
+            placeholder={
+              statusFilter
+                ? `Search ${statusFilter} monitors...`
+                : "Filter by name, url, type..."
+            }
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        {statusFilter && (
+          <Button
+            variant="ghost"
+            className="h-9 px-2 text-muted-foreground hover:text-foreground"
+            onClick={() => setStatusFilter(null)}
+          >
+            <X className="mr-2 size-4" />
+            Clear Filter
+          </Button>
+        )}
       </div>
 
       {monitors.length === 0 ? (
@@ -516,6 +575,15 @@ function MonitorRow({
               }}
             >
               Edit monitor
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(monitor.id);
+                toast.success("Monitor ID copied to clipboard");
+              }}
+            >
+              Copy ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
