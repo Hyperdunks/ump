@@ -175,6 +175,62 @@ export default function DashboardPage() {
           </div>
         );
       })}
+
+      {/* Recent Monitors Grid */}
+      <div className="space-y-3">
+        <div>
+          <h2 className="text-sm font-semibold">Your Monitors</h2>
+          <p className="text-xs text-muted-foreground">Recently added monitors to Sentinel.</p>
+        </div>
+
+        {monitorsLoading ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {[...Array(3)].map((_, i) => (
+              <Skeleton key={i} className="h-24 w-full rounded-xl" />
+            ))}
+          </div>
+        ) : monitorsData?.data && monitorsData.data.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {monitorsData.data.slice(0, 5).map((monitor: any) => (
+              <Link key={monitor.id} href={`/dashboard/monitors/${monitor.id}`} className="block transition-transform hover:scale-[1.02]">
+                <Card className="h-full cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors p-4">
+                  <div className="flex flex-col h-full justify-between gap-4">
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1 overflow-hidden">
+                        <h4 className="font-semibold text-sm truncate">{monitor.name}</h4>
+                        <p className="text-xs text-muted-foreground truncate" title={monitor.url}>
+                          {monitor.url}
+                        </p>
+                      </div>
+                      <Badge variant={monitor.isActive ? "default" : "secondary"}>
+                        {monitor.isActive ? "Active" : "Paused"}
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className={`size-2 rounded-full ${monitor.isActive ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
+                      <span className="text-xs text-muted-foreground">
+                        {monitor.isActive ? 'Monitoring running' : 'Monitoring paused'}
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Card className="p-6">
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <Activity />
+                </EmptyMedia>
+                <EmptyTitle>No monitors found</EmptyTitle>
+                <EmptyDescription>You haven't created any monitors yet.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          </Card>
+        )}
+      </div>
     </div>
   );
 }
