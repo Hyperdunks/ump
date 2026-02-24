@@ -211,9 +211,9 @@ export default function AppSidebar(
       {/* Footer */}
       <SidebarFooter>
         {state === "expanded" ? (
-          <UserButton side="right" className="" />
+          <UserButton side="right" size="default" />
         ) : (
-          <UserAvatar user={session?.user} />
+          <UserButton size="icon" side="right" />
         )}
       </SidebarFooter>
 
