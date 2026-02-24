@@ -2,8 +2,10 @@
 
 import { MoreHorizontal, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
+import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog";
+import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,9 +35,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMonitors } from "@/hooks/api";
+import { useMonitorChecks, useMonitors } from "@/hooks/api";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils/format";
+import { calculatePercentiles } from "@/lib/utils/percentile";
 
 const statusCardConfig = [
   {
@@ -69,6 +72,19 @@ export default function MonitorsListPage() {
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editingMonitor, setEditingMonitor] = useState<any | null>(null);
+  const [deletingMonitor, setDeletingMonitor] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
+  const [monitorStats, setMonitorStats] = useState<Record<string, number>>({});
+
+  const handleUpdateP95 = useCallback((id: string, p95: number) => {
+    setMonitorStats((prev) => {
+      if (prev[id] === p95) return prev;
+      return { ...prev, [id]: p95 };
+    });
+  }, []);
 
   const { data, isLoading, isError } = useMonitors({ page, limit: 20 });
 
@@ -251,7 +267,11 @@ export default function MonitorsListPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-lg font-bold">—</span>
+            <span className="text-lg font-bold">
+              {Object.values(monitorStats).length > 0
+                ? `${Math.max(...Object.values(monitorStats))}ms`
+                : "—"}
+            </span>
           </CardContent>
         </Card>
       </div>
@@ -311,57 +331,13 @@ export default function MonitorsListPage() {
             </TableHeader>
             <TableBody>
               {filtered.map((monitor) => (
-                <TableRow
+                <MonitorRow
                   key={monitor.id}
-                  className="cursor-pointer"
-                  onClick={() =>
-                    router.push(`/dashboard/monitors/${monitor.id}`)
-                  }
-                >
-                  <TableCell
-                    className="pl-4"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <Checkbox aria-label={`Select ${monitor.name}`} />
-                  </TableCell>
-                  <TableCell className="font-medium">{monitor.name}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant={monitor.isActive ? "default" : "secondary"}
-                      className={
-                        monitor.isActive
-                          ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400"
-                          : ""
-                      }
-                    >
-                      {monitor.isActive ? "active" : "inactive"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">—</TableCell>
-                  <TableCell>
-                    {formatRelativeTime(monitor.latestCheck?.checkedAt)}
-                  </TableCell>
-                  <TableCell>—</TableCell>
-                  <TableCell>—</TableCell>
-                  <TableCell>—</TableCell>
-                  <TableCell onClick={(e) => e.stopPropagation()}>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={<Button variant="ghost" size="icon-sm" />}
-                      >
-                        <MoreHorizontal className="size-4 text-muted-foreground" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>View details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit monitor</DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem variant="destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                  monitor={monitor}
+                  onUpdateP95={handleUpdateP95}
+                  onEdit={setEditingMonitor}
+                  onDelete={setDeletingMonitor}
+                />
               ))}
             </TableBody>
           </Table>
@@ -439,6 +415,121 @@ export default function MonitorsListPage() {
         open={createModalOpen}
         onOpenChange={setCreateModalOpen}
       />
+      {editingMonitor && (
+        <EditMonitorModal
+          open={!!editingMonitor}
+          onOpenChange={(open) => !open && setEditingMonitor(null)}
+          monitor={editingMonitor}
+        />
+      )}
+      {deletingMonitor && (
+        <DeleteMonitorDialog
+          open={!!deletingMonitor}
+          onOpenChange={(open) => !open && setDeletingMonitor(null)}
+          monitor={deletingMonitor}
+        />
+      )}
     </div>
+  );
+}
+
+function MonitorRow({
+  monitor,
+  onUpdateP95,
+  onEdit,
+  onDelete,
+}: {
+  monitor: any;
+  onUpdateP95: (id: string, p95: number) => void;
+  onEdit: (monitor: any) => void;
+  onDelete: (monitor: { id: string; name: string }) => void;
+}) {
+  const router = useRouter();
+  const { data: checksData } = useMonitorChecks(monitor.id, { limit: 50 });
+
+  const responseTimes =
+    checksData?.data
+      ?.filter((c: any) => c.responseTime !== null)
+      .map((c: any) => c.responseTime as number) ?? [];
+
+  const percentiles =
+    responseTimes.length >= 3 ? calculatePercentiles(responseTimes) : null;
+
+  useEffect(() => {
+    if (percentiles?.p95 != null) {
+      onUpdateP95(monitor.id, percentiles.p95);
+    }
+  }, [percentiles?.p95, monitor.id, onUpdateP95]);
+
+  return (
+    <TableRow
+      className="cursor-pointer"
+      onClick={() => router.push(`/dashboard/monitors/${monitor.id}`)}
+    >
+      <TableCell className="pl-4" onClick={(e) => e.stopPropagation()}>
+        <Checkbox aria-label={`Select ${monitor.name}`} />
+      </TableCell>
+      <TableCell className="font-medium">{monitor.name}</TableCell>
+      <TableCell>
+        <Badge
+          variant={monitor.isActive ? "default" : "secondary"}
+          className={
+            monitor.isActive
+              ? "bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400"
+              : ""
+          }
+        >
+          {monitor.isActive ? "active" : "inactive"}
+        </Badge>
+      </TableCell>
+      <TableCell className="text-muted-foreground">
+        {monitor.lastIncident
+          ? formatRelativeTime(monitor.lastIncident.createdAt)
+          : "—"}
+      </TableCell>
+      <TableCell>
+        {formatRelativeTime(monitor.latestCheck?.checkedAt)}
+      </TableCell>
+      <TableCell>{percentiles ? `${percentiles.p50}ms` : "—"}</TableCell>
+      <TableCell>{percentiles ? `${percentiles.p90}ms` : "—"}</TableCell>
+      <TableCell>{percentiles ? `${percentiles.p95}ms` : "—"}</TableCell>
+      <TableCell onClick={(e) => e.stopPropagation()}>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={<Button variant="ghost" size="icon-sm" />}
+          >
+            <MoreHorizontal className="size-4 text-muted-foreground" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push(`/dashboard/monitors/${monitor.id}`);
+              }}
+            >
+              View details
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit(monitor);
+              }}
+            >
+              Edit monitor
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              variant="destructive"
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete({ id: monitor.id, name: monitor.name });
+              }}
+            >
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </TableCell>
+    </TableRow>
   );
 }
