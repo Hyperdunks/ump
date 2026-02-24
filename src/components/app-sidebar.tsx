@@ -211,7 +211,7 @@ export default function AppSidebar(
       {/* Footer */}
       <SidebarFooter>
         {state === "expanded" ? (
-          <UserButton side="right" size="default" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
+          <UserButton side="right" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
         ) : (
           <UserButton size="icon" side="right" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
         )}
