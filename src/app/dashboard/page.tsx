@@ -106,39 +106,41 @@ export default function DashboardPage() {
               ) : hasIncidents ? (
                 <div className="space-y-3">
                   {incidentsData.data.slice(0, 5).map((incident: any) => (
-                    <Card key={incident.id} className="p-4 transition-colors hover:bg-muted/50">
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold">{incident.monitorName}</span>
-                            <Badge
-                              variant={
-                                incident.state === "resolved"
-                                  ? "default"
-                                  : incident.state === "investigating"
-                                    ? "secondary"
-                                    : "destructive"
-                              }
-                            >
-                              {incident.state}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {incident.cause || "No cause specified"}
-                          </p>
-                        </div>
-                        <div className="text-xs text-muted-foreground sm:text-right">
-                          <div>
-                            Detected {formatDistanceToNow(new Date(incident.detectedAt))} ago
-                          </div>
-                          {incident.resolvedAt && (
-                            <div>
-                              Resolved {formatDistanceToNow(new Date(incident.resolvedAt))} ago
+                    <Link key={incident.id} href={`/dashboard/incidents/${incident.id}`} className="block">
+                      <Card className="p-4 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2">
+                              <span className="font-semibold">{incident.monitorName}</span>
+                              <Badge
+                                variant={
+                                  incident.state === "resolved"
+                                    ? "default"
+                                    : incident.state === "investigating"
+                                      ? "secondary"
+                                      : "destructive"
+                                }
+                              >
+                                {incident.state}
+                              </Badge>
                             </div>
-                          )}
+                            <p className="text-sm text-muted-foreground">
+                              {incident.cause || "No cause specified"}
+                            </p>
+                          </div>
+                          <div className="text-xs text-muted-foreground sm:text-right">
+                            <div>
+                              Detected {formatDistanceToNow(new Date(incident.detectedAt))} ago
+                            </div>
+                            {incident.resolvedAt && (
+                              <div>
+                                Resolved {formatDistanceToNow(new Date(incident.resolvedAt))} ago
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    </Card>
+                      </Card>
+                    </Link>
                   ))}
                 </div>
               ) : (
