@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/table";
 import { useMonitors } from "@/hooks/api";
 import { cn } from "@/lib/utils";
+import { formatRelativeTime } from "@/lib/utils/format";
 
 const statusCardConfig = [
   {
@@ -82,8 +83,11 @@ export default function MonitorsListPage() {
     for (const monitor of data.data) {
       if (!monitor.isActive) {
         statusCounts.inactive++;
+      } else if (monitor.latestCheck?.status === "down") {
+        statusCounts.failing++;
+      } else if (monitor.latestCheck?.status === "degraded") {
+        statusCounts.degraded++;
       } else {
-        // List endpoint doesn't include latestCheck; active monitors shown as "normal"
         statusCounts.normal++;
       }
     }
@@ -334,7 +338,9 @@ export default function MonitorsListPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">—</TableCell>
-                  <TableCell>—</TableCell>
+                  <TableCell>
+                    {formatRelativeTime(monitor.latestCheck?.checkedAt)}
+                  </TableCell>
                   <TableCell>—</TableCell>
                   <TableCell>—</TableCell>
                   <TableCell>—</TableCell>
