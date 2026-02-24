@@ -3,6 +3,7 @@
 import { MoreHorizontal, Plus, Search, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "sonner";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog";
 import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
@@ -574,6 +575,15 @@ function MonitorRow({
               }}
             >
               Edit monitor
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.stopPropagation();
+                navigator.clipboard.writeText(monitor.id);
+                toast.success("Monitor ID copied to clipboard");
+              }}
+            >
+              Copy ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
