@@ -1,6 +1,15 @@
 "use client";
 
-import { MoreHorizontal, Plus, Search, X } from "lucide-react";
+import {
+  Copy,
+  ExternalLink,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Search,
+  Trash,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -559,13 +568,14 @@ function MonitorRow({
           >
             <MoreHorizontal className="size-4 text-muted-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
                 router.push(`/dashboard/monitors/${monitor.id}`);
               }}
             >
+              <ExternalLink className="mr-2 size-4" />
               View details
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -574,6 +584,7 @@ function MonitorRow({
                 onEdit(monitor);
               }}
             >
+              <Pencil className="mr-2 size-4" />
               Edit monitor
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -583,6 +594,7 @@ function MonitorRow({
                 toast.success("Monitor ID copied to clipboard");
               }}
             >
+              <Copy className="mr-2 size-4" />
               Copy ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -593,7 +605,8 @@ function MonitorRow({
                 onDelete({ id: monitor.id, name: monitor.name });
               }}
             >
-              Delete
+              <Trash className="mr-2 size-4" />
+              Delete monitor
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
