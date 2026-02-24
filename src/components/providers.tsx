@@ -20,7 +20,7 @@ export function Providers({ children }: { children: ReactNode }) {
           authClient={authClient}
           navigate={router.push}
           replace={router.replace}
-          persistClient={false}
+          persistClient={false} // Disabled to avoid stale state - session re-validates via cookie cache on reload
           onSessionChange={() => {
             router.refresh();
           }}

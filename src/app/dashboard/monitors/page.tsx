@@ -1,6 +1,15 @@
 "use client";
 
-import { MoreHorizontal, Plus, Search, X } from "lucide-react";
+import {
+  ExternalLink,
+  MoreHorizontal,
+  Pencil,
+  Plus,
+  Search,
+  Share,
+  Trash,
+  X,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -69,7 +78,6 @@ const statusCardConfig = [
 ] as const;
 
 export default function MonitorsListPage() {
-  const router = useRouter();
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<
@@ -559,13 +567,14 @@ function MonitorRow({
           >
             <MoreHorizontal className="size-4 text-muted-foreground" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
+          <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuItem
               onClick={(e) => {
                 e.stopPropagation();
                 router.push(`/dashboard/monitors/${monitor.id}`);
               }}
             >
+              <ExternalLink className="mr-2 size-4" />
               View details
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -574,17 +583,22 @@ function MonitorRow({
                 onEdit(monitor);
               }}
             >
+              <Pencil className="mr-2 size-4" />
               Edit monitor
             </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={(e) => {
-                e.stopPropagation();
-                navigator.clipboard.writeText(monitor.id);
-                toast.success("Monitor ID copied to clipboard");
-              }}
-            >
-              Copy ID
-            </DropdownMenuItem>
+            {monitor.isPublic && (
+              <DropdownMenuItem
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const url = `${window.location.origin}/status/${monitor.id}`;
+                  navigator.clipboard.writeText(url);
+                  toast.success("Public link copied to clipboard");
+                }}
+              >
+                <Share className="mr-2 size-4" />
+                Copy Public Link
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem
               variant="destructive"
@@ -593,7 +607,8 @@ function MonitorRow({
                 onDelete({ id: monitor.id, name: monitor.name });
               }}
             >
-              Delete
+              <Trash className="mr-2 size-4" />
+              Delete monitor
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

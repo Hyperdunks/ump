@@ -1,20 +1,68 @@
-import { and, desc, eq, gte } from "drizzle-orm";
+import { and, desc, eq, gte, or, inArray } from "drizzle-orm";
 import { Activity, CheckCircle2, Clock, Globe, XCircle } from "lucide-react";
-import { notFound } from "next/navigation";
 import { db } from "@/db";
 import { healthCheck, monitor } from "@/db/schema";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import Link from "next/link";
 
 interface PageProps {
   params: Promise<{ monitorId: string }>;
 }
 
-async function getPublicMonitor(monitorId: string) {
+async function getPublicMonitor(monitorQuery: string) {
+  const decodedQuery = decodeURIComponent(monitorQuery);
+  const urlForms = [decodedQuery];
+  if (!decodedQuery.startsWith("http")) {
+    urlForms.push(`https://${decodedQuery}`, `http://${decodedQuery}`);
+  }
+
   const [mon] = await db
     .select()
     .from(monitor)
-    .where(and(eq(monitor.id, monitorId), eq(monitor.isPublic, true)));
+    .where(
+      and(
+        eq(monitor.isPublic, true),
+        or(
+          eq(monitor.id, decodedQuery),
+          inArray(monitor.url, urlForms)
+        )
+      )
+    );
 
   return mon || null;
+}
+
+import type { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { monitorId } = await params;
+  const mon = await getPublicMonitor(monitorId);
+
+  if (!mon) {
+    return {
+      title: "Not Found",
+      description: "Monitor not found or not public",
+    };
+  }
+
+  return {
+    title: `${mon.name} Status - Sentinel`,
+    description: `Current status page for ${mon.url}`,
+    openGraph: {
+      title: `${mon.name} - Sentinel Uptime`,
+      description: `Check the real-time status and uptime history of ${mon.name}.`,
+      url: `/status/${mon.id}`,
+      type: "website",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${mon.name} - Sentinel`,
+      description: `Current status page for ${mon.url}`,
+    },
+  };
 }
 
 async function getRecentChecks(monitorId: string) {
@@ -52,9 +100,34 @@ function getAverageResponseTime(checks: { responseTime: number | null }[]) {
 export default async function PublicStatusPage({ params }: PageProps) {
   const { monitorId } = await params;
   const mon = await getPublicMonitor(monitorId);
+  const session = await auth.api.getSession({ headers: await headers() });
 
   if (!mon) {
-    notFound();
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <Globe className="w-16 h-16 text-muted-foreground mb-6 mx-auto" />
+        <h1 className="text-3xl font-bold mb-3">Monitor not found</h1>
+        <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+          The status page you are looking for does not exist or is not public.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-4 mt-8">
+          <Link
+            href="/status"
+            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-8 py-3 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+          >
+            Back to status page
+          </Link>
+          {session && (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
+            >
+              Go to Dashboard
+            </Link>
+          )}
+        </div>
+      </div>
+    );
   }
 
   const recentChecks = await getRecentChecks(monitorId);
@@ -175,8 +248,16 @@ export default async function PublicStatusPage({ params }: PageProps) {
         </div>
 
         {/* Footer */}
-        <footer className="mt-8 text-center text-sm text-muted-foreground">
+        <footer className="mt-8 mb-8 text-center text-sm text-muted-foreground flex flex-col items-center gap-4">
           <p>Powered by Sentinel Uptime Monitoring</p>
+          {session && (
+            <Link
+              href="/dashboard"
+              className="inline-flex items-center justify-center rounded-md bg-primary px-8 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors mt-4"
+            >
+              Go to Dashboard
+            </Link>
+          )}
         </footer>
       </main>
     </div>

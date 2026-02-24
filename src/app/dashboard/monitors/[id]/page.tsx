@@ -5,11 +5,13 @@ import {
   ExternalLink,
   MoreHorizontal,
   Pencil,
+  Share,
   Trash,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import { type Alert, AlertList } from "@/components/alerts/alert-list";
 import { CreateAlertModal } from "@/components/alerts/create-alert-modal";
 import { DeleteAlertDialog } from "@/components/alerts/delete-alert-dialog";
@@ -32,10 +34,20 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
   useMonitor,
   useMonitorChecks,
@@ -247,25 +259,47 @@ export default function MonitorDetailPage() {
               30 days
             </ToggleGroupItem>
           </ToggleGroup>
-          <Button
-            variant="outline"
-            onClick={() => setEditModalOpen(true)}
-            disabled={isLoading || !monitorData}
-          >
-            <Pencil className="mr-2 size-4" />
-            Edit
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => setDeleteDialogOpen(true)}
-            disabled={isLoading || !monitorData}
-          >
-            <Trash className="mr-2 size-4" />
-            Delete
-          </Button>
-          <Button variant="ghost" size="icon">
-            <MoreHorizontal className="size-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  disabled={isLoading || !monitorData}
+                />
+              }
+            >
+              <MoreHorizontal className="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={() => setEditModalOpen(true)}>
+                <Pencil className="mr-2 size-4" />
+                Edit monitor
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {monitorData?.isPublic && (
+                <DropdownMenuItem
+                  onClick={() => {
+                    if (monitorData) {
+                      const url = `${window.location.origin}/status/${monitorData.id}`;
+                      navigator.clipboard.writeText(url);
+                      toast.success("Public link copied to clipboard");
+                    }
+                  }}
+                >
+                  <Share className="mr-2 size-4" />
+                  Copy Public Link
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                variant="destructive"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Trash className="mr-2 size-4" />
+                Delete monitor
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 
@@ -402,6 +436,78 @@ export default function MonitorDetailPage() {
           </div>
         </div>
         <LatencyChart monitorId={monitorId} />
+      </div>
+
+      {/* Recent Checks */}
+      <div className="space-y-4">
+        <div>
+          <h3 className="text-lg font-semibold">Recent Checks</h3>
+          <p className="text-sm text-muted-foreground">
+            The last 10 checks for this monitor
+          </p>
+        </div>
+        <Card className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Status</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Response Time</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                [...Array(5)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell>
+                      <Skeleton className="h-5 w-16" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-32" />
+                    </TableCell>
+                    <TableCell>
+                      <Skeleton className="h-4 w-16" />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : checksData?.data?.length === 0 ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="py-8 text-center text-muted-foreground"
+                  >
+                    No recent checks found
+                  </TableCell>
+                </TableRow>
+              ) : (
+                checksData?.data?.slice(0, 10).map((check) => (
+                  <TableRow key={check.id}>
+                    <TableCell>
+                      <Badge
+                        variant={
+                          check.status === "up" ? "default" : "destructive"
+                        }
+                        className={
+                          check.status === "up"
+                            ? "bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-950/40 dark:text-green-400"
+                            : ""
+                        }
+                      >
+                        {check.status === "up" ? "Up" : "Down"}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {new Date(check.checkedAt).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      {check.responseTime ? `${check.responseTime}ms` : "—"}
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </Card>
       </div>
 
       {/* Alerts Section */}
