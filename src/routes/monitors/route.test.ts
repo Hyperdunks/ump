@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { normalizeMonitorUrl } from "@/lib/normalize-monitor-url";
 
 describe("Monitor API Validators", () => {
   test("validates monitor type enum values", () => {
@@ -62,5 +63,27 @@ describe("URL Validation", () => {
     for (const url of invalidUrls) {
       expect(() => new URL(url)).toThrow();
     }
+  });
+});
+
+describe("Monitor URL normalization", () => {
+  test("adds https for domains without protocol", () => {
+    expect(normalizeMonitorUrl("google.com")).toBe("https://google.com");
+    expect(normalizeMonitorUrl("harzh.xyz")).toBe("https://harzh.xyz");
+  });
+
+  test("keeps explicit protocols unchanged", () => {
+    expect(normalizeMonitorUrl("https://google.com")).toBe(
+      "https://google.com",
+    );
+    expect(normalizeMonitorUrl("http://api.example.com/health")).toBe(
+      "http://api.example.com/health",
+    );
+    expect(normalizeMonitorUrl("postgresql://localhost:5432/ump")).toBe(
+      "postgresql://localhost:5432/ump",
+    );
+    expect(normalizeMonitorUrl("mongodb+srv://cluster0.example.mongodb.net")).toBe(
+      "mongodb+srv://cluster0.example.mongodb.net",
+    );
   });
 });
