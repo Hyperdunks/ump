@@ -59,8 +59,8 @@ export function EditMonitorModal({
     url: monitor.url,
     type: monitor.type as (typeof MONITOR_TYPES)[number],
     method: monitor.method as (typeof HTTP_METHODS)[number],
-    checkInterval: monitor.checkInterval,
-    timeout: monitor.timeout,
+    checkInterval: monitor.checkInterval as number | "",
+    timeout: monitor.timeout as number | "",
     expectedStatusCodes: monitor.expectedStatusCodes.join(","),
     isActive: monitor.isActive,
     isPublic: monitor.isPublic,
@@ -73,8 +73,8 @@ export function EditMonitorModal({
         url: monitor.url,
         type: monitor.type as (typeof MONITOR_TYPES)[number],
         method: monitor.method as (typeof HTTP_METHODS)[number],
-        checkInterval: monitor.checkInterval,
-        timeout: monitor.timeout,
+        checkInterval: monitor.checkInterval as number | "",
+        timeout: monitor.timeout as number | "",
         expectedStatusCodes: monitor.expectedStatusCodes.join(","),
         isActive: monitor.isActive,
         isPublic: monitor.isPublic,
@@ -94,8 +94,8 @@ export function EditMonitorModal({
       url: normalizeMonitorUrl(formData.url),
       type: formData.type,
       method: formData.method,
-      checkInterval: formData.checkInterval,
-      timeout: formData.timeout,
+      checkInterval: Number(formData.checkInterval),
+      timeout: Number(formData.timeout),
       expectedStatusCodes: formData.expectedStatusCodes
         .split(",")
         .map((s) => s.trim())
@@ -213,9 +213,10 @@ export function EditMonitorModal({
                   min={300}
                   max={3600}
                   value={formData.checkInterval}
-                  onChange={(e) =>
-                    handleChange("checkInterval", Number(e.target.value))
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("checkInterval", val === "" ? "" : Number(val));
+                  }}
                   required
                 />
               </Field>
@@ -226,12 +227,13 @@ export function EditMonitorModal({
                 </FieldLabel>
                 <Input
                   type="number"
-                  min={1000}
+                  min={3000}
                   max={60000}
                   value={formData.timeout}
-                  onChange={(e) =>
-                    handleChange("timeout", Number(e.target.value))
-                  }
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    handleChange("timeout", val === "" ? "" : Number(val));
+                  }}
                   required
                 />
               </Field>

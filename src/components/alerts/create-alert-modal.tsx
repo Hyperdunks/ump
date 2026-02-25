@@ -43,7 +43,7 @@ const defaultFormData = {
   name: "",
   channel: "email" as const,
   endpoint: "",
-  failureThreshold: 3,
+  failureThreshold: 3 as number | "",
   isEnabled: true,
 };
 
@@ -59,14 +59,15 @@ export function CreateAlertModal({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
-  async function handleSubmit() {
+  async function handleSubmit(e?: React.FormEvent) {
+    if (e) e.preventDefault();
     await createAlert.mutateAsync({
       monitorId,
       data: {
         name: formData.name,
         channel: formData.channel,
         endpoint: formData.endpoint,
-        failureThreshold: formData.failureThreshold,
+        failureThreshold: Number(formData.failureThreshold),
         isEnabled: formData.isEnabled,
       },
     });
@@ -77,125 +78,131 @@ export function CreateAlertModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg">
-        <DialogHeader>
-          <div className="flex items-center gap-2">
-            <div className="rounded-lg bg-muted p-2">
-              <BellPlus className="size-5" />
+        <form onSubmit={handleSubmit}>
+          <DialogHeader>
+            <div className="flex items-center gap-2">
+              <div className="rounded-lg bg-muted p-2">
+                <BellPlus className="size-5" />
+              </div>
+              <div>
+                <DialogTitle>Create Alert</DialogTitle>
+                <DialogDescription>
+                  Configure a new alert notification for this monitor.
+                </DialogDescription>
+              </div>
             </div>
-            <div>
-              <DialogTitle>Create Alert</DialogTitle>
-              <DialogDescription>
-                Configure a new alert notification for this monitor.
-              </DialogDescription>
-            </div>
-          </div>
-        </DialogHeader>
+          </DialogHeader>
 
-        <div className="space-y-4">
           <div className="space-y-4">
-            <Field>
-              <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
-                Name *
-              </FieldLabel>
-              <Input
-                placeholder="Production Alert"
-                value={formData.name}
-                onChange={(e) => handleInputChange("name", e.target.value)}
-              />
-            </Field>
+            <div className="space-y-4">
+              <Field>
+                <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
+                  Name *
+                </FieldLabel>
+                <Input
+                  placeholder="Production Alert"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange("name", e.target.value)}
+                  required
+                />
+              </Field>
 
-            <Field>
-              <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
-                Channel
-              </FieldLabel>
-              <Select
-                value={formData.channel}
-                onValueChange={(val) =>
-                  handleInputChange(
-                    "channel",
-                    val as (typeof CHANNEL_TYPES)[number],
-                  )
-                }
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CHANNEL_TYPES.map((channel) => (
-                    <SelectItem key={channel} value={channel}>
-                      {channel.toUpperCase()}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </Field>
+              <Field>
+                <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
+                  Channel
+                </FieldLabel>
+                <Select
+                  value={formData.channel}
+                  onValueChange={(val) =>
+                    handleInputChange(
+                      "channel",
+                      val as (typeof CHANNEL_TYPES)[number],
+                    )
+                  }
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CHANNEL_TYPES.map((channel) => (
+                      <SelectItem key={channel} value={channel}>
+                        {channel.toUpperCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </Field>
 
-            <Field>
-              <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
-                Endpoint *
-              </FieldLabel>
-              <Input
-                placeholder={endpointPlaceholders[formData.channel]}
-                value={formData.endpoint}
-                onChange={(e) => handleInputChange("endpoint", e.target.value)}
-              />
-            </Field>
-          </div>
-
-          <Field>
-            <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
-              Failure Threshold
-            </FieldLabel>
-            <Input
-              type="number"
-              min={1}
-              max={10}
-              value={formData.failureThreshold}
-              onChange={(e) =>
-                handleInputChange("failureThreshold", Number(e.target.value))
-              }
-            />
-          </Field>
-
-          <div className="flex items-center justify-between rounded-lg border p-4">
-            <div className="space-y-0.5">
-              <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
-                Enabled
-              </FieldLabel>
-              <p className="text-xs text-muted-foreground">
-                Enable alert notifications immediately
-              </p>
+              <Field>
+                <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
+                  Endpoint *
+                </FieldLabel>
+                <Input
+                  placeholder={endpointPlaceholders[formData.channel]}
+                  value={formData.endpoint}
+                  onChange={(e) => handleInputChange("endpoint", e.target.value)}
+                  required
+                />
+              </Field>
             </div>
-            <Switch
-              checked={formData.isEnabled}
-              onCheckedChange={(checked) =>
-                handleInputChange("isEnabled", checked)
-              }
-              size="sm"
-            />
-          </div>
-        </div>
 
-        <DialogFooter>
-          <DialogClose render={<Button variant="outline" />}>
-            Cancel
-          </DialogClose>
-          <Button
-            onClick={handleSubmit}
-            disabled={
-              createAlert.isPending || !formData.name || !formData.endpoint
-            }
-          >
-            {createAlert.isPending ? (
-              "Creating..."
-            ) : (
-              <>
-                <Plus className="mr-2 size-4" />
-                Create Alert
-              </>
-            )}
-          </Button>
-        </DialogFooter>
+            <Field>
+              <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
+                Failure Threshold
+              </FieldLabel>
+              <Input
+                type="number"
+                min={1}
+                max={10}
+                value={formData.failureThreshold}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleInputChange("failureThreshold", val === "" ? "" : Number(val));
+                }}
+                required
+              />
+            </Field>
+
+            <div className="flex items-center justify-between rounded-lg border p-4">
+              <div className="space-y-0.5">
+                <FieldLabel className="text-[10px] font-bold uppercase tracking-wider">
+                  Enabled
+                </FieldLabel>
+                <p className="text-xs text-muted-foreground">
+                  Enable alert notifications immediately
+                </p>
+              </div>
+              <Switch
+                checked={formData.isEnabled}
+                onCheckedChange={(checked) =>
+                  handleInputChange("isEnabled", checked)
+                }
+                size="sm"
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <DialogClose render={<Button variant="outline" type="button" />}>
+              Cancel
+            </DialogClose>
+            <Button
+              type="submit"
+              disabled={
+                createAlert.isPending || !formData.name || !formData.endpoint
+              }
+            >
+              {createAlert.isPending ? (
+                "Creating..."
+              ) : (
+                <>
+                  <Plus className="mr-2 size-4" />
+                  Create Alert
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

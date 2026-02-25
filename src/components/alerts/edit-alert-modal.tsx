@@ -50,7 +50,7 @@ export function EditAlertModal({
     name: "",
     channel: "email" as (typeof ALERT_CHANNELS)[number],
     endpoint: "",
-    failureThreshold: 3,
+    failureThreshold: 3 as number | "",
     isEnabled: true,
   });
 
@@ -60,7 +60,7 @@ export function EditAlertModal({
         name: alert.name,
         channel: alert.channel,
         endpoint: alert.endpoint,
-        failureThreshold: alert.failureThreshold,
+        failureThreshold: alert.failureThreshold as number | "",
         isEnabled: alert.isEnabled,
       });
     }
@@ -79,7 +79,7 @@ export function EditAlertModal({
       name: formData.name,
       channel: formData.channel,
       endpoint: formData.endpoint,
-      failureThreshold: formData.failureThreshold,
+      failureThreshold: Number(formData.failureThreshold),
       isEnabled: formData.isEnabled,
     };
 
@@ -176,9 +176,10 @@ export function EditAlertModal({
                 min={1}
                 max={10}
                 value={formData.failureThreshold}
-                onChange={(e) =>
-                  handleChange("failureThreshold", Number(e.target.value))
-                }
+                onChange={(e) => {
+                  const val = e.target.value;
+                  handleChange("failureThreshold", val === "" ? "" : Number(val));
+                }}
                 required
               />
             </Field>
@@ -201,7 +202,7 @@ export function EditAlertModal({
           </div>
 
           <DialogFooter>
-            <DialogClose render={<Button variant="outline" />}>
+            <DialogClose render={<Button variant="outline" type="button" />}>
               Cancel
             </DialogClose>
             <Button type="submit" disabled={updateAlert.isPending}>
