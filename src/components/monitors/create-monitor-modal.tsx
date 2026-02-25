@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useCreateMonitor } from "@/hooks/api/use-monitors";
+import { normalizeMonitorUrl } from "@/lib/normalize-monitor-url";
 
 const MONITOR_TYPES = ["http", "https", "tcp", "ping"] as const;
 const HTTP_METHODS = ["GET", "POST", "HEAD"] as const;
@@ -58,9 +59,11 @@ export function CreateMonitorModal({
   }
 
   async function handleSubmit() {
+    const normalizedUrl = normalizeMonitorUrl(formData.url);
+
     await createMonitor.mutateAsync({
       name: formData.name,
-      url: formData.url,
+      url: normalizedUrl,
       type: formData.type,
       method: formData.method,
       checkInterval: formData.checkInterval,

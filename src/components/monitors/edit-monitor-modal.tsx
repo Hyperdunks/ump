@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useUpdateMonitor } from "@/hooks/api/use-monitors";
+import { normalizeMonitorUrl } from "@/lib/normalize-monitor-url";
 
 const MONITOR_TYPES = ["http", "https", "tcp", "ping"] as const;
 const HTTP_METHODS = ["GET", "POST", "HEAD"] as const;
@@ -90,7 +91,7 @@ export function EditMonitorModal({
 
     const data = {
       name: formData.name,
-      url: formData.url,
+      url: normalizeMonitorUrl(formData.url),
       type: formData.type,
       method: formData.method,
       checkInterval: formData.checkInterval,

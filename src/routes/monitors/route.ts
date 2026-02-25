@@ -4,6 +4,7 @@ import { betterAuthPlugin } from "@/app/api/[[...slug]]/auth";
 import { db } from "@/db";
 import { healthCheck, incident, monitor } from "@/db/schema";
 import { nanoid } from "@/lib/nanoid";
+import { normalizeMonitorUrl } from "@/lib/normalize-monitor-url";
 import { idParam, paginationQuery } from "@/lib/params";
 import { getUptimeAllPeriods } from "@/lib/workers";
 
@@ -143,7 +144,7 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
           id,
           userId: user.id,
           name: body.name,
-          url: body.url,
+          url: normalizeMonitorUrl(body.url),
           type: body.type ?? "https",
           method: body.method ?? "GET",
           checkInterval: body.checkInterval ?? 60,
@@ -172,9 +173,14 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
 
       if (!existing) return status(404, { message: "Monitor not found" });
 
+      const updateData =
+        typeof body.url === "string"
+          ? { ...body, url: normalizeMonitorUrl(body.url) }
+          : body;
+
       const [updated] = await db
         .update(monitor)
-        .set(body)
+        .set(updateData)
         .where(eq(monitor.id, params.id))
         .returning();
       return { data: updated };
