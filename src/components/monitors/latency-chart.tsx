@@ -95,7 +95,12 @@ export default function LatencyChart({ monitorId }: { monitorId: string }) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="time" hide />
+          <XAxis
+            dataKey="time"
+            tick={{ fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+          />
           <YAxis
             orientation="right"
             tick={{ fontSize: 10 }}
@@ -105,18 +110,18 @@ export default function LatencyChart({ monitorId }: { monitorId: string }) {
           <ChartTooltip content={<ChartTooltipContent />} />
           <Area
             type="monotone"
-            dataKey="p50"
-            stroke="var(--color-p50)"
-            fillOpacity={1}
-            fill="url(#colorP50)"
-            strokeWidth={2}
-          />
-          <Area
-            type="monotone"
             dataKey="p99"
             stroke="var(--color-p99)"
             fillOpacity={0.15}
             fill="url(#colorP99)"
+            strokeWidth={2}
+          />
+          <Area
+            type="monotone"
+            dataKey="p50"
+            stroke="var(--color-p50)"
+            fillOpacity={1}
+            fill="url(#colorP50)"
             strokeWidth={2}
           />
         </AreaChart>

@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
 import { type Alert, AlertList } from "@/components/alerts/alert-list";
 import { CreateAlertModal } from "@/components/alerts/create-alert-modal";
@@ -96,16 +96,39 @@ export default function MonitorDetailPage() {
   const { data: checksData } = useMonitorChecks(monitorId, { limit: 500 });
   const { data: monitorsData } = useMonitors({ limit: 50 });
 
+  const [timeRange, setTimeRange] = useState<"1d" | "7d" | "30d">("1d");
+
   const isLoading = isLoadingMonitor || isLoadingUptime;
-  const stats24h = uptimeData?.["24h"];
+
+  const uptimeKey = timeRange === "1d" ? "24h" : timeRange;
+  const periodStats = uptimeData?.[uptimeKey];
 
   const activeMonitors =
     monitorsData?.data?.filter((m) => m.isActive).slice(0, 50) ?? [];
 
-  const responseTimes =
-    checksData?.data
-      ?.filter((c) => c.responseTime !== null)
-      .map((c) => c.responseTime as number) ?? [];
+  const timeRangeMs =
+    timeRange === "1d"
+      ? 24 * 60 * 60 * 1000
+      : timeRange === "7d"
+        ? 7 * 24 * 60 * 60 * 1000
+        : 30 * 24 * 60 * 60 * 1000;
+
+  const filteredChecks = useMemo(() => {
+    const cutoff = new Date(Date.now() - timeRangeMs);
+    return (
+      checksData?.data?.filter(
+        (c) => new Date(c.checkedAt) >= cutoff,
+      ) ?? []
+    );
+  }, [checksData?.data, timeRangeMs]);
+
+  const responseTimes = useMemo(
+    () =>
+      filteredChecks
+        .filter((c) => c.responseTime !== null)
+        .map((c) => c.responseTime as number),
+    [filteredChecks],
+  );
 
   const percentiles =
     responseTimes.length >= 3 ? calculatePercentiles(responseTimes) : null;
@@ -147,27 +170,27 @@ export default function MonitorDetailPage() {
   const statCards = [
     {
       label: "UPTIME",
-      value: formatPercent(stats24h?.uptimePercent),
-      subValue: stats24h
-        ? `${(100 - stats24h.uptimePercent).toFixed(2)}%`
+      value: formatPercent(periodStats?.uptimePercent),
+      subValue: periodStats
+        ? `${(100 - periodStats.uptimePercent).toFixed(2)}%`
         : "—",
       color: "green" as const,
     },
     {
       label: "DEGRADED",
-      value: stats24h?.degradedChecks?.toString() ?? "—",
+      value: periodStats?.degradedChecks?.toString() ?? "—",
       subValue:
-        stats24h && stats24h.totalChecks > 0
-          ? `${((stats24h.degradedChecks / stats24h.totalChecks) * 100).toFixed(1)}%`
+        periodStats && periodStats.totalChecks > 0
+          ? `${((periodStats.degradedChecks / periodStats.totalChecks) * 100).toFixed(1)}%`
           : "—",
       color: "yellow" as const,
     },
     {
       label: "FAILING",
-      value: stats24h?.downChecks?.toString() ?? "—",
+      value: periodStats?.downChecks?.toString() ?? "—",
       subValue:
-        stats24h && stats24h.totalChecks > 0
-          ? `${((stats24h.downChecks / stats24h.totalChecks) * 100).toFixed(1)}%`
+        periodStats && periodStats.totalChecks > 0
+          ? `${((periodStats.downChecks / periodStats.totalChecks) * 100).toFixed(1)}%`
           : "—",
       color: "red" as const,
     },
@@ -248,7 +271,15 @@ export default function MonitorDetailPage() {
           )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <ToggleGroup defaultValue={["1d"]} variant="outline">
+          <ToggleGroup
+            value={[timeRange]}
+            onValueChange={(value) => {
+              if (value.length > 0) {
+                setTimeRange(value[value.length - 1] as "1d" | "7d" | "30d");
+              }
+            }}
+            variant="outline"
+          >
             <ToggleGroupItem value="1d" className="text-xs">
               Last day
             </ToggleGroupItem>
@@ -365,7 +396,7 @@ export default function MonitorDetailPage() {
               </CardHeader>
               <CardContent>
                 <span className="text-xl font-bold">
-                  {stats24h?.totalChecks ?? "—"}
+                  {periodStats?.totalChecks ?? "—"}
                 </span>
               </CardContent>
             </Card>
@@ -470,7 +501,7 @@ export default function MonitorDetailPage() {
                     </TableCell>
                   </TableRow>
                 ))
-              ) : checksData?.data?.length === 0 ? (
+              ) : filteredChecks.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={3}
@@ -480,7 +511,7 @@ export default function MonitorDetailPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                checksData?.data?.slice(0, 10).map((check) => (
+                filteredChecks.slice(0, 10).map((check) => (
                   <TableRow key={check.id}>
                     <TableCell>
                       <Badge

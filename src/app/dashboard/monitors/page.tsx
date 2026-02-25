@@ -16,10 +16,21 @@ import { toast } from "sonner";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog";
 import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,7 +56,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useMonitorChecks, useMonitors } from "@/hooks/api";
+import {
+  useDeleteMonitor,
+  useMonitorChecks,
+  useMonitors,
+} from "@/hooks/api";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils/format";
 import { calculatePercentiles } from "@/lib/utils/percentile";
@@ -90,6 +105,10 @@ export default function MonitorsListPage() {
     name: string;
   } | null>(null);
   const [monitorStats, setMonitorStats] = useState<Record<string, number>>({});
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const deleteMonitor = useDeleteMonitor();
 
   const handleUpdateP95 = useCallback((id: string, p95: number) => {
     setMonitorStats((prev) => {
@@ -380,11 +399,45 @@ export default function MonitorsListPage() {
         </Card>
       ) : (
         <Card className="p-0">
+          {selectedIds.size > 0 && (
+            <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-2">
+              <span className="text-sm text-muted-foreground">
+                {selectedIds.size} monitor{selectedIds.size > 1 ? "s" : ""} selected
+              </span>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => setBulkDeleteOpen(true)}
+              >
+                <Trash className="size-4" data-icon="inline-start" />
+                Delete Selected
+              </Button>
+            </div>
+          )}
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead className="w-10 pl-4">
-                  <Checkbox aria-label="Select all" />
+                  <Checkbox
+                    aria-label="Select all"
+                    checked={
+                      filtered.length > 0 &&
+                      filtered.every((m) => selectedIds.has(m.id))
+                    }
+                    indeterminate={
+                      filtered.some((m) => selectedIds.has(m.id)) &&
+                      !filtered.every((m) => selectedIds.has(m.id))
+                    }
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        setSelectedIds(
+                          new Set(filtered.map((m) => m.id)),
+                        );
+                      } else {
+                        setSelectedIds(new Set());
+                      }
+                    }}
+                  />
                 </TableHead>
                 <TableHead>Name</TableHead>
                 <TableHead>Status</TableHead>
@@ -401,6 +454,15 @@ export default function MonitorsListPage() {
                 <MonitorRow
                   key={monitor.id}
                   monitor={monitor}
+                  isSelected={selectedIds.has(monitor.id)}
+                  onToggleSelect={(id) => {
+                    setSelectedIds((prev) => {
+                      const next = new Set(prev);
+                      if (next.has(id)) next.delete(id);
+                      else next.add(id);
+                      return next;
+                    });
+                  }}
                   onUpdateP95={handleUpdateP95}
                   onEdit={setEditingMonitor}
                   onDelete={setDeletingMonitor}
@@ -496,17 +558,58 @@ export default function MonitorsListPage() {
           monitor={deletingMonitor}
         />
       )}
+
+      <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedIds.size} Monitor{selectedIds.size > 1 ? "s" : ""}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the selected monitor{selectedIds.size > 1 ? "s" : ""} and all associated check history. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              disabled={isBulkDeleting}
+              onClick={async () => {
+                setIsBulkDeleting(true);
+                try {
+                  await Promise.all(
+                    Array.from(selectedIds).map((id) =>
+                      deleteMonitor.mutateAsync(id),
+                    ),
+                  );
+                  toast.success(`Deleted ${selectedIds.size} monitor${selectedIds.size > 1 ? "s" : ""}`);
+                  setSelectedIds(new Set());
+                } catch {
+                  toast.error("Some monitors failed to delete");
+                } finally {
+                  setIsBulkDeleting(false);
+                  setBulkDeleteOpen(false);
+                }
+              }}
+            >
+              {isBulkDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
 
 function MonitorRow({
   monitor,
+  isSelected,
+  onToggleSelect,
   onUpdateP95,
   onEdit,
   onDelete,
 }: {
   monitor: any;
+  isSelected: boolean;
+  onToggleSelect: (id: string) => void;
   onUpdateP95: (id: string, p95: number) => void;
   onEdit: (monitor: any) => void;
   onDelete: (monitor: { id: string; name: string }) => void;
@@ -534,7 +637,11 @@ function MonitorRow({
       onClick={() => router.push(`/dashboard/monitors/${monitor.id}`)}
     >
       <TableCell className="pl-4" onClick={(e) => e.stopPropagation()}>
-        <Checkbox aria-label={`Select ${monitor.name}`} />
+        <Checkbox
+          aria-label={`Select ${monitor.name}`}
+          checked={isSelected}
+          onCheckedChange={() => onToggleSelect(monitor.id)}
+        />
       </TableCell>
       <TableCell className="font-medium">{monitor.name}</TableCell>
       <TableCell>
