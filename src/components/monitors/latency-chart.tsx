@@ -95,7 +95,12 @@ export default function LatencyChart({ monitorId }: { monitorId: string }) {
             </linearGradient>
           </defs>
           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis dataKey="time" hide />
+          <XAxis
+            dataKey="time"
+            tick={{ fontSize: 10 }}
+            axisLine={false}
+            tickLine={false}
+          />
           <YAxis
             orientation="right"
             tick={{ fontSize: 10 }}
