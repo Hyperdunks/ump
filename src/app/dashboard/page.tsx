@@ -46,7 +46,7 @@ export default function DashboardPage() {
     },
     {
       label: "Status Pages",
-      value: incidentsData?.data?.length?.toString() ?? "0",
+      value: monitorsData?.data?.filter((m: any) => m.isPublic)?.length?.toString() ?? "0",
       icon: Files,
       href: "/status",
     }
