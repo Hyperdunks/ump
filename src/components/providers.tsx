@@ -12,6 +12,7 @@ import { queryClient } from "@/lib/query-client";
 
 export function Providers({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const googleEnabled = process.env.NEXT_PUBLIC_ENABLE_GOOGLE_AUTH === "true";
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -26,9 +27,13 @@ export function Providers({ children }: { children: ReactNode }) {
           }}
           Link={Link}
           basePath="/"
-          social={{
-            providers: ["google"],
-          }}
+          {...(googleEnabled
+            ? {
+                social: {
+                  providers: ["google"] as const,
+                },
+              }
+            : {})}
           avatar={{
             upload: async (file: File) => {
               const formData = new FormData();

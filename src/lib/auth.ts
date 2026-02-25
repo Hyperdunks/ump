@@ -6,6 +6,11 @@ import * as schema from "@/db/schema";
 import { sendPasswordResetEmail, sendVerificationEmail } from "@/lib/resend";
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const googleEnabled = Boolean(googleClientId && googleClientSecret);
+const requireEmailVerification =
+  process.env.DISABLE_EMAIL_VERIFICATION !== "true";
 
 export const auth = betterAuth({
   trustedOrigins: [appUrl],
@@ -15,15 +20,19 @@ export const auth = betterAuth({
       maxAge: 5 * 60,
     },
   },
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    },
-  },
+  ...(googleEnabled
+    ? {
+        socialProviders: {
+          google: {
+            clientId: googleClientId!,
+            clientSecret: googleClientSecret!,
+          },
+        },
+      }
+    : {}),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification,
     sendResetPassword: async ({ user, url, token }) => {
       const resetUrl = `${appUrl}/auth/reset-password?token=${token}`;
       sendPasswordResetEmail(user.email, resetUrl, user.name).catch((err) => {
