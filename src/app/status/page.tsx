@@ -67,7 +67,7 @@ export default async function PublicStatusListPage() {
   return (
     <div className="min-h-screen bg-background">
       <header className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-6 py-6">
+        <div className="mx-auto max-w-4xl px-4 py-5 sm:px-6 sm:py-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-3">
@@ -83,9 +83,9 @@ export default async function PublicStatusListPage() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
         {monitors.length === 0 ? (
-          <div className="bg-card rounded-lg border border-border p-12 text-center">
+          <div className="bg-card rounded-lg border border-border p-8 text-center sm:p-12">
             <Globe className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h2 className="text-lg font-semibold mb-2">
               {session ? "No public monitors available" : "Sign in to view your public monitors"}
@@ -104,9 +104,9 @@ export default async function PublicStatusListPage() {
                 <Link
                   key={mon.id}
                   href={`/status/${mon.id}`}
-                  className="block bg-card rounded-lg border border-border p-6 hover:border-primary/50 transition-colors group"
+                  className="block bg-card rounded-lg border border-border p-4 transition-colors hover:border-primary/50 group sm:p-6"
                 >
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-3 mb-1">
                         <h2 className="text-lg font-semibold truncate">
@@ -118,7 +118,7 @@ export default async function PublicStatusListPage() {
                         {mon.url}
                       </p>
                     </div>
-                    <div className="flex items-center gap-3 ml-4">
+                    <div className="flex items-center gap-3 sm:ml-4">
                       {latestCheck ? (
                         <>
                           <div className="flex items-center gap-2">
@@ -151,7 +151,7 @@ export default async function PublicStatusListPage() {
                     </div>
                   </div>
                   {latestCheck && (
-                    <div className="mt-3 pt-3 border-t border-border flex items-center gap-6 text-sm text-muted-foreground">
+                    <div className="mt-3 flex flex-col gap-2 border-t border-border pt-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:gap-6">
                       <span>
                         Last checked:{" "}
                         {new Date(latestCheck.checkedAt).toLocaleString()}

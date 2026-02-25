@@ -27,7 +27,7 @@ function DashboardSkeleton() {
           <Skeleton className="h-8 w-full" />
         </div>
       </div>
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-4 sm:p-6">
         <div className="space-y-4">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-32 w-full" />
@@ -53,7 +53,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           <div className="flex flex-1">
             <AppSidebar />
             <SidebarInset>
-              <main className="relative flex-1 p-6 md:p-8">
+              <main className="relative flex-1 p-4 sm:p-6 md:p-8">
                 <div className="mx-auto w-full">{children}</div>
               </main>
             </SidebarInset>
