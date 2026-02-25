@@ -33,6 +33,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendOnSignUp: true,
+    sendOnSignIn: true,
     sendVerificationEmail: async ({ user, url }) => {
       sendVerificationEmail(user.email, url, user.name).catch((err) => {
         console.error("[Auth] Failed to send verification email:", err);
