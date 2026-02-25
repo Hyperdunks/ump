@@ -1,7 +1,7 @@
 "use client";
 
 import { BellPlus, Plus } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -23,8 +23,12 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useCreateAlert } from "@/hooks/api/use-alerts";
+import { useSession } from "@/lib/auth-client";
 
 const CHANNEL_TYPES = ["email", "webhook", "slack", "discord"] as const;
+const COMING_SOON_CHANNELS: ReadonlySet<string> = new Set(["slack", "discord"]);
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const endpointPlaceholders = {
   email: "alerts@company.com",
@@ -52,15 +56,58 @@ export function CreateAlertModal({
   onOpenChange,
   monitorId,
 }: CreateAlertModalProps) {
+  const { data: session } = useSession();
   const [formData, setFormData] = useState(defaultFormData);
+  const [endpointTouched, setEndpointTouched] = useState(false);
   const createAlert = useCreateAlert();
+
+  // Auto-fill user email when modal opens with email channel
+  const userEmail =
+    session?.user?.emailVerified && session?.user?.email
+      ? session.user.email
+      : "";
 
   function handleInputChange(field: keyof typeof formData, value: unknown) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
+  function handleChannelChange(val: (typeof CHANNEL_TYPES)[number]) {
+    handleInputChange("channel", val);
+    if (val === "email" && userEmail) {
+      handleInputChange("endpoint", userEmail);
+      setEndpointTouched(false);
+    } else {
+      handleInputChange("endpoint", "");
+      setEndpointTouched(false);
+    }
+  }
+
+  // Reset form and pre-fill email when modal opens
+  useEffect(() => {
+    if (open) {
+      const initial = { ...defaultFormData };
+      if (userEmail) {
+        initial.endpoint = userEmail;
+      }
+      setFormData(initial);
+      setEndpointTouched(false);
+    }
+  }, [open, userEmail]);
+
+  const emailError =
+    formData.channel === "email" &&
+    endpointTouched &&
+    formData.endpoint.length > 0 &&
+    !emailRegex.test(formData.endpoint);
+
+  const isEmailInvalid =
+    formData.channel === "email" &&
+    formData.endpoint.length > 0 &&
+    !emailRegex.test(formData.endpoint);
+
   async function handleSubmit(e?: React.FormEvent) {
     if (e) e.preventDefault();
+    if (isEmailInvalid) return;
     await createAlert.mutateAsync({
       monitorId,
       data: {
@@ -72,6 +119,7 @@ export function CreateAlertModal({
       },
     });
     setFormData(defaultFormData);
+    setEndpointTouched(false);
     onOpenChange(false);
   }
 
@@ -114,8 +162,7 @@ export function CreateAlertModal({
                 <Select
                   value={formData.channel}
                   onValueChange={(val) =>
-                    handleInputChange(
-                      "channel",
+                    handleChannelChange(
                       val as (typeof CHANNEL_TYPES)[number],
                     )
                   }
@@ -125,8 +172,15 @@ export function CreateAlertModal({
                   </SelectTrigger>
                   <SelectContent>
                     {CHANNEL_TYPES.map((channel) => (
-                      <SelectItem key={channel} value={channel}>
+                      <SelectItem
+                        key={channel}
+                        value={channel}
+                        disabled={COMING_SOON_CHANNELS.has(channel)}
+                      >
                         {channel.toUpperCase()}
+                        {COMING_SOON_CHANNELS.has(channel)
+                          ? " (Coming Soon)"
+                          : ""}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -140,9 +194,19 @@ export function CreateAlertModal({
                 <Input
                   placeholder={endpointPlaceholders[formData.channel]}
                   value={formData.endpoint}
-                  onChange={(e) => handleInputChange("endpoint", e.target.value)}
+                  onChange={(e) => {
+                    handleInputChange("endpoint", e.target.value);
+                    setEndpointTouched(true);
+                  }}
+                  onBlur={() => setEndpointTouched(true)}
                   required
+                  className={emailError ? "border-destructive" : ""}
                 />
+                {emailError && (
+                  <p className="text-xs text-destructive mt-1">
+                    Please enter a valid email address.
+                  </p>
+                )}
               </Field>
             </div>
 
@@ -177,19 +241,22 @@ export function CreateAlertModal({
                 onCheckedChange={(checked) =>
                   handleInputChange("isEnabled", checked)
                 }
-                size="sm"
+                size="default"
               />
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="pt-4">
             <DialogClose render={<Button variant="outline" type="button" />}>
               Cancel
             </DialogClose>
             <Button
               type="submit"
               disabled={
-                createAlert.isPending || !formData.name || !formData.endpoint
+                createAlert.isPending ||
+                !formData.name ||
+                !formData.endpoint ||
+                isEmailInvalid
               }
             >
               {createAlert.isPending ? (

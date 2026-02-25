@@ -23,8 +23,12 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useUpdateAlert } from "@/hooks/api/use-alerts";
+import { useSession } from "@/lib/auth-client";
 
 const ALERT_CHANNELS = ["email", "webhook", "slack", "discord"] as const;
+const COMING_SOON_CHANNELS: ReadonlySet<string> = new Set(["slack", "discord"]);
+
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 interface EditAlertModalProps {
   open: boolean;
@@ -44,6 +48,7 @@ export function EditAlertModal({
   onOpenChange,
   alert,
 }: EditAlertModalProps) {
+  const { data: session } = useSession();
   const updateAlert = useUpdateAlert();
 
   const [formData, setFormData] = useState({
@@ -53,6 +58,12 @@ export function EditAlertModal({
     failureThreshold: 3 as number | "",
     isEnabled: true,
   });
+  const [endpointTouched, setEndpointTouched] = useState(false);
+
+  const userEmail =
+    session?.user?.emailVerified && session?.user?.email
+      ? session.user.email
+      : "";
 
   useEffect(() => {
     if (open && alert) {
@@ -63,6 +74,7 @@ export function EditAlertModal({
         failureThreshold: alert.failureThreshold as number | "",
         isEnabled: alert.isEnabled,
       });
+      setEndpointTouched(false);
     }
   }, [open, alert]);
 
@@ -70,10 +82,33 @@ export function EditAlertModal({
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 
+  function handleChannelChange(val: (typeof ALERT_CHANNELS)[number]) {
+    handleChange("channel", val);
+    if (val === "email" && userEmail) {
+      handleChange("endpoint", userEmail);
+      setEndpointTouched(false);
+    } else {
+      handleChange("endpoint", "");
+      setEndpointTouched(false);
+    }
+  }
+
+  const emailError =
+    formData.channel === "email" &&
+    endpointTouched &&
+    formData.endpoint.length > 0 &&
+    !emailRegex.test(formData.endpoint);
+
+  const isEmailInvalid =
+    formData.channel === "email" &&
+    formData.endpoint.length > 0 &&
+    !emailRegex.test(formData.endpoint);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (!alert) return;
+    if (isEmailInvalid) return;
 
     const data = {
       name: formData.name,
@@ -136,8 +171,7 @@ export function EditAlertModal({
               <Select
                 value={formData.channel}
                 onValueChange={(val) =>
-                  handleChange(
-                    "channel",
+                  handleChannelChange(
                     val as (typeof ALERT_CHANNELS)[number],
                   )
                 }
@@ -147,8 +181,15 @@ export function EditAlertModal({
                 </SelectTrigger>
                 <SelectContent>
                   {ALERT_CHANNELS.map((channel) => (
-                    <SelectItem key={channel} value={channel}>
+                    <SelectItem
+                      key={channel}
+                      value={channel}
+                      disabled={COMING_SOON_CHANNELS.has(channel)}
+                    >
                       {channel.charAt(0).toUpperCase() + channel.slice(1)}
+                      {COMING_SOON_CHANNELS.has(channel)
+                        ? " (Coming Soon)"
+                        : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -161,10 +202,20 @@ export function EditAlertModal({
               </FieldLabel>
               <Input
                 value={formData.endpoint}
-                onChange={(e) => handleChange("endpoint", e.target.value)}
+                onChange={(e) => {
+                  handleChange("endpoint", e.target.value);
+                  setEndpointTouched(true);
+                }}
+                onBlur={() => setEndpointTouched(true)}
                 placeholder={channelPlaceholders[formData.channel]}
                 required
+                className={emailError ? "border-destructive" : ""}
               />
+              {emailError && (
+                <p className="text-xs text-destructive mt-1">
+                  Please enter a valid email address.
+                </p>
+              )}
             </Field>
 
             <Field>
@@ -196,16 +247,19 @@ export function EditAlertModal({
                 onCheckedChange={(checked) =>
                   handleChange("isEnabled", checked)
                 }
-                size="sm"
+                size="default"
               />
             </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="pt-4">
             <DialogClose render={<Button variant="outline" type="button" />}>
               Cancel
             </DialogClose>
-            <Button type="submit" disabled={updateAlert.isPending}>
+            <Button
+              type="submit"
+              disabled={updateAlert.isPending || isEmailInvalid}
+            >
               {updateAlert.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
