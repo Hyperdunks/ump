@@ -8,7 +8,12 @@ interface DashboardHeaderProps {
 
 export function DashboardHeader({ children, className }: DashboardHeaderProps) {
   return (
-    <div className={cn("flex items-center justify-between mb-6", className)}>
+    <div
+      className={cn(
+        "mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between",
+        className,
+      )}
+    >
       {children}
     </div>
   );

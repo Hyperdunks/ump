@@ -12,7 +12,7 @@ type NavbarProps = {
 
 export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
   return (
-    <nav className=" px-6 py-3 relative z-10">
+    <nav className="relative z-10 px-4 py-3 sm:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-semibold text-lg">
           {/* Logo */}
@@ -20,7 +20,7 @@ export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
         </div>
 
         {/* Nav Links + Search + UserButton */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <DynamicSearch />
           <AnimatedBackground
             defaultValue={activeTab}
