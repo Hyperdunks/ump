@@ -20,13 +20,16 @@ interface WelcomeEmailProps {
   verifyUrl?: string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
+const appUrl = (
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000")
+).replace(/\/$/, "");
 
 export const WelcomeEmail = ({
   username = "there",
-  verifyUrl = "https://sentinel.com/verify",
+  verifyUrl = `${appUrl}/verify`,
 }: WelcomeEmailProps) => {
   return (
     <Html>
@@ -59,7 +62,7 @@ export const WelcomeEmail = ({
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[32px]">
               <Img
-                src={`${baseUrl}/static/sentinel-logo.png`}
+                src={`${appUrl}/static/sentinel-logo.png`}
                 width="40"
                 height="40"
                 alt="Sentinel"

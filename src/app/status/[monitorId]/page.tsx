@@ -1,10 +1,10 @@
-import { and, desc, eq, gte, or, inArray } from "drizzle-orm";
+import { and, desc, eq, gte, inArray, or } from "drizzle-orm";
 import { Activity, CheckCircle2, Clock, Globe, XCircle } from "lucide-react";
+import { headers } from "next/headers";
+import Link from "next/link";
 import { db } from "@/db";
 import { healthCheck, monitor } from "@/db/schema";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import Link from "next/link";
 
 interface PageProps {
   params: Promise<{ monitorId: string }>;
@@ -23,11 +23,8 @@ async function getPublicMonitor(monitorQuery: string) {
     .where(
       and(
         eq(monitor.isPublic, true),
-        or(
-          eq(monitor.id, decodedQuery),
-          inArray(monitor.url, urlForms)
-        )
-      )
+        or(eq(monitor.id, decodedQuery), inArray(monitor.url, urlForms)),
+      ),
     );
 
   return mon || null;

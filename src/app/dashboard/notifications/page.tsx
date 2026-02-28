@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -29,7 +30,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { useIncidents } from "@/hooks/api";
-import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 
 type NotificationType = "error" | "warning" | "success" | "info";

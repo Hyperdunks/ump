@@ -215,7 +215,10 @@ export function EditMonitorModal({
                   value={formData.checkInterval}
                   onChange={(e) => {
                     const val = e.target.value;
-                    handleChange("checkInterval", val === "" ? "" : Number(val));
+                    handleChange(
+                      "checkInterval",
+                      val === "" ? "" : Number(val),
+                    );
                   }}
                   required
                 />

@@ -4,6 +4,7 @@ import { ExternalLink, Pencil } from "lucide-react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
+import { DashboardHeader } from "@/components/dashboard-header";
 import { EditIncidentModal } from "@/components/incidents/edit-incident-modal";
 import { IncidentStateButtons } from "@/components/incidents/incident-state-buttons";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIncident } from "@/hooks/api";
-import { DashboardHeader } from "@/components/dashboard-header";
 import { cn } from "@/lib/utils";
 
 function formatRelativeTime(date: Date | string | null | undefined): string {

@@ -26,26 +26,14 @@ interface AlertSummaryEmailProps {
   }[];
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
+const appUrl = (
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000")
+).replace(/\/$/, "");
 
-export const AlertSummaryEmail = ({
-  alerts = [
-    {
-      monitorName: "Production API",
-      status: "down",
-      timestamp: "10:23 AM UTC",
-      incidentId: "inc_123",
-    },
-    {
-      monitorName: "Payment Gateway",
-      status: "degraded",
-      timestamp: "10:21 AM UTC",
-      incidentId: "inc_124",
-    },
-  ],
-}: AlertSummaryEmailProps) => {
+export const AlertSummaryEmail = ({ alerts = [] }: AlertSummaryEmailProps) => {
   return (
     <Html>
       <Tailwind
@@ -80,7 +68,7 @@ export const AlertSummaryEmail = ({
               <Row>
                 <Column>
                   <Img
-                    src={`${baseUrl}/static/sentinel-logo.png`}
+                    src={`${appUrl}/static/sentinel-logo.png`}
                     width="32"
                     height="32"
                     alt="Sentinel"
@@ -119,7 +107,7 @@ export const AlertSummaryEmail = ({
                   </Column>
                   <Column align="right">
                     <Button
-                      href={`https://sentinel.com/incidents/${alert.incidentId}`}
+                      href={`${appUrl}/dashboard/incidents/${alert.incidentId}`}
                       className="text-[12px] font-medium text-black no-underline bg-[#f3f4f6] px-3 py-1.5 rounded border border-solid border-[#e5e7eb]"
                     >
                       View
@@ -131,7 +119,7 @@ export const AlertSummaryEmail = ({
 
             <Section className="mt-[32px]">
               <Link
-                href="https://sentinel.com/dashboard"
+                href={`${appUrl}/dashboard`}
                 className="text-blue-600 text-[14px] no-underline"
               >
                 Go to Dashboard &rarr;

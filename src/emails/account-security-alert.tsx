@@ -25,17 +25,20 @@ interface AccountSecurityAlertEmailProps {
   secureAccountUrl?: string;
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
+const appUrl = (
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000")
+).replace(/\/$/, "");
 
 export const AccountSecurityAlertEmail = ({
-  username = "Harsh",
-  device = "Chrome on Windows",
-  location = "Hyderabad, India",
-  ipAddress = "192.168.1.1",
-  timestamp = "January 8, 2026 at 10:23 PM",
-  secureAccountUrl = "https://sentinel.com/account/secure",
+  username = "User",
+  device,
+  location,
+  ipAddress,
+  timestamp,
+  secureAccountUrl = `${appUrl}/dashboard`,
 }: AccountSecurityAlertEmailProps) => {
   return (
     <Html>
@@ -62,7 +65,7 @@ export const AccountSecurityAlertEmail = ({
           <Container className="my-10 mx-auto p-5 max-w-[480px]">
             <Section className="mb-6">
               <Img
-                src={`${baseUrl}/static/sentinel-logo.png`}
+                src={`${appUrl}/static/sentinel-logo.png`}
                 width="40"
                 height="40"
                 alt="Sentinel"

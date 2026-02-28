@@ -7,6 +7,13 @@ import { VerifyEmail } from "@/emails/verify-email";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
 
+const appUrl = (
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000")
+).replace(/\/$/, "");
+
 // Configure your verified sender email here
 // Use "onboarding@resend.dev" for testing (works without domain verification)
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
@@ -17,11 +24,26 @@ const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "onboarding@resend.dev";
 
 export interface SendAlertEmailOptions {
   to: string;
+  incidentId: string;
+  monitorId: string;
   monitorName: string;
   monitorUrl: string;
   timestamp: Date;
   error?: string;
   downtimeDuration?: string;
+}
+
+function formatUtcTimestamp(date: Date): string {
+  return `${new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: true,
+    timeZone: "UTC",
+  }).format(date)} UTC`;
 }
 
 /**
@@ -37,8 +59,10 @@ export async function sendMonitorDownEmail(
     react: MonitorDown({
       monitorName: options.monitorName,
       monitorUrl: options.monitorUrl,
+      incidentId: options.incidentId,
       reason: options.error,
-      timestamp: options.timestamp.toISOString(),
+      timestamp: formatUtcTimestamp(options.timestamp),
+      viewIncidentUrl: `${appUrl}/dashboard/incidents/${options.incidentId}`,
     }),
   });
 
@@ -63,8 +87,11 @@ export async function sendMonitorRecoveredEmail(
     react: MonitorRecovered({
       monitorName: options.monitorName,
       monitorUrl: options.monitorUrl,
-      timestamp: options.timestamp.toISOString(),
+      monitorId: options.monitorId,
+      incidentId: options.incidentId,
+      timestamp: formatUtcTimestamp(options.timestamp),
       downtimeDuration: options.downtimeDuration,
+      viewMonitorUrl: `${appUrl}/dashboard/monitors/${options.monitorId}`,
     }),
   });
 

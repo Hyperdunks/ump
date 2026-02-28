@@ -14,7 +14,6 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
-import * as React from "react";
 
 interface MonitorDownProps {
   monitorName?: string;
@@ -30,12 +29,12 @@ const baseUrl = process.env.VERCEL_URL
   : "";
 
 export const MonitorDown = ({
-  monitorName = "Production API",
-  monitorUrl = "https://api.sentinel.com",
-  incidentId = "inc_123",
-  reason = "Connection Timeout (5000ms)",
-  timestamp = "Jan 08, 2026 10:45 PM UTC",
-  viewIncidentUrl = "https://sentinel.com/incidents/inc_123",
+  monitorName = "Monitor",
+  monitorUrl = "",
+  incidentId = "",
+  reason = "",
+  timestamp = "",
+  viewIncidentUrl = "",
 }: MonitorDownProps) => {
   return (
     <Html>
