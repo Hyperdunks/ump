@@ -56,11 +56,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  useDeleteMonitor,
-  useMonitorChecks,
-  useMonitors,
-} from "@/hooks/api";
+import { useDeleteMonitor, useMonitorChecks, useMonitors } from "@/hooks/api";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils/format";
 import { calculatePercentiles } from "@/lib/utils/percentile";
@@ -313,7 +309,7 @@ export default function MonitorsListPage() {
               statusFilter === card.key
                 ? "ring-2 ring-offset-1 dark:ring-offset-background"
                 : "ring-1",
-              card.color
+              card.color,
             )}
             onClick={() =>
               setStatusFilter((prev) => (prev === card.key ? null : card.key))
@@ -402,7 +398,8 @@ export default function MonitorsListPage() {
           {selectedIds.size > 0 && (
             <div className="flex items-center justify-between border-b bg-muted/50 px-4 py-2">
               <span className="text-sm text-muted-foreground">
-                {selectedIds.size} monitor{selectedIds.size > 1 ? "s" : ""} selected
+                {selectedIds.size} monitor{selectedIds.size > 1 ? "s" : ""}{" "}
+                selected
               </span>
               <Button
                 variant="destructive"
@@ -430,9 +427,7 @@ export default function MonitorsListPage() {
                     }
                     onCheckedChange={(checked) => {
                       if (checked) {
-                        setSelectedIds(
-                          new Set(filtered.map((m) => m.id)),
-                        );
+                        setSelectedIds(new Set(filtered.map((m) => m.id)));
                       } else {
                         setSelectedIds(new Set());
                       }
@@ -562,13 +557,20 @@ export default function MonitorsListPage() {
       <AlertDialog open={bulkDeleteOpen} onOpenChange={setBulkDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete {selectedIds.size} Monitor{selectedIds.size > 1 ? "s" : ""}?</AlertDialogTitle>
+            <AlertDialogTitle>
+              Delete {selectedIds.size} Monitor{selectedIds.size > 1 ? "s" : ""}
+              ?
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete the selected monitor{selectedIds.size > 1 ? "s" : ""} and all associated check history. This action cannot be undone.
+              This will permanently delete the selected monitor
+              {selectedIds.size > 1 ? "s" : ""} and all associated check
+              history. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isBulkDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isBulkDeleting}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground"
               disabled={isBulkDeleting}
@@ -580,7 +582,9 @@ export default function MonitorsListPage() {
                       deleteMonitor.mutateAsync(id),
                     ),
                   );
-                  toast.success(`Deleted ${selectedIds.size} monitor${selectedIds.size > 1 ? "s" : ""}`);
+                  toast.success(
+                    `Deleted ${selectedIds.size} monitor${selectedIds.size > 1 ? "s" : ""}`,
+                  );
                   setSelectedIds(new Set());
                 } catch {
                   toast.error("Some monitors failed to delete");

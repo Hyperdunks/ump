@@ -20,6 +20,7 @@ import { DeleteMonitorDialog } from "@/components/monitors/delete-monitor-dialog
 import { EditMonitorModal } from "@/components/monitors/edit-monitor-modal";
 import LatencyChart from "@/components/monitors/latency-chart";
 import UptimeChart from "@/components/monitors/uptime-chart";
+import { Badge } from "@/components/ui/badge";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -38,7 +39,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   Table,
   TableBody,
@@ -47,7 +47,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
   useMonitor,
   useMonitorChecks,
@@ -116,9 +116,7 @@ export default function MonitorDetailPage() {
   const filteredChecks = useMemo(() => {
     const cutoff = new Date(Date.now() - timeRangeMs);
     return (
-      checksData?.data?.filter(
-        (c) => new Date(c.checkedAt) >= cutoff,
-      ) ?? []
+      checksData?.data?.filter((c) => new Date(c.checkedAt) >= cutoff) ?? []
     );
   }, [checksData?.data, timeRangeMs]);
 
@@ -438,9 +436,7 @@ export default function MonitorDetailPage() {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold">Uptime</h3>
-          <p className="text-sm text-muted-foreground">
-            Uptime of 24hours
-          </p>
+          <p className="text-sm text-muted-foreground">Uptime of 24hours</p>
         </div>
         <UptimeChart monitorId={monitorId} />
       </div>

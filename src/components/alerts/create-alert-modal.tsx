@@ -162,9 +162,7 @@ export function CreateAlertModal({
                 <Select
                   value={formData.channel}
                   onValueChange={(val) =>
-                    handleChannelChange(
-                      val as (typeof CHANNEL_TYPES)[number],
-                    )
+                    handleChannelChange(val as (typeof CHANNEL_TYPES)[number])
                   }
                 >
                   <SelectTrigger className="w-full">
@@ -221,7 +219,10 @@ export function CreateAlertModal({
                 value={formData.failureThreshold}
                 onChange={(e) => {
                   const val = e.target.value;
-                  handleInputChange("failureThreshold", val === "" ? "" : Number(val));
+                  handleInputChange(
+                    "failureThreshold",
+                    val === "" ? "" : Number(val),
+                  );
                 }}
                 required
               />

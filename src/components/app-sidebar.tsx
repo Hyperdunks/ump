@@ -1,7 +1,6 @@
 "use client";
 
-import { UserButton, UserAvatar } from "@daveyplate/better-auth-ui";
-import { useSession } from "@/lib/auth-client";
+import { UserAvatar, UserButton } from "@daveyplate/better-auth-ui";
 import {
   Activity,
   AlertTriangle,
@@ -30,9 +29,10 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
-import { useSidebar } from "@/components/ui/sidebar";
 import { useMonitors } from "@/hooks/api";
+import { useSession } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -141,11 +141,11 @@ export default function AppSidebar(
                         className={cn(
                           "size-2 shrink-0 rounded-full",
                           monitor.latestCheck?.status === "up" &&
-                          "bg-green-500",
+                            "bg-green-500",
                           monitor.latestCheck?.status === "degraded" &&
-                          "bg-yellow-500",
+                            "bg-yellow-500",
                           monitor.latestCheck?.status === "down" &&
-                          "bg-red-500 animate-pulse",
+                            "bg-red-500 animate-pulse",
                         )}
                       />
                     </SidebarMenuButton>
@@ -187,11 +187,11 @@ export default function AppSidebar(
                         className={cn(
                           "size-2 shrink-0 rounded-full",
                           monitor.latestCheck?.status === "up" &&
-                          "bg-green-500",
+                            "bg-green-500",
                           monitor.latestCheck?.status === "degraded" &&
-                          "bg-yellow-500",
+                            "bg-yellow-500",
                           monitor.latestCheck?.status === "down" &&
-                          "bg-red-500 animate-pulse",
+                            "bg-red-500 animate-pulse",
                         )}
                       />
                     </SidebarMenuButton>
@@ -211,9 +211,16 @@ export default function AppSidebar(
       {/* Footer */}
       <SidebarFooter>
         {state === "expanded" ? (
-          <UserButton side="right" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
+          <UserButton
+            side="right"
+            className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
+          />
         ) : (
-          <UserButton size="icon" side="right" className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20" />
+          <UserButton
+            size="icon"
+            side="right"
+            className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
+          />
         )}
       </SidebarFooter>
 

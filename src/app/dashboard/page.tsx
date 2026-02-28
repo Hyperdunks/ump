@@ -1,7 +1,9 @@
 "use client";
 
-import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import { Activity, AlertTriangle, Files } from "lucide-react";
+import Link from "next/link";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Empty,
@@ -12,8 +14,6 @@ import {
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useIncidents, useMonitors } from "@/hooks/api";
-import { Badge } from "@/components/ui/badge";
-import { formatDistanceToNow } from "date-fns";
 
 const sections = [
   {
@@ -46,10 +46,13 @@ export default function DashboardPage() {
     },
     {
       label: "Status Pages",
-      value: monitorsData?.data?.filter((m: any) => m.isPublic)?.length?.toString() ?? "0",
+      value:
+        monitorsData?.data
+          ?.filter((m: any) => m.isPublic)
+          ?.length?.toString() ?? "0",
       icon: Files,
       href: "/status",
-    }
+    },
   ] as const;
 
   return (
@@ -65,8 +68,15 @@ export default function DashboardPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {summaryCards.map((card) => (
-          <Link key={card.label} href={card.href} className="block transition-transform hover:scale-[1.02]">
-            <Card size="sm" className="h-full cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
+          <Link
+            key={card.label}
+            href={card.href}
+            className="block transition-transform hover:scale-[1.02]"
+          >
+            <Card
+              size="sm"
+              className="h-full cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+            >
               <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-xs font-medium text-muted-foreground">
                   {card.label}
@@ -88,13 +98,16 @@ export default function DashboardPage() {
       {/* Sections */}
       {sections.map((section) => {
         if (section.title === "Incidents") {
-          const hasIncidents = incidentsData?.data && incidentsData.data.length > 0;
+          const hasIncidents =
+            incidentsData?.data && incidentsData.data.length > 0;
 
           return (
             <div key={section.title} className="space-y-3">
               <div>
                 <h2 className="text-sm font-semibold">{section.title}</h2>
-                <p className="text-xs text-muted-foreground">{section.subtitle}</p>
+                <p className="text-xs text-muted-foreground">
+                  {section.subtitle}
+                </p>
               </div>
 
               {incidentsLoading ? (
@@ -106,12 +119,18 @@ export default function DashboardPage() {
               ) : hasIncidents ? (
                 <div className="space-y-3">
                   {incidentsData.data.slice(0, 5).map((incident: any) => (
-                    <Link key={incident.id} href={`/dashboard/incidents/${incident.id}`} className="block">
+                    <Link
+                      key={incident.id}
+                      href={`/dashboard/incidents/${incident.id}`}
+                      className="block"
+                    >
                       <Card className="p-4 cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors">
                         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                           <div className="space-y-1">
                             <div className="flex items-center gap-2">
-                              <span className="font-semibold">{incident.monitorName}</span>
+                              <span className="font-semibold">
+                                {incident.monitorName}
+                              </span>
                               <Badge
                                 variant={
                                   incident.state === "resolved"
@@ -130,11 +149,19 @@ export default function DashboardPage() {
                           </div>
                           <div className="text-xs text-muted-foreground sm:text-right">
                             <div>
-                              Detected {formatDistanceToNow(new Date(incident.detectedAt))} ago
+                              Detected{" "}
+                              {formatDistanceToNow(
+                                new Date(incident.detectedAt),
+                              )}{" "}
+                              ago
                             </div>
                             {incident.resolvedAt && (
                               <div>
-                                Resolved {formatDistanceToNow(new Date(incident.resolvedAt))} ago
+                                Resolved{" "}
+                                {formatDistanceToNow(
+                                  new Date(incident.resolvedAt),
+                                )}{" "}
+                                ago
                               </div>
                             )}
                           </div>
@@ -150,7 +177,9 @@ export default function DashboardPage() {
                       <section.icon />
                     </EmptyMedia>
                     <EmptyTitle>{section.emptyText}</EmptyTitle>
-                    <EmptyDescription>{section.emptyDescription}</EmptyDescription>
+                    <EmptyDescription>
+                      {section.emptyDescription}
+                    </EmptyDescription>
                   </EmptyHeader>
                 </Empty>
               )}
@@ -163,7 +192,9 @@ export default function DashboardPage() {
           <div key={section.title} className="space-y-3">
             <div>
               <h2 className="text-sm font-semibold">{section.title}</h2>
-              <p className="text-xs text-muted-foreground">{section.subtitle}</p>
+              <p className="text-xs text-muted-foreground">
+                {section.subtitle}
+              </p>
             </div>
             <Empty>
               <EmptyHeader>
@@ -182,7 +213,9 @@ export default function DashboardPage() {
       <div className="space-y-3">
         <div>
           <h2 className="text-sm font-semibold">Your Monitors</h2>
-          <p className="text-xs text-muted-foreground">Recently added monitors to Sentinel.</p>
+          <p className="text-xs text-muted-foreground">
+            Recently added monitors to Sentinel.
+          </p>
         </div>
 
         {monitorsLoading ? (
@@ -194,24 +227,39 @@ export default function DashboardPage() {
         ) : monitorsData?.data && monitorsData.data.length > 0 ? (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {monitorsData.data.slice(0, 5).map((monitor: any) => (
-              <Link key={monitor.id} href={`/dashboard/monitors/${monitor.id}`} className="block transition-transform hover:scale-[1.02]">
+              <Link
+                key={monitor.id}
+                href={`/dashboard/monitors/${monitor.id}`}
+                className="block transition-transform hover:scale-[1.02]"
+              >
                 <Card className="h-full cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors p-4">
                   <div className="flex flex-col h-full justify-between gap-4">
                     <div className="flex justify-between items-start">
                       <div className="space-y-1 overflow-hidden">
-                        <h4 className="font-semibold text-sm truncate">{monitor.name}</h4>
-                        <p className="text-xs text-muted-foreground truncate" title={monitor.url}>
+                        <h4 className="font-semibold text-sm truncate">
+                          {monitor.name}
+                        </h4>
+                        <p
+                          className="text-xs text-muted-foreground truncate"
+                          title={monitor.url}
+                        >
                           {monitor.url}
                         </p>
                       </div>
-                      <Badge variant={monitor.isActive ? "default" : "secondary"}>
+                      <Badge
+                        variant={monitor.isActive ? "default" : "secondary"}
+                      >
                         {monitor.isActive ? "Active" : "Paused"}
                       </Badge>
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className={`size-2 rounded-full ${monitor.isActive ? 'bg-emerald-500' : 'bg-muted-foreground'}`} />
+                      <div
+                        className={`size-2 rounded-full ${monitor.isActive ? "bg-emerald-500" : "bg-muted-foreground"}`}
+                      />
                       <span className="text-xs text-muted-foreground">
-                        {monitor.isActive ? 'Monitoring running' : 'Monitoring paused'}
+                        {monitor.isActive
+                          ? "Monitoring running"
+                          : "Monitoring paused"}
                       </span>
                     </div>
                   </div>
@@ -227,7 +275,9 @@ export default function DashboardPage() {
                   <Activity />
                 </EmptyMedia>
                 <EmptyTitle>No monitors found</EmptyTitle>
-                <EmptyDescription>You haven't created any monitors yet.</EmptyDescription>
+                <EmptyDescription>
+                  You haven't created any monitors yet.
+                </EmptyDescription>
               </EmptyHeader>
             </Empty>
           </Card>
