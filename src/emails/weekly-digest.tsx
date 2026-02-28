@@ -28,18 +28,21 @@ interface WeeklyDigestEmailProps {
   };
 }
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
+const appUrl = (
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : "http://localhost:3000")
+).replace(/\/$/, "");
 
 export const WeeklyDigestEmail = ({
-  startDate = "Oct 23",
-  endDate = "Oct 30",
+  startDate = "",
+  endDate = "",
   stats = {
-    uptime: 99.98,
-    incidents: 2,
-    avgResponseTime: 45,
-    monitorsActive: 12,
+    uptime: 0,
+    incidents: 0,
+    avgResponseTime: 0,
+    monitorsActive: 0,
   },
 }: WeeklyDigestEmailProps) => {
   return (
@@ -64,7 +67,7 @@ export const WeeklyDigestEmail = ({
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[16px] mb-[24px]">
               <Img
-                src={`${baseUrl}/static/sentinel-logo.png`}
+                src={`${appUrl}/static/sentinel-logo.png`}
                 width="32"
                 height="32"
                 alt="Sentinel"
@@ -131,7 +134,7 @@ export const WeeklyDigestEmail = ({
             <Section className="mt-[32px] text-center">
               <Button
                 className="bg-white text-black text-[12px] font-medium border border-solid border-[#eaeaea] rounded px-5 py-3 hover:bg-[#fafafa]"
-                href="https://sentinel.com/dashboard/reports"
+                href={`${appUrl}/dashboard`}
               >
                 View Full Report
               </Button>

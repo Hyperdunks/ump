@@ -11,6 +11,7 @@ export interface AlertPayload {
   incidentId: string;
   status: "down" | "recovered";
   error?: string;
+  downtimeDuration?: string;
   timestamp: Date;
 }
 
@@ -88,6 +89,8 @@ async function sendEmail(to: string, payload: AlertPayload): Promise<void> {
   if (payload.status === "down") {
     await sendMonitorDownEmail({
       to,
+      incidentId: payload.incidentId,
+      monitorId: payload.monitorId,
       monitorName: payload.monitorName,
       monitorUrl: payload.monitorUrl,
       error: payload.error,
@@ -96,8 +99,11 @@ async function sendEmail(to: string, payload: AlertPayload): Promise<void> {
   } else {
     await sendMonitorRecoveredEmail({
       to,
+      incidentId: payload.incidentId,
+      monitorId: payload.monitorId,
       monitorName: payload.monitorName,
       monitorUrl: payload.monitorUrl,
+      downtimeDuration: payload.downtimeDuration,
       timestamp: payload.timestamp,
     });
   }

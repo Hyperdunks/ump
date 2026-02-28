@@ -82,8 +82,8 @@ describe("Monitor URL normalization", () => {
     expect(normalizeMonitorUrl("postgresql://localhost:5432/ump")).toBe(
       "postgresql://localhost:5432/ump",
     );
-    expect(normalizeMonitorUrl("mongodb+srv://cluster0.example.mongodb.net")).toBe(
-      "mongodb+srv://cluster0.example.mongodb.net",
-    );
+    expect(
+      normalizeMonitorUrl("mongodb+srv://cluster0.example.mongodb.net"),
+    ).toBe("mongodb+srv://cluster0.example.mongodb.net");
   });
 });

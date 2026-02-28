@@ -19,6 +19,7 @@ import * as React from "react";
 interface MonitorRecoveredProps {
   monitorName?: string;
   monitorUrl?: string;
+  monitorId?: string;
   incidentId?: string;
   downtimeDuration?: string;
   timestamp?: string;
@@ -30,12 +31,12 @@ const baseUrl = process.env.VERCEL_URL
   : "";
 
 export const MonitorRecovered = ({
-  monitorName = "Production API",
-  monitorUrl = "https://api.sentinel.com",
-  incidentId = "inc_123",
-  downtimeDuration = "12 mins 30 secs",
-  timestamp = "Jan 08, 2026 10:57 PM UTC",
-  viewMonitorUrl = "https://sentinel.com/monitors/123",
+  monitorName = "Monitor",
+  monitorUrl = "",
+  incidentId = "",
+  downtimeDuration = "",
+  timestamp = "",
+  viewMonitorUrl = "",
 }: MonitorRecoveredProps) => {
   return (
     <Html>
