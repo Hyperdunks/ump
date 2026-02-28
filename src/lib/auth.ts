@@ -41,6 +41,11 @@ export const auth = betterAuth({
     },
     autoSignInAfterVerification: true,
   },
+  user: {
+    deleteUser: {
+      enabled: true,
+    },
+  },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
