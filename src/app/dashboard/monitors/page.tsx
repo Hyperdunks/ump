@@ -176,7 +176,7 @@ export default function MonitorsListPage() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-semibold">Monitors</h1>
             <p className="text-sm text-muted-foreground">
@@ -263,7 +263,7 @@ export default function MonitorsListPage() {
   if (isError) {
     return (
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-semibold">Monitors</h1>
             <p className="text-sm text-muted-foreground">
@@ -286,7 +286,7 @@ export default function MonitorsListPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold">Monitors</h1>
           <p className="text-sm text-muted-foreground">
@@ -371,7 +371,7 @@ export default function MonitorsListPage() {
       </div>
 
       {monitors.length === 0 ? (
-        <Card className="p-12 text-center">
+        <Card className="p-8 text-center sm:p-12">
           <div className="mx-auto max-w-sm space-y-4">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
               <Search className="size-6 text-muted-foreground" />

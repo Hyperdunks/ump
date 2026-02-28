@@ -101,7 +101,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
 
   if (!mon) {
     return (
-      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 text-center sm:p-6">
         <Globe className="w-16 h-16 text-muted-foreground mb-6 mx-auto" />
         <h1 className="text-3xl font-bold mb-3">Monitor not found</h1>
         <p className="text-muted-foreground mb-8 max-w-md mx-auto">
@@ -137,7 +137,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-border bg-card/50 backdrop-blur-sm">
-        <div className="max-w-4xl mx-auto px-6 py-6">
+        <div className="mx-auto max-w-4xl px-4 py-5 sm:px-6 sm:py-6">
           <div className="flex items-center gap-3">
             <Globe className="w-6 h-6 text-muted-foreground" />
             <h1 className="text-2xl font-bold">{mon.name}</h1>
@@ -147,9 +147,9 @@ export default async function PublicStatusPage({ params }: PageProps) {
       </header>
 
       {/* Current Status */}
-      <main className="max-w-4xl mx-auto px-6 py-8">
-        <div className="bg-card rounded-lg border border-border p-8 mb-8">
-          <div className="flex items-center justify-between">
+      <main className="mx-auto max-w-4xl px-4 py-6 sm:px-6 sm:py-8">
+        <div className="mb-8 rounded-lg border border-border bg-card p-5 sm:p-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4">
               {isUp ? (
                 <div className="flex items-center gap-3">
@@ -176,8 +176,8 @@ export default async function PublicStatusPage({ params }: PageProps) {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-card rounded-lg border border-border p-6">
+        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
               <CheckCircle2 className="w-5 h-5 text-green-500" />
               <span className="text-sm text-muted-foreground">
@@ -187,7 +187,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
             <div className="text-3xl font-bold">{uptime}%</div>
           </div>
 
-          <div className="bg-card rounded-lg border border-border p-6">
+          <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
               <Clock className="w-5 h-5 text-blue-500" />
               <span className="text-sm text-muted-foreground">
@@ -197,7 +197,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
             <div className="text-3xl font-bold">{avgResponseTime}ms</div>
           </div>
 
-          <div className="bg-card rounded-lg border border-border p-6">
+          <div className="bg-card rounded-lg border border-border p-4 sm:p-6">
             <div className="flex items-center gap-3 mb-2">
               <Activity className="w-5 h-5 text-purple-500" />
               <span className="text-sm text-muted-foreground">
@@ -210,14 +210,14 @@ export default async function PublicStatusPage({ params }: PageProps) {
 
         {/* Recent Checks */}
         <div className="bg-card rounded-lg border border-border overflow-hidden">
-          <div className="px-6 py-4 border-b border-border">
+          <div className="border-b border-border px-4 py-4 sm:px-6">
             <h2 className="text-lg font-semibold">Recent Checks</h2>
           </div>
           <div className="divide-y divide-border max-h-[400px] overflow-auto">
             {recentChecks.slice(0, 20).map((check) => (
               <div
                 key={check.id}
-                className="px-6 py-3 flex items-center justify-between"
+                className="flex items-center justify-between px-4 py-3 sm:px-6"
               >
                 <div className="flex items-center gap-3">
                   {check.status === "up" ? (
@@ -237,7 +237,7 @@ export default async function PublicStatusPage({ params }: PageProps) {
               </div>
             ))}
             {recentChecks.length === 0 && (
-              <div className="px-6 py-8 text-center text-muted-foreground">
+              <div className="px-4 py-8 text-center text-muted-foreground sm:px-6">
                 No recent checks available
               </div>
             )}

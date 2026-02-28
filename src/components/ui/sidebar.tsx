@@ -343,7 +343,7 @@ function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-header"
       data-sidebar="header"
-      className={cn("gap-2 p-2 flex flex-col", className)}
+      className={cn("gap-2 p-3 md:p-2 flex flex-col", className)}
       {...props}
     />
   );
@@ -354,7 +354,7 @@ function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-footer"
       data-sidebar="footer"
-      className={cn("gap-2 p-2 flex flex-col", className)}
+      className={cn("gap-2 p-3 md:p-2 flex flex-col", className)}
       {...props}
     />
   );
@@ -368,7 +368,7 @@ function SidebarSeparator({
     <Separator
       data-slot="sidebar-separator"
       data-sidebar="separator"
-      className={cn("bg-sidebar-border mx-2 w-auto", className)}
+      className={cn("bg-sidebar-border mx-3 md:mx-2 w-auto", className)}
       {...props}
     />
   );
@@ -393,7 +393,7 @@ function SidebarGroup({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="sidebar-group"
       data-sidebar="group"
-      className={cn("p-2 relative flex w-full min-w-0 flex-col", className)}
+      className={cn("p-3 md:p-2 relative flex w-full min-w-0 flex-col", className)}
       {...props}
     />
   );
