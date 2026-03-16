@@ -266,6 +266,32 @@ export const notification = pgTable(
 );
 
 // ============================================================================
+// USER INTEGRATION TABLE (Global integrations per user)
+// ============================================================================
+
+export const userIntegration = pgTable(
+  "user_integration",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    channel: alertChannelEnum("channel").notNull(),
+    endpoint: text("endpoint").notNull(),
+    isEnabled: boolean("is_enabled").default(true).notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("userIntegration_userId_idx").on(table.userId),
+    index("userIntegration_userId_channel_idx").on(table.userId, table.channel),
+  ],
+);
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 
@@ -273,6 +299,7 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   monitors: many(monitor),
+  integrations: many(userIntegration),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -333,6 +360,16 @@ export const notificationRelations = relations(notification, ({ one }) => ({
   }),
 }));
 
+export const userIntegrationRelations = relations(
+  userIntegration,
+  ({ one }) => ({
+    user: one(user, {
+      fields: [userIntegration.userId],
+      references: [user.id],
+    }),
+  }),
+);
+
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
 
@@ -350,3 +387,6 @@ export type NewAlertConfig = typeof alertConfig.$inferInsert;
 
 export type Notification = typeof notification.$inferSelect;
 export type NewNotification = typeof notification.$inferInsert;
+
+export type UserIntegration = typeof userIntegration.$inferSelect;
+export type NewUserIntegration = typeof userIntegration.$inferInsert;

@@ -1,6 +1,11 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { alertConfig, notification } from "@/db/schema";
+import {
+  alertConfig,
+  monitor,
+  notification,
+  userIntegration,
+} from "@/db/schema";
 import { nanoid } from "@/lib/nanoid";
 import { sendMonitorDownEmail, sendMonitorRecoveredEmail } from "@/lib/resend";
 
@@ -17,12 +22,13 @@ export interface AlertPayload {
 
 /**
  * Send notifications for all enabled alert configs of a monitor
+ * AND all enabled global integrations of the monitor's owner.
  */
 export async function sendAlerts(
   incidentId: string,
   alertPayload: AlertPayload,
 ): Promise<void> {
-  // Fetch all enabled alert configs for this monitor
+  // Fetch all enabled per-monitor alert configs
   const configs = await db
     .select()
     .from(alertConfig)
@@ -30,12 +36,40 @@ export async function sendAlerts(
 
   const enabledConfigs = configs.filter((c) => c.isEnabled);
 
-  // Send notifications in parallel
-  await Promise.allSettled(
-    enabledConfigs.map((config) =>
-      sendNotification(config, incidentId, alertPayload),
-    ),
+  // Fetch the monitor owner's global integrations
+  const [mon] = await db
+    .select({ userId: monitor.userId })
+    .from(monitor)
+    .where(eq(monitor.id, alertPayload.monitorId));
+
+  let globalIntegrations: (typeof userIntegration.$inferSelect)[] = [];
+  if (mon) {
+    const allGlobal = await db
+      .select()
+      .from(userIntegration)
+      .where(eq(userIntegration.userId, mon.userId));
+    globalIntegrations = allGlobal.filter((g) => g.isEnabled);
+  }
+
+  // Deduplicate: skip global integrations that overlap with per-monitor configs
+  const perMonitorKeys = new Set(
+    enabledConfigs.map((c) => `${c.channel}:${c.endpoint}`),
   );
+  const uniqueGlobal = globalIntegrations.filter(
+    (g) => !perMonitorKeys.has(`${g.channel}:${g.endpoint}`),
+  );
+
+  // Send per-monitor notifications
+  const perMonitorPromises = enabledConfigs.map((config) =>
+    sendNotification(config, incidentId, alertPayload),
+  );
+
+  // Send global integration notifications
+  const globalPromises = uniqueGlobal.map((integration) =>
+    sendGlobalNotification(integration, incidentId, alertPayload),
+  );
+
+  await Promise.allSettled([...perMonitorPromises, ...globalPromises]);
 }
 
 /**
@@ -76,6 +110,53 @@ async function sendNotification(
     alertConfigId: config.id,
     incidentId,
     channel: config.channel,
+    success,
+    error,
+    sentAt: new Date(),
+  });
+}
+
+/**
+ * Send a global integration notification and record the result
+ */
+async function sendGlobalNotification(
+  integration: typeof userIntegration.$inferSelect,
+  incidentId: string,
+  payload: AlertPayload,
+): Promise<void> {
+  let success = false;
+  let error: string | undefined;
+
+  try {
+    switch (integration.channel) {
+      case "webhook":
+        await sendWebhook(integration.endpoint, payload);
+        break;
+      case "slack":
+        await sendSlack(integration.endpoint, payload);
+        break;
+      case "discord":
+        await sendDiscord(integration.endpoint, payload);
+        break;
+      case "email":
+        await sendEmail(integration.endpoint, payload);
+        break;
+    }
+    success = true;
+  } catch (err) {
+    error = err instanceof Error ? err.message : "Unknown error";
+    console.error(
+      `[Notification] Failed to send global ${integration.channel}:`,
+      error,
+    );
+  }
+
+  // Record notification attempt (alertConfigId is the integration ID for global)
+  await db.insert(notification).values({
+    id: nanoid(),
+    alertConfigId: integration.id,
+    incidentId,
+    channel: integration.channel,
     success,
     error,
     sentAt: new Date(),

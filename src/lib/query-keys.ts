@@ -25,6 +25,9 @@ export const queryKeys = {
   user: {
     me: ["user", "me"] as const,
   },
+  integrations: {
+    all: ["integrations"] as const,
+  },
   admin: {
     all: ["admin"] as const,
     monitors: (params: { page?: number; limit?: number }) =>
