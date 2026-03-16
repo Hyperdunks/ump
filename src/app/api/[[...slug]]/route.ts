@@ -6,6 +6,7 @@ import { initializeLastCheckTimes } from "@/lib/workers";
 import { adminRouter } from "@/routes/admin/route";
 import { alertsRouter } from "@/routes/alerts/route";
 import { incidentRouter } from "@/routes/incidents/route";
+import { integrationsRouter } from "@/routes/integrations/route";
 import { monitorRouter } from "@/routes/monitors/route";
 import { userRouter } from "@/routes/user/route";
 import { betterAuthPlugin, OpenAPI } from "./auth";
@@ -27,6 +28,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(monitorRouter)
   .use(incidentRouter)
   .use(alertsRouter)
+  .use(integrationsRouter)
   .use(adminRouter)
   .use(userRouter)
   .get("/health", () => ({

@@ -26,7 +26,6 @@ import { useUpdateAlert } from "@/hooks/api/use-alerts";
 import { useSession } from "@/lib/auth-client";
 
 const ALERT_CHANNELS = ["email", "webhook", "slack", "discord"] as const;
-const COMING_SOON_CHANNELS: ReadonlySet<string> = new Set(["slack", "discord"]);
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -182,12 +181,8 @@ export function EditAlertModal({
                     <SelectItem
                       key={channel}
                       value={channel}
-                      disabled={COMING_SOON_CHANNELS.has(channel)}
                     >
                       {channel.charAt(0).toUpperCase() + channel.slice(1)}
-                      {COMING_SOON_CHANNELS.has(channel)
-                        ? " (Coming Soon)"
-                        : ""}
                     </SelectItem>
                   ))}
                 </SelectContent>
