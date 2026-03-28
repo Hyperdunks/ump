@@ -7,7 +7,6 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Row,
@@ -16,6 +15,8 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
+import { appUrl } from "@/lib/app-url";
 
 interface WeeklyDigestEmailProps {
   startDate?: string;
@@ -27,13 +28,6 @@ interface WeeklyDigestEmailProps {
     monitorsActive: number;
   };
 }
-
-const appUrl = (
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000")
-).replace(/\/$/, "");
 
 export const WeeklyDigestEmail = ({
   startDate = "",
@@ -59,15 +53,16 @@ export const WeeklyDigestEmail = ({
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>
           Your Weekly Sentinel Report: {stats.uptime.toString()}% Uptime
         </Preview>
         <Body className="bg-white my-auto mx-auto font-sans antialiased">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[16px] mb-[24px]">
-              <Img
-                src={`${appUrl}/static/sentinel-logo.png`}
+              <EmailLogo
                 width="32"
                 height="32"
                 alt="Sentinel"

@@ -7,7 +7,6 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Row,
@@ -16,6 +15,8 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
+import { appUrl } from "@/lib/app-url";
 
 interface AlertSummaryEmailProps {
   alerts?: {
@@ -25,13 +26,6 @@ interface AlertSummaryEmailProps {
     incidentId: string;
   }[];
 }
-
-const appUrl = (
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000")
-).replace(/\/$/, "");
 
 export const AlertSummaryEmail = ({ alerts = [] }: AlertSummaryEmailProps) => {
   return (
@@ -60,19 +54,16 @@ export const AlertSummaryEmail = ({ alerts = [] }: AlertSummaryEmailProps) => {
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>Alert: Services require attention</Preview>
         <Body className="bg-white my-auto mx-auto font-sans antialiased">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[16px]">
               <Row>
                 <Column>
-                  <Img
-                    src={`${appUrl}/static/sentinel-logo.png`}
-                    width="32"
-                    height="32"
-                    alt="Sentinel"
-                  />
+                  <EmailLogo width="32" height="32" alt="Sentinel" />
                 </Column>
                 <Column align="right">
                   <Text className="text-[#666666] text-[12px]">

@@ -1,7 +1,7 @@
 "use client";
 
 import { UserButton } from "@daveyplate/better-auth-ui";
-import { Activity } from "lucide-react";
+import { BrandLogo } from "@/components/brand-logo";
 import DynamicSearch from "./dynamic-search";
 import { AnimatedBackground } from "./ui/animated-background";
 
@@ -16,7 +16,7 @@ export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 font-semibold text-lg">
           {/* Logo */}
-          <Activity className="w-5 h-5" />
+          <BrandLogo size={20} />
         </div>
 
         {/* Nav Links + Search + UserButton */}

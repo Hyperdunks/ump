@@ -5,31 +5,22 @@ import {
   Head,
   Heading,
   Html,
-  Img,
-  Link,
   Preview,
   Section,
   Tailwind,
   Text,
 } from "@react-email/components";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
+import { appUrl } from "@/lib/app-url";
 
 interface ResetPasswordProps {
   username?: string;
   resetUrl?: string;
 }
 
-const appUrl =
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000");
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
-
 export const ResetPassword = ({
   username = "there",
-  resetUrl = `${appUrl}/api/auth/reset?token=123`,
+  resetUrl = `${appUrl}/auth/reset-password?token=123`,
 }: ResetPasswordProps) => {
   return (
     <Html>
@@ -44,17 +35,14 @@ export const ResetPassword = ({
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>Reset your Sentinel password</Preview>
         <Body className="bg-white font-sans text-base antialiased text-[#24292e]">
           <Container className="my-10 mx-auto p-5 max-w-[480px]">
             <Section className="mb-8">
-              <Img
-                src={`${baseUrl}/static/sentinel-logo.png`}
-                width="40"
-                height="40"
-                alt="Sentinel"
-              />
+              <EmailLogo width="40" height="40" alt="Sentinel" />
             </Section>
 
             <Heading className="text-[24px] font-semibold text-[#000000] p-0 my-6 mx-0">

@@ -4,15 +4,9 @@ import { MonitorDown } from "@/emails/monitor-down";
 import { MonitorRecovered } from "@/emails/monitor-recovered";
 import { ResetPassword } from "@/emails/reset-password";
 import { VerifyEmail } from "@/emails/verify-email";
+import { appUrl } from "@/lib/app-url";
 
 export const resend = new Resend(process.env.RESEND_API_KEY);
-
-const appUrl = (
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000")
-).replace(/\/$/, "");
 
 // Configure your verified sender email here
 // Use "onboarding@resend.dev" for testing (works without domain verification)

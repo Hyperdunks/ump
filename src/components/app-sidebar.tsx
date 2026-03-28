@@ -12,6 +12,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import { BrandLogo } from "@/components/brand-logo";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { CreateStatusPageModal } from "@/components/status-pages/create-status-page-modal";
 import { Button } from "@/components/ui/button";
@@ -70,9 +71,7 @@ export default function AppSidebar(
           <SidebarMenuItem className="flex items-center gap-2">
             {state === "expanded" && (
               <SidebarMenuButton size="lg" render={<Link href="/dashboard" />}>
-                <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <Activity className="size-4 bg-primary-background" />
-                </div>
+                <BrandLogo size={32} />
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">Sentinel</span>
                   <span className="truncate text-xs text-muted-foreground">
