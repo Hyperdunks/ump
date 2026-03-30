@@ -16,6 +16,15 @@ export function BrandLogo({ size = 32, className }: BrandLogoProps) {
         alt="Sentinel"
         width={size}
         height={size}
+        className="block dark:hidden"
+        priority
+      />
+      <Image
+        src="/logo-light.png"
+        alt="Sentinel"
+        width={size}
+        height={size}
+        className="hidden dark:block"
         priority
       />
     </span>
