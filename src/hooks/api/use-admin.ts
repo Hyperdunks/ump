@@ -3,12 +3,33 @@ import { toast } from "sonner";
 import { api } from "@/lib/client";
 import { queryKeys } from "@/lib/query-keys";
 
+export type AdminPagination = {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+};
+
+export type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  role: "user" | "admin";
+  createdAt: string | Date;
+};
+
+export type AdminUsersResponse = {
+  data: AdminUser[];
+  pagination: AdminPagination;
+};
+
 type UpdateRoleData = {
   role: "user" | "admin";
 };
 
 export function useAdminMonitors(
   params: { page?: number; limit?: number } = {},
+  options: { enabled?: boolean } = {},
 ) {
   return useQuery({
     queryKey: queryKeys.admin.monitors(params),
@@ -22,10 +43,14 @@ export function useAdminMonitors(
       if (error) throw error;
       return data;
     },
+    enabled: options.enabled ?? true,
   });
 }
 
-export function useAdminUsers(params: { page?: number; limit?: number } = {}) {
+export function useAdminUsers(
+  params: { page?: number; limit?: number } = {},
+  options: { enabled?: boolean } = {},
+) {
   return useQuery({
     queryKey: queryKeys.admin.users(params),
     queryFn: async () => {
@@ -36,12 +61,13 @@ export function useAdminUsers(params: { page?: number; limit?: number } = {}) {
         },
       });
       if (error) throw error;
-      return data;
+      return data as AdminUsersResponse;
     },
+    enabled: options.enabled ?? true,
   });
 }
 
-export function useAdminStats() {
+export function useAdminStats(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: queryKeys.admin.stats(),
     queryFn: async () => {
@@ -49,6 +75,7 @@ export function useAdminStats() {
       if (error) throw error;
       return data;
     },
+    enabled: options.enabled ?? true,
   });
 }
 

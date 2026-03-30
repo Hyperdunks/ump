@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/client";
 import { queryKeys } from "@/lib/query-keys";
 
-export function useUserProfile() {
+export function useUserProfile(options: { enabled?: boolean } = {}) {
   return useQuery({
     queryKey: queryKeys.user.me,
     queryFn: async () => {
@@ -11,6 +11,7 @@ export function useUserProfile() {
       if (error) throw error;
       return data;
     },
+    enabled: options.enabled ?? true,
   });
 }
 
