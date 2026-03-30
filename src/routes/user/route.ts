@@ -7,6 +7,7 @@ import { user } from "@/db/schema";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase();
 
 export const userRouter = new Elysia({ prefix: "/user" })
   .use(betterAuthPlugin)
@@ -29,6 +30,9 @@ export const userRouter = new Elysia({ prefix: "/user" })
         email: dbUser.email,
         image: dbUser.image,
         role: dbUser.role,
+        isAdmin:
+          typeof ADMIN_EMAIL === "string" &&
+          dbUser.email.toLowerCase() === ADMIN_EMAIL,
         emailVerified: dbUser.emailVerified,
         createdAt: dbUser.createdAt,
         updatedAt: dbUser.updatedAt,

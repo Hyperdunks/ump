@@ -5,12 +5,18 @@ import { db } from "@/db";
 import { incident, monitor, user as userTable } from "@/db/schema";
 import { idParam, paginationQuery, updateRoleBody } from "@/lib/params";
 
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL?.toLowerCase();
+
+function isAdminEmail(email: string): boolean {
+  return Boolean(ADMIN_EMAIL && email.toLowerCase() === ADMIN_EMAIL);
+}
+
 export const adminRouter = new Elysia({ prefix: "/admin" })
   .use(betterAuthPlugin)
   .get(
     "/monitors",
     async ({ user, query, status }) => {
-      if (user.role !== "admin")
+      if (!isAdminEmail(user.email))
         return status(403, { message: "Admin access required" });
 
       const page = query.page ?? 1;
@@ -24,7 +30,19 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
         .limit(limit)
         .offset(offset);
 
-      return { data: monitors };
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(monitor);
+
+      return {
+        data: monitors,
+        pagination: {
+          page,
+          limit,
+          total: Number(count),
+          totalPages: Math.ceil(Number(count) / limit),
+        },
+      };
     },
     { auth: true, query: paginationQuery },
   )
@@ -33,7 +51,7 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
   .get(
     "/users",
     async ({ user: currentUser, query, status }) => {
-      if (currentUser.role !== "admin")
+      if (!isAdminEmail(currentUser.email))
         return status(403, { message: "Admin access required" });
 
       const page = query.page ?? 1;
@@ -53,7 +71,19 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
         .limit(limit)
         .offset(offset);
 
-      return { data: users };
+      const [{ count }] = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(userTable);
+
+      return {
+        data: users,
+        pagination: {
+          page,
+          limit,
+          total: Number(count),
+          totalPages: Math.ceil(Number(count) / limit),
+        },
+      };
     },
     { auth: true, query: paginationQuery },
   )
@@ -62,7 +92,7 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
   .put(
     "/users/:id/role",
     async ({ user: currentUser, params, body, status }) => {
-      if (currentUser.role !== "admin")
+      if (!isAdminEmail(currentUser.email))
         return status(403, { message: "Admin access required" });
 
       const [existing] = await db
@@ -91,7 +121,7 @@ export const adminRouter = new Elysia({ prefix: "/admin" })
   .get(
     "/stats",
     async ({ user, status }) => {
-      if (user.role !== "admin")
+      if (!isAdminEmail(user.email))
         return status(403, { message: "Admin access required" });
 
       const [
