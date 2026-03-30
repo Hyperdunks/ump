@@ -8,21 +8,18 @@ export async function proxy(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  // Redirect authenticated users from root to dashboard
   if (pathname === "/") {
     if (session) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
   }
 
-  // Protect dashboard routes
   if (pathname.startsWith("/dashboard")) {
     if (!session) {
       return NextResponse.redirect(new URL("/sign-in", request.url));
     }
   }
 
-  // Redirect authenticated users from auth pages
   if (pathname.startsWith("/sign-in") || pathname.startsWith("/sign-up")) {
     if (session) {
       return NextResponse.redirect(new URL("/dashboard", request.url));
