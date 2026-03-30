@@ -6,7 +6,6 @@ import {
   Head,
   Heading,
   Html,
-  Img,
   Link,
   Preview,
   Row,
@@ -15,6 +14,7 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
 
 interface MonitorRecoveredProps {
   monitorName?: string;
@@ -25,10 +25,6 @@ interface MonitorRecoveredProps {
   timestamp?: string;
   viewMonitorUrl?: string;
 }
-
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
 
 export const MonitorRecovered = ({
   monitorName = "Monitor",
@@ -52,17 +48,14 @@ export const MonitorRecovered = ({
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>RECOVERED: {monitorName} is back online</Preview>
         <Body className="bg-white font-sans text-base antialiased text-[#24292e]">
           <Container className="my-10 mx-auto p-5 max-w-[480px]">
             <Section className="mb-8">
-              <Img
-                src={`${baseUrl}/static/sentinel-logo.png`}
-                width="32"
-                height="32"
-                alt="Sentinel"
-              />
+              <EmailLogo width="32" height="32" alt="Sentinel" />
             </Section>
 
             <Section className="bg-[#ecfdf5] rounded-lg border border-solid border-[#d1fae5] p-6 mb-6">

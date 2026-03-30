@@ -6,7 +6,6 @@ import {
   Head,
   Heading,
   Html,
-  Img,
   Link,
   Preview,
   Row,
@@ -15,6 +14,8 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
+import { appUrl } from "@/lib/app-url";
 
 interface AccountSecurityAlertEmailProps {
   username?: string;
@@ -24,13 +25,6 @@ interface AccountSecurityAlertEmailProps {
   timestamp?: string;
   secureAccountUrl?: string;
 }
-
-const appUrl = (
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000")
-).replace(/\/$/, "");
 
 export const AccountSecurityAlertEmail = ({
   username = "User",
@@ -59,13 +53,14 @@ export const AccountSecurityAlertEmail = ({
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>Security Alert: Verify your login attempt</Preview>
         <Body className="bg-white font-sans text-base antialiased text-[#24292e]">
           <Container className="my-10 mx-auto p-5 max-w-[480px]">
             <Section className="mb-6">
-              <Img
-                src={`${appUrl}/static/sentinel-logo.png`}
+              <EmailLogo
                 width="40"
                 height="40"
                 alt="Sentinel"
@@ -77,12 +72,9 @@ export const AccountSecurityAlertEmail = ({
               <Section className="bg-[#fef2f2] px-6 py-4 border-b border-solid border-[#fee2e2]">
                 <Row>
                   <Column width="30">
-                    <Img
-                      src="https://react.email/static/question-mark-circle.png"
-                      width="24"
-                      height="24"
-                      alt="Alert"
-                    />
+                    <div className="w-6 h-6 rounded-full bg-[#fecaca] text-[#991b1b] text-[14px] font-bold leading-[24px] text-center">
+                      !
+                    </div>
                   </Column>
                   <Column>
                     <Heading className="text-[#991b1b] text-[16px] font-semibold m-0">
@@ -156,14 +148,21 @@ export const AccountSecurityAlertEmail = ({
             </Section>
 
             <Text className="text-center text-[12px] text-[#a1a1aa] mt-8">
-              © 2026 Sentinel Inc. 123 Monitor Way, Cloud City.
+              © 2026 Sentinel Inc. <br />
+              Surat, Gujarat.
             </Text>
             <Text className="text-center text-[12px] text-[#a1a1aa] mt-2">
-              <Link href="#" className="text-[#a1a1aa] underline">
+              <Link
+                href={`${appUrl}/settings/notifications`}
+                className="text-[#a1a1aa] underline"
+              >
                 Unsubscribe
               </Link>{" "}
               •{" "}
-              <Link href="#" className="text-[#a1a1aa] underline">
+              <Link
+                href={`${appUrl}/privacy`}
+                className="text-[#a1a1aa] underline"
+              >
                 Privacy Policy
               </Link>
             </Text>

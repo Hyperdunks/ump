@@ -6,7 +6,6 @@ import {
   Head,
   Heading,
   Html,
-  Img,
   Link,
   Preview,
   Row,
@@ -14,6 +13,7 @@ import {
   Tailwind,
   Text,
 } from "@react-email/components";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
 
 interface MonitorDownProps {
   monitorName?: string;
@@ -23,10 +23,6 @@ interface MonitorDownProps {
   timestamp?: string;
   viewIncidentUrl?: string;
 }
-
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
 
 export const MonitorDown = ({
   monitorName = "Monitor",
@@ -50,17 +46,14 @@ export const MonitorDown = ({
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>DOWN: {monitorName} is currently unreachable</Preview>
         <Body className="bg-white font-sans text-base antialiased text-[#24292e]">
           <Container className="my-10 mx-auto p-5 max-w-[480px]">
             <Section className="mb-8">
-              <Img
-                src={`${baseUrl}/static/sentinel-logo.png`}
-                width="32"
-                height="32"
-                alt="Sentinel"
-              />
+              <EmailLogo width="40" height="40" alt="Sentinel" />
             </Section>
 
             <Section className="bg-[#fef2f2] rounded-lg border border-solid border-[#fee2e2] p-6 mb-6">

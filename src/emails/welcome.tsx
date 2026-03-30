@@ -6,7 +6,6 @@ import {
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -14,22 +13,17 @@ import {
   Text,
 } from "@react-email/components";
 import * as React from "react";
+import { EmailLogo, EmailLogoStyles } from "@/emails/components/email-logo";
+import { appUrl } from "@/lib/app-url";
 
 interface WelcomeEmailProps {
   username?: string;
   verifyUrl?: string;
 }
 
-const appUrl = (
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : "http://localhost:3000")
-).replace(/\/$/, "");
-
 export const WelcomeEmail = ({
   username = "there",
-  verifyUrl = `${appUrl}/verify`,
+  verifyUrl = `${appUrl}/verify-email`,
 }: WelcomeEmailProps) => {
   return (
     <Html>
@@ -56,13 +50,14 @@ export const WelcomeEmail = ({
           },
         }}
       >
-        <Head />
+        <Head>
+          <EmailLogoStyles />
+        </Head>
         <Preview>Welcome to Sentinel - The uptime monitoring platform.</Preview>
         <Body className="bg-white my-auto mx-auto font-sans antialiased">
           <Container className="border border-solid border-[#eaeaea] rounded my-[40px] mx-auto p-[20px] max-w-[465px]">
             <Section className="mt-[32px]">
-              <Img
-                src={`${appUrl}/static/sentinel-logo.png`}
+              <EmailLogo
                 width="40"
                 height="40"
                 alt="Sentinel"
@@ -104,7 +99,7 @@ export const WelcomeEmail = ({
             </Text>
           </Container>
           <Text className="text-[#666666] text-[12px] text-center mt-[20px]">
-            © 2026 Sentinel Inc. • 123 Monitor Way, Cloud City
+            © 2026 Sentinel Inc. • Surat, Gujarat
           </Text>
         </Body>
       </Tailwind>
