@@ -109,7 +109,7 @@ bun run db:migrate
 6. Start the development server:
 ```sh
 bun run dev
-
+```
 
 ## Support
 
