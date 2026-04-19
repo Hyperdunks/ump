@@ -13,10 +13,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { ModeToggle } from "@/components/mode-toggle";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { CreateStatusPageModal } from "@/components/status-pages/create-status-page-modal";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Tooltip,
   TooltipContent,
@@ -232,19 +232,22 @@ export default function AppSidebar(
 
       {/* Footer */}
       <SidebarFooter>
-        {state === "expanded" ? (
-          <UserButton
-            size="default"
-            side="right"
-            className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
-          />
-        ) : (
-          <UserButton
-            size="icon"
-            side="right"
-            className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
-          />
-        )}
+        <div className="flex flex-col gap-2 w-full">
+          <ModeToggle />
+          {state === "expanded" ? (
+            <UserButton
+              size="default"
+              side="right"
+              className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20 w-full"
+            />
+          ) : (
+            <UserButton
+              size="icon"
+              side="right"
+              className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
+            />
+          )}
+        </div>
       </SidebarFooter>
 
       <CreateMonitorModal
