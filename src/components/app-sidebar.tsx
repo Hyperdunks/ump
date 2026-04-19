@@ -126,8 +126,8 @@ export default function AppSidebar(
                 </Button>
               </div>
               <SidebarGroupContent>
-                <ScrollArea className="max-h-32">
-                  {monitors.slice(0, 4).map((monitor) => (
+                <div className="max-h-52 overflow-y-auto">
+                  {monitors.map((monitor) => (
                     <SidebarMenuButton
                       key={monitor.id}
                       render={
@@ -154,7 +154,7 @@ export default function AppSidebar(
                       No monitors found
                     </p>
                   )}
-                </ScrollArea>
+                </div>
               </SidebarGroupContent>
             </SidebarGroup>
 
@@ -174,8 +174,8 @@ export default function AppSidebar(
                 </Button>
               </div>
               <SidebarGroupContent>
-                <ScrollArea className="max-h-32">
-                  {publicMonitors.slice(0, 4).map((monitor) => (
+                <div className="max-h-52 overflow-y-auto">
+                  {publicMonitors.map((monitor) => (
                     <SidebarMenuButton
                       key={monitor.id}
                       render={<Link href={`/status/${monitor.id}`} />}
@@ -200,7 +200,7 @@ export default function AppSidebar(
                       No public status pages
                     </p>
                   )}
-                </ScrollArea>
+                </div>
               </SidebarGroupContent>
             </SidebarGroup>
           </>
