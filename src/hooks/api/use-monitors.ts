@@ -172,6 +172,6 @@ export function useTestMonitor() {
     },
     onError: (error) => {
       toast.error("Failed to test monitor");
-    }
+    },
   });
 }

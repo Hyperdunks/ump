@@ -55,13 +55,7 @@ function SidebarRow({
 // Section header (collapsible trigger)
 // ---------------------------------------------------------------------------
 
-function SectionHeader({
-  title,
-  isOpen,
-}: {
-  title: string;
-  isOpen: boolean;
-}) {
+function SectionHeader({ title, isOpen }: { title: string; isOpen: boolean }) {
   return (
     <CollapsibleTrigger className="flex h-9 w-full shrink-0 cursor-pointer items-center px-2">
       <span className="text-sm font-medium">{title}</span>
@@ -96,7 +90,8 @@ function getStatusLabel(
 ): { label: string; color: string } {
   if (activeIncident && activeIncident.state !== "resolved") {
     return {
-      label: activeIncident.state === "investigating" ? "Investigating" : "Incident",
+      label:
+        activeIncident.state === "investigating" ? "Investigating" : "Incident",
       color: "text-red-500",
     };
   }
@@ -150,10 +145,7 @@ export function MonitorRightSidebar({
           <SectionHeader title="Overview" isOpen={overviewOpen} />
           <CollapsibleContent>
             <div>
-              <SidebarRow
-                label="External Name"
-                value={monitor?.name ?? "—"}
-              />
+              <SidebarRow label="External Name" value={monitor?.name ?? "—"} />
               <SidebarRow
                 label="Status"
                 value={status.label}
@@ -163,17 +155,12 @@ export function MonitorRightSidebar({
                 label="Type"
                 value={
                   <span className="flex items-center gap-1">
-                    <span className="uppercase">
-                      {monitor?.type ?? "—"}
-                    </span>
+                    <span className="uppercase">{monitor?.type ?? "—"}</span>
                     <Globe className="size-2.5 shrink-0 text-muted-foreground" />
                   </span>
                 }
               />
-              <SidebarRow
-                label="Endpoint"
-                value={monitor?.url ?? "—"}
-              />
+              <SidebarRow label="Endpoint" value={monitor?.url ?? "—"} />
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -193,11 +180,7 @@ export function MonitorRightSidebar({
               />
               <SidebarRow
                 label="Timeout"
-                value={
-                  monitor?.timeout
-                    ? formatTimeout(monitor.timeout)
-                    : "—"
-                }
+                value={monitor?.timeout ? formatTimeout(monitor.timeout) : "—"}
               />
               <SidebarRow
                 label="Public"
@@ -207,10 +190,7 @@ export function MonitorRightSidebar({
                 label="Active"
                 value={monitor ? String(monitor.isActive) : "—"}
               />
-              <SidebarRow
-                label="Method"
-                value={monitor?.method ?? "—"}
-              />
+              <SidebarRow label="Method" value={monitor?.method ?? "—"} />
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -221,10 +201,7 @@ export function MonitorRightSidebar({
             open={notificationsOpen}
             onOpenChange={setNotificationsOpen}
           >
-            <SectionHeader
-              title="Notifications"
-              isOpen={notificationsOpen}
-            />
+            <SectionHeader title="Notifications" isOpen={notificationsOpen} />
             <CollapsibleContent>
               <div className="space-y-1 px-2 py-1">
                 {alerts.map((alert) => (
@@ -243,7 +220,6 @@ export function MonitorRightSidebar({
           </Collapsible>
         )}
       </div>
-
     </aside>
   );
 }

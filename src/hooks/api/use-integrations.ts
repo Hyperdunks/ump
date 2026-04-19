@@ -52,7 +52,10 @@ export function useUpdateIntegration() {
     mutationFn: async ({
       id,
       data,
-    }: { id: string; data: UpdateIntegrationData }) => {
+    }: {
+      id: string;
+      data: UpdateIntegrationData;
+    }) => {
       const { data: res, error } = await api.integrations({ id }).put(data);
       if (error) throw error;
       return res;

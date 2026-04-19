@@ -36,13 +36,22 @@ function getBucketMinutes(timeRange: "1d" | "7d" | "30d"): number {
   }
 }
 
-function formatBucketLabel(time: string, timeRange: "1d" | "7d" | "30d"): string {
+function formatBucketLabel(
+  time: string,
+  timeRange: "1d" | "7d" | "30d",
+): string {
   const d = new Date(time);
   switch (timeRange) {
     case "1d":
-      return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      return d.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     case "7d":
-      return d.toLocaleDateString("en-US", { weekday: "short", hour: "2-digit" });
+      return d.toLocaleDateString("en-US", {
+        weekday: "short",
+        hour: "2-digit",
+      });
     case "30d":
       return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   }

@@ -241,7 +241,9 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
       query: t.Object({
         page: t.Optional(t.Numeric({ default: 1 })),
         limit: t.Optional(t.Numeric({ default: 50 })),
-        since: t.Optional(t.String({ description: "ISO date string to filter checks from" })),
+        since: t.Optional(
+          t.String({ description: "ISO date string to filter checks from" }),
+        ),
       }),
     },
   )
@@ -381,7 +383,9 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
         const preconnect = Math.max(1, actualTtfb - Math.round(totalMs * 0.4));
         dnsEnd = Math.round(preconnect * 0.6);
         connectEnd = Math.round(preconnect * 0.15);
-        tlsEnd = mon.url.startsWith("https") ? Math.round(preconnect * 0.25) : 0;
+        tlsEnd = mon.url.startsWith("https")
+          ? Math.round(preconnect * 0.25)
+          : 0;
 
         const isExpectedStatus = mon.expectedStatusCodes.includes(
           statusCode.toString(),
@@ -399,9 +403,10 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
         transferEnd = 0;
 
         if (err instanceof Error) {
-          error = err.name === "AbortError"
-            ? `Timeout after ${mon.timeout}ms`
-            : err.message;
+          error =
+            err.name === "AbortError"
+              ? `Timeout after ${mon.timeout}ms`
+              : err.message;
         } else {
           error = "Unknown error";
         }

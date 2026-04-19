@@ -60,7 +60,10 @@ function ResultRow({
         {label}
       </span>
       <span
-        className={cn("min-w-0 flex-1 break-all px-4 py-2.5 text-sm font-medium", valueClassName)}
+        className={cn(
+          "min-w-0 flex-1 break-all px-4 py-2.5 text-sm font-medium",
+          valueClassName,
+        )}
       >
         {value}
       </span>
@@ -98,7 +101,10 @@ function TimingRow({
       <div className="flex flex-1 items-center gap-2">
         <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
           <div
-            className={cn("h-full rounded-full", timingColors[label] ?? "bg-blue-500")}
+            className={cn(
+              "h-full rounded-full",
+              timingColors[label] ?? "bg-blue-500",
+            )}
             style={{ width: `${Math.min(100, Number(percent))}%` }}
           />
         </div>
@@ -146,15 +152,16 @@ export function TestMonitorDrawer({
 
   const data = testMutation.data as TestResult | undefined;
   const totalTiming = data
-    ? data.timing.dns + data.timing.connect + data.timing.tls + data.timing.ttfb + data.timing.transfer
+    ? data.timing.dns +
+      data.timing.connect +
+      data.timing.tls +
+      data.timing.ttfb +
+      data.timing.transfer
     : 0;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent
-        side="right"
-        className="w-full overflow-y-auto sm:max-w-lg"
-      >
+      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-lg">
         <SheetHeader>
           <SheetTitle>Test Result</SheetTitle>
         </SheetHeader>
@@ -163,9 +170,7 @@ export function TestMonitorDrawer({
         {testMutation.isPending && (
           <div className="flex flex-col items-center justify-center gap-3 py-24">
             <Loader2 className="size-8 animate-spin text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">
-              Sending request...
-            </p>
+            <p className="text-sm text-muted-foreground">Sending request...</p>
           </div>
         )}
 
@@ -173,9 +178,7 @@ export function TestMonitorDrawer({
         {testMutation.isError && (
           <div className="flex flex-col items-center justify-center gap-3 py-24">
             <XCircle className="size-8 text-red-500" />
-            <p className="text-sm text-red-500">
-              Failed to execute test
-            </p>
+            <p className="text-sm text-red-500">Failed to execute test</p>
             <button
               type="button"
               onClick={() => testMutation.mutate(monitorId)}
@@ -190,7 +193,9 @@ export function TestMonitorDrawer({
         {data && (
           <div className="flex flex-col">
             {/* Request Section */}
-            <h3 className="border-b border-border px-3 pb-2 pt-3 text-sm font-semibold">Request</h3>
+            <h3 className="border-b border-border px-3 pb-2 pt-3 text-sm font-semibold">
+              Request
+            </h3>
             <ResultRow
               label="Result"
               value={
@@ -198,9 +203,7 @@ export function TestMonitorDrawer({
                   <span
                     className={cn(
                       "size-2.5 rounded-full",
-                      data.result === "success"
-                        ? "bg-green-500"
-                        : "bg-red-500",
+                      data.result === "success" ? "bg-green-500" : "bg-red-500",
                     )}
                   />
                   <span

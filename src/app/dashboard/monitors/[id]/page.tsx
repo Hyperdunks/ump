@@ -120,7 +120,8 @@ export default function MonitorDetailPage() {
     [timeRangeMs],
   );
 
-  const checksLimit = timeRange === "1d" ? 500 : timeRange === "7d" ? 2500 : 5000;
+  const checksLimit =
+    timeRange === "1d" ? 500 : timeRange === "7d" ? 2500 : 5000;
   const { data: checksData } = useMonitorChecks(monitorId, {
     limit: checksLimit,
     since: sinceDate,
@@ -251,7 +252,9 @@ export default function MonitorDetailPage() {
                     {activeMonitors.map((m) => (
                       <DropdownMenuItem
                         key={m.id}
-                        onSelect={() => router.push(`/dashboard/monitors/${m.id}`)}
+                        onSelect={() =>
+                          router.push(`/dashboard/monitors/${m.id}`)
+                        }
                         className={m.id === monitorId ? "bg-accent" : ""}
                       >
                         <span className="truncate">{m.name}</span>
@@ -322,7 +325,11 @@ export default function MonitorDetailPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h1 className="text-2xl font-semibold">
-              {isLoading ? <Skeleton className="h-8 w-40" /> : monitorData?.name}
+              {isLoading ? (
+                <Skeleton className="h-8 w-40" />
+              ) : (
+                monitorData?.name
+              )}
             </h1>
             {isLoading ? (
               <Skeleton className="mt-1 h-4 w-48" />
@@ -507,7 +514,12 @@ export default function MonitorDetailPage() {
           <div>
             <h3 className="text-lg font-semibold">Uptime</h3>
             <p className="text-sm text-muted-foreground">
-              Uptime of {timeRange === "1d" ? "24 hours" : timeRange === "7d" ? "7 days" : "30 days"}
+              Uptime of{" "}
+              {timeRange === "1d"
+                ? "24 hours"
+                : timeRange === "7d"
+                  ? "7 days"
+                  : "30 days"}
             </p>
           </div>
           <UptimeChart monitorId={monitorId} timeRange={timeRange} />
@@ -529,7 +541,11 @@ export default function MonitorDetailPage() {
                 quantile within a
               </span>
               <span className="rounded border bg-background px-2 py-0.5 text-xs font-medium shadow-sm">
-                {timeRange === "1d" ? "30 minutes" : timeRange === "7d" ? "3 hours" : "12 hours"}
+                {timeRange === "1d"
+                  ? "30 minutes"
+                  : timeRange === "7d"
+                    ? "3 hours"
+                    : "12 hours"}
               </span>
               <span className="text-sm text-muted-foreground">resolution</span>
             </div>
@@ -649,15 +665,12 @@ export default function MonitorDetailPage() {
           </>
         )}
       </div>
-      <MonitorRightSidebar
-        monitorId={monitorId}
-        open={sidebarOpen}
-      />
+      <MonitorRightSidebar monitorId={monitorId} open={sidebarOpen} />
       <TestMonitorDrawer
         monitorId={monitorId}
         open={testDrawerOpen}
         onOpenChange={setTestDrawerOpen}
       />
-    </div >
+    </div>
   );
 }

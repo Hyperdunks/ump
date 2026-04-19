@@ -99,9 +99,7 @@ export const integrationsRouter = new Elysia({ prefix: "/integrations" })
 
       if (!existing) return status(404, { message: "Integration not found" });
 
-      await db
-        .delete(userIntegration)
-        .where(eq(userIntegration.id, params.id));
+      await db.delete(userIntegration).where(eq(userIntegration.id, params.id));
 
       return { success: true };
     },

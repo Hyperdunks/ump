@@ -54,9 +54,7 @@ export function Providers({ children }: { children: ReactNode }) {
             enableSystem
             disableTransitionOnChange
           >
-            <TooltipProvider delay={200} >
-              {children}
-            </TooltipProvider>
+            <TooltipProvider delay={200}>{children}</TooltipProvider>
           </ThemeProvider>
         </AuthUIProviderTanstack>
       </AuthQueryProvider>

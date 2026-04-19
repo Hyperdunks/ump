@@ -23,17 +23,30 @@ function getBucketConfig(timeRange: "1d" | "7d" | "30d") {
   }
 }
 
-function formatBucketKey(date: Date, timeRange: "1d" | "7d" | "30d", bucketMinutes: number): string {
+function formatBucketKey(
+  date: Date,
+  timeRange: "1d" | "7d" | "30d",
+  bucketMinutes: number,
+): string {
   const bucketMs = bucketMinutes * 60 * 1000;
   const bucketTime = new Date(Math.floor(date.getTime() / bucketMs) * bucketMs);
 
   switch (timeRange) {
     case "1d":
-      return bucketTime.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+      return bucketTime.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     case "7d":
-      return bucketTime.toLocaleDateString("en-US", { weekday: "short", hour: "2-digit" });
+      return bucketTime.toLocaleDateString("en-US", {
+        weekday: "short",
+        hour: "2-digit",
+      });
     case "30d":
-      return bucketTime.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      return bucketTime.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
   }
 }
 
