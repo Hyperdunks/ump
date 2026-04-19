@@ -220,17 +220,30 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
       const limit = query.limit ?? 50;
       const offset = (page - 1) * limit;
 
+      const conditions = [eq(healthCheck.monitorId, params.id)];
+      if (query.since) {
+        conditions.push(gte(healthCheck.checkedAt, new Date(query.since)));
+      }
+
       const checks = await db
         .select()
         .from(healthCheck)
-        .where(eq(healthCheck.monitorId, params.id))
+        .where(and(...conditions))
         .orderBy(desc(healthCheck.checkedAt))
         .limit(limit)
         .offset(offset);
 
       return { data: checks };
     },
-    { auth: true, params: idParam, query: paginationQuery },
+    {
+      auth: true,
+      params: idParam,
+      query: t.Object({
+        page: t.Optional(t.Numeric({ default: 1 })),
+        limit: t.Optional(t.Numeric({ default: 50 })),
+        since: t.Optional(t.String({ description: "ISO date string to filter checks from" })),
+      }),
+    },
   )
 
   // Get monitor stats

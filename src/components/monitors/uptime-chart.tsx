@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/chart";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMonitorChecks } from "@/hooks/api";
+import { useMemo } from "react";
 
 const chartConfig = {
   success: {
@@ -24,10 +25,34 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
+function getBucketMinutes(timeRange: "1d" | "7d" | "30d"): number {
+  switch (timeRange) {
+    case "1d":
+      return 30;
+    case "7d":
+      return 180; // 3 hours
+    case "30d":
+      return 720; // 12 hours
+  }
+}
+
+function formatBucketLabel(time: string, timeRange: "1d" | "7d" | "30d"): string {
+  const d = new Date(time);
+  switch (timeRange) {
+    case "1d":
+      return d.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+    case "7d":
+      return d.toLocaleDateString("en-US", { weekday: "short", hour: "2-digit" });
+    case "30d":
+      return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  }
+}
+
 function bucketChecksByTime(
   checks: Array<{ status: string; checkedAt: string | Date }>,
-  bucketMinutes = 30,
+  timeRange: "1d" | "7d" | "30d",
 ) {
+  const bucketMinutes = getBucketMinutes(timeRange);
   const buckets = new Map<
     string,
     { success: number; error: number; degraded: number }
@@ -36,11 +61,19 @@ function bucketChecksByTime(
   const now = new Date();
   const bucketMs = bucketMinutes * 60 * 1000;
 
-  // Align 'now' to the nearest bucket to ensure precise matching
-  const alignedNow = new Date(Math.floor(now.getTime() / bucketMs) * bucketMs);
+  const timeRangeMs =
+    timeRange === "1d"
+      ? 24 * 60 * 60 * 1000
+      : timeRange === "7d"
+        ? 7 * 24 * 60 * 60 * 1000
+        : 30 * 24 * 60 * 60 * 1000;
 
-  // Initialize buckets for last 24 hours (48 buckets of 30 min)
-  for (let i = 47; i >= 0; i--) {
+  // Align 'now' to the nearest bucket
+  const alignedNow = new Date(Math.floor(now.getTime() / bucketMs) * bucketMs);
+  const totalBuckets = Math.ceil(timeRangeMs / bucketMs);
+
+  // Initialize buckets
+  for (let i = totalBuckets - 1; i >= 0; i--) {
     const bucketTime = new Date(alignedNow.getTime() - i * bucketMs);
     const bucketKey = bucketTime.toISOString();
     buckets.set(bucketKey, { success: 0, error: 0, degraded: 0 });
@@ -62,23 +95,39 @@ function bucketChecksByTime(
     }
   }
 
-  // Convert to array and format time labels
+  // Convert to array
   return Array.from(buckets.entries())
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([time, counts]) => ({
-      time: new Date(time).toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      time: formatBucketLabel(time, timeRange),
       ...counts,
     }));
 }
 
-export default function UptimeChart({ monitorId }: { monitorId: string }) {
-  const { data, isLoading } = useMonitorChecks(monitorId, { limit: 500 });
+export default function UptimeChart({
+  monitorId,
+  timeRange = "1d",
+}: {
+  monitorId: string;
+  timeRange?: "1d" | "7d" | "30d";
+}) {
+  const timeRangeMs =
+    timeRange === "1d"
+      ? 24 * 60 * 60 * 1000
+      : timeRange === "7d"
+        ? 7 * 24 * 60 * 60 * 1000
+        : 30 * 24 * 60 * 60 * 1000;
+
+  const since = useMemo(
+    () => new Date(Date.now() - timeRangeMs).toISOString(),
+    [timeRangeMs],
+  );
+
+  const limit = timeRange === "1d" ? 500 : timeRange === "7d" ? 2500 : 5000;
+  const { data, isLoading } = useMonitorChecks(monitorId, { limit, since });
 
   const checks = data?.data ?? [];
-  const uptimeData = bucketChecksByTime(checks);
+  const uptimeData = bucketChecksByTime(checks, timeRange);
 
   if (isLoading) {
     return <Skeleton className="h-48 w-full" />;

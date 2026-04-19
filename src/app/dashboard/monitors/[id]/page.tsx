@@ -95,11 +95,28 @@ export default function MonitorDetailPage() {
   } = useMonitor(monitorId);
   const { data: uptimeData, isLoading: isLoadingUptime } =
     useMonitorUptime(monitorId);
-  const { data: checksData } = useMonitorChecks(monitorId, { limit: 500 });
   const { data: monitorsData } = useMonitors({ limit: 50 });
 
   const [timeRange, setTimeRange] = useState<"1d" | "7d" | "30d">("1d");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const timeRangeMs =
+    timeRange === "1d"
+      ? 24 * 60 * 60 * 1000
+      : timeRange === "7d"
+        ? 7 * 24 * 60 * 60 * 1000
+        : 30 * 24 * 60 * 60 * 1000;
+
+  const sinceDate = useMemo(
+    () => new Date(Date.now() - timeRangeMs).toISOString(),
+    [timeRangeMs],
+  );
+
+  const checksLimit = timeRange === "1d" ? 500 : timeRange === "7d" ? 2500 : 5000;
+  const { data: checksData } = useMonitorChecks(monitorId, {
+    limit: checksLimit,
+    since: sinceDate,
+  });
 
   const isLoading = isLoadingMonitor || isLoadingUptime;
 
@@ -109,26 +126,14 @@ export default function MonitorDetailPage() {
   const activeMonitors =
     monitorsData?.data?.filter((m) => m.isActive).slice(0, 50) ?? [];
 
-  const timeRangeMs =
-    timeRange === "1d"
-      ? 24 * 60 * 60 * 1000
-      : timeRange === "7d"
-        ? 7 * 24 * 60 * 60 * 1000
-        : 30 * 24 * 60 * 60 * 1000;
-
-  const filteredChecks = useMemo(() => {
-    const cutoff = new Date(Date.now() - timeRangeMs);
-    return (
-      checksData?.data?.filter((c) => new Date(c.checkedAt) >= cutoff) ?? []
-    );
-  }, [checksData?.data, timeRangeMs]);
+  const allChecks = checksData?.data ?? [];
 
   const responseTimes = useMemo(
     () =>
-      filteredChecks
+      allChecks
         .filter((c) => c.responseTime !== null)
         .map((c) => c.responseTime as number),
-    [filteredChecks],
+    [allChecks],
   );
 
   const percentiles =
@@ -478,9 +483,11 @@ export default function MonitorDetailPage() {
       <div className="space-y-4">
         <div>
           <h3 className="text-lg font-semibold">Uptime</h3>
-          <p className="text-sm text-muted-foreground">Uptime of 24hours</p>
+          <p className="text-sm text-muted-foreground">
+            Uptime of {timeRange === "1d" ? "24 hours" : timeRange === "7d" ? "7 days" : "30 days"}
+          </p>
         </div>
-        <UptimeChart monitorId={monitorId} />
+        <UptimeChart monitorId={monitorId} timeRange={timeRange} />
       </div>
 
       {/* Latency Chart */}
@@ -499,12 +506,12 @@ export default function MonitorDetailPage() {
               quantile within a
             </span>
             <span className="rounded border bg-background px-2 py-0.5 text-xs font-medium shadow-sm">
-              30 minutes
+              {timeRange === "1d" ? "30 minutes" : timeRange === "7d" ? "3 hours" : "12 hours"}
             </span>
             <span className="text-sm text-muted-foreground">resolution</span>
           </div>
         </div>
-        <LatencyChart monitorId={monitorId} />
+        <LatencyChart monitorId={monitorId} timeRange={timeRange} />
       </div>
 
       {/* Recent Checks */}
@@ -539,7 +546,7 @@ export default function MonitorDetailPage() {
                     </TableCell>
                   </TableRow>
                 ))
-              ) : filteredChecks.length === 0 ? (
+              ) : allChecks.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={3}
@@ -549,7 +556,7 @@ export default function MonitorDetailPage() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredChecks.slice(0, 10).map((check) => (
+                allChecks.slice(0, 10).map((check) => (
                   <TableRow key={check.id}>
                     <TableCell>
                       <Badge
