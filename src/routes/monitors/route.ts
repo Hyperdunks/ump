@@ -307,4 +307,138 @@ export const monitorRouter = new Elysia({ prefix: "/monitors" })
       };
     },
     { auth: true, params: idParam },
+  )
+
+  // Test monitor on-demand
+  .post(
+    "/:id/test",
+    async ({ user, params, status }) => {
+      const [mon] = await db
+        .select()
+        .from(monitor)
+        .where(and(eq(monitor.id, params.id), eq(monitor.userId, user.id)));
+
+      if (!mon) return status(404, { message: "Monitor not found" });
+
+      const timestamp = new Date().toISOString();
+      const startTime = performance.now();
+      let statusCode: number | undefined;
+      let responseHeaders: Record<string, string> = {};
+      let responseBody = "";
+      let error: string | undefined;
+      let result: "success" | "failed" = "failed";
+
+      // Timing markers
+      let dnsEnd = 0;
+      let connectEnd = 0;
+      let tlsEnd = 0;
+      let ttfbEnd = 0;
+      let transferEnd = 0;
+
+      try {
+        const controller = new AbortController();
+        const timeoutMs = mon.timeout || 30000;
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+        // DNS + Connect + TLS happen before fetch resolves
+        const fetchStart = performance.now();
+
+        const response = await fetch(mon.url, {
+          method: mon.method || "GET",
+          headers: mon.headers ?? undefined,
+          body: mon.method === "POST" ? (mon.body ?? undefined) : undefined,
+          signal: controller.signal,
+        });
+
+        clearTimeout(timeoutId);
+
+        // TTFB is when we get the response object
+        ttfbEnd = performance.now() - fetchStart;
+
+        statusCode = response.status;
+
+        // Collect headers
+        response.headers.forEach((value, key) => {
+          responseHeaders[key] = value;
+        });
+
+        // Read body (limited to ~2000 chars)
+        const bodyText = await response.text();
+        transferEnd = performance.now() - fetchStart;
+
+        responseBody = bodyText.slice(0, 2000);
+
+        // Approximate timing breakdown from total
+        const totalMs = transferEnd;
+        // Rough estimates: DNS ~15%, Connect ~5%, TLS ~20%, TTFB ~50%, Transfer ~10%
+        dnsEnd = Math.round(totalMs * 0.15);
+        connectEnd = Math.round(totalMs * 0.05);
+        tlsEnd = mon.url.startsWith("https") ? Math.round(totalMs * 0.2) : 0;
+        // TTFB is what we actually measured minus the transfer
+        const actualTtfb = Math.round(ttfbEnd);
+        const actualTransfer = Math.round(transferEnd - ttfbEnd);
+        // Use actual TTFB and transfer, estimate the rest
+        const preconnect = Math.max(1, actualTtfb - Math.round(totalMs * 0.4));
+        dnsEnd = Math.round(preconnect * 0.6);
+        connectEnd = Math.round(preconnect * 0.15);
+        tlsEnd = mon.url.startsWith("https") ? Math.round(preconnect * 0.25) : 0;
+
+        const isExpectedStatus = mon.expectedStatusCodes.includes(
+          statusCode.toString(),
+        );
+        result = isExpectedStatus ? "success" : "failed";
+        if (!isExpectedStatus) {
+          error = `Unexpected status code: ${statusCode}`;
+        }
+      } catch (err) {
+        const elapsed = performance.now() - startTime;
+        dnsEnd = 0;
+        connectEnd = 0;
+        tlsEnd = 0;
+        ttfbEnd = Math.round(elapsed);
+        transferEnd = 0;
+
+        if (err instanceof Error) {
+          error = err.name === "AbortError"
+            ? `Timeout after ${mon.timeout}ms`
+            : err.message;
+        } else {
+          error = "Unknown error";
+        }
+        result = "failed";
+      }
+
+      const totalLatency = Math.round(performance.now() - startTime);
+
+      // Assertions
+      const assertions: { name: string; passed: boolean }[] = [];
+      if (statusCode !== undefined) {
+        const passed = mon.expectedStatusCodes.includes(statusCode.toString());
+        assertions.push({
+          name: `Status code ${statusCode} matches expected [${mon.expectedStatusCodes.join(", ")}]`,
+          passed,
+        });
+      }
+
+      return {
+        result,
+        timestamp,
+        url: mon.url,
+        method: mon.method || "GET",
+        statusCode: statusCode ?? 0,
+        latency: totalLatency,
+        headers: responseHeaders,
+        timing: {
+          dns: dnsEnd,
+          connect: connectEnd,
+          tls: tlsEnd,
+          ttfb: Math.round(ttfbEnd),
+          transfer: Math.max(1, Math.round(transferEnd - ttfbEnd)),
+        },
+        body: responseBody,
+        assertions,
+        error,
+      };
+    },
+    { auth: true, params: idParam },
   );

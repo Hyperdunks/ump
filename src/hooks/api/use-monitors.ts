@@ -162,3 +162,16 @@ export function useDeleteMonitor() {
     },
   });
 }
+
+export function useTestMonitor() {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await api.monitors({ id }).test.post();
+      if (error) throw error;
+      return data;
+    },
+    onError: (error) => {
+      toast.error("Failed to test monitor");
+    }
+  });
+}

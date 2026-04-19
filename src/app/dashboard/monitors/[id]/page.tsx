@@ -8,11 +8,13 @@ import {
   Pencil,
   Share,
   Trash,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { MonitorRightSidebar } from "@/components/monitors/monitor-right-sidebar";
+import { TestMonitorDrawer } from "@/components/monitors/test-monitor-drawer";
 import { toast } from "sonner";
 import { type Alert, AlertList } from "@/components/alerts/alert-list";
 import { CreateAlertModal } from "@/components/alerts/create-alert-modal";
@@ -59,6 +61,7 @@ import {
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/lib/utils/format";
 import { calculatePercentiles } from "@/lib/utils/percentile";
+import { LightningBoltIcon } from "@radix-ui/react-icons";
 
 const colorMap = {
   green: {
@@ -145,6 +148,7 @@ export default function MonitorDetailPage() {
   const [editAlertModalOpen, setEditAlertModalOpen] = useState(false);
   const [deleteAlertDialogOpen, setDeleteAlertDialogOpen] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+  const [testDrawerOpen, setTestDrawerOpen] = useState(false);
 
   const handleEditAlert = (alert: Alert) => {
     setSelectedAlert(alert);
@@ -213,423 +217,436 @@ export default function MonitorDetailPage() {
   return (
     <div className="flex gap-6">
       <div className="min-w-0 flex-1 space-y-8">
-      {/* Breadcrumb + Sidebar Toggle */}
-      <div className="flex items-center justify-between">
-        <Breadcrumb>
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink render={<Link href="/dashboard/monitors" />}>
-                Monitors
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
-                  {isLoading ? (
-                    <Skeleton className="h-4 w-24" />
-                  ) : (
-                    <>
-                      {monitorData?.name}
-                      <ChevronDown className="size-3" />
-                    </>
-                  )}
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="max-h-64 overflow-y-auto"
-                >
-                  {activeMonitors.map((m) => (
-                    <DropdownMenuItem
-                      key={m.id}
-                      onSelect={() => router.push(`/dashboard/monitors/${m.id}`)}
-                      className={m.id === monitorId ? "bg-accent" : ""}
-                    >
-                      <span className="truncate">{m.name}</span>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Overview</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-        <div className="hidden items-center gap-2 md:flex">
-          <span className="relative flex size-2.5">
-            <span
-              className={cn(
-                "absolute inline-flex size-full animate-ping rounded-full opacity-75",
-                monitorData?.latestCheck?.status === "up"
-                  ? "bg-green-500"
-                  : monitorData?.latestCheck?.status === "degraded"
-                    ? "bg-yellow-500"
-                    : monitorData?.latestCheck?.status === "down"
-                      ? "bg-red-500"
-                      : "bg-muted-foreground",
-              )}
-            />
-            <span
-              className={cn(
-                "relative inline-flex size-2.5 rounded-full",
-                monitorData?.latestCheck?.status === "up"
-                  ? "bg-green-500"
-                  : monitorData?.latestCheck?.status === "degraded"
-                    ? "bg-yellow-500"
-                    : monitorData?.latestCheck?.status === "down"
-                      ? "bg-red-500"
-                      : "bg-muted-foreground",
-              )}
-            />
-          </span>
-          <button
-            type="button"
-            onClick={() => setSidebarOpen((prev) => !prev)}
-            className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-            title="Toggle sidebar"
-          >
-            <PanelRight className="size-4" />
-          </button>
-        </div>
-      </div>
-
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold">
-            {isLoading ? <Skeleton className="h-8 w-40" /> : monitorData?.name}
-          </h1>
-          {isLoading ? (
-            <Skeleton className="mt-1 h-4 w-48" />
-          ) : (
-            <a
-              href={monitorData?.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
-            >
-              {monitorData?.url}
-              <ExternalLink className="size-3" />
-            </a>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <ToggleGroup
-            value={[timeRange]}
-            onValueChange={(value) => {
-              if (value.length > 0) {
-                setTimeRange(value[value.length - 1] as "1d" | "7d" | "30d");
-              }
-            }}
-            variant="outline"
-          >
-            <ToggleGroupItem value="1d" className="text-xs">
-              Last day
-            </ToggleGroupItem>
-            <ToggleGroupItem value="7d" className="text-xs">
-              7 days
-            </ToggleGroupItem>
-            <ToggleGroupItem value="30d" className="text-xs">
-              30 days
-            </ToggleGroupItem>
-          </ToggleGroup>
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  disabled={isLoading || !monitorData}
-                />
-              }
-            >
-              <MoreHorizontal className="size-4" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={() => setEditModalOpen(true)}>
-                <Pencil className="mr-2 size-4" />
-                Edit monitor
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              {monitorData?.isPublic && (
-                <DropdownMenuItem
-                  onClick={() => {
-                    if (monitorData) {
-                      const url = `${window.location.origin}/status/${monitorData.id}`;
-                      navigator.clipboard.writeText(url);
-                      toast.success("Public link copied to clipboard");
-                    }
-                  }}
-                >
-                  <Share className="mr-2 size-4" />
-                  Copy Public Link
-                </DropdownMenuItem>
-              )}
-              <DropdownMenuItem
-                variant="destructive"
-                onClick={() => setDeleteDialogOpen(true)}
-              >
-                <Trash className="mr-2 size-4" />
-                Delete monitor
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-      </div>
-
-      {/* Main Stats */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        {isLoading ? (
-          [...Array(5)].map((_, i) => (
-            <Card key={i} size="sm">
-              <CardHeader>
-                <Skeleton className="h-3 w-16" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-6 w-20" />
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <>
-            {statCards.map((card) => (
-              <Card
-                key={card.label}
-                size="sm"
-                className={cn(
-                  "ring-1",
-                  colorMap[card.color].bg,
-                  colorMap[card.color].ring,
-                )}
-              >
-                <CardHeader>
-                  <CardTitle
-                    className={cn(
-                      "text-xs font-semibold uppercase tracking-wider",
-                      colorMap[card.color].text,
+        {/* Breadcrumb + Sidebar Toggle */}
+        <div className="flex items-center justify-between">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink render={<Link href="/dashboard/monitors" />}>
+                  Monitors
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
+                    {isLoading ? (
+                      <Skeleton className="h-4 w-24" />
+                    ) : (
+                      <>
+                        {monitorData?.name}
+                        <ChevronDown className="size-3" />
+                      </>
                     )}
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="max-h-64 overflow-y-auto"
                   >
-                    {card.label}
-                  </CardTitle>
+                    {activeMonitors.map((m) => (
+                      <DropdownMenuItem
+                        key={m.id}
+                        onSelect={() => router.push(`/dashboard/monitors/${m.id}`)}
+                        className={m.id === monitorId ? "bg-accent" : ""}
+                      >
+                        <span className="truncate">{m.name}</span>
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Overview</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+          <div className="hidden items-center gap-2 md:flex">
+            <span className="relative flex size-2.5">
+              <span
+                className={cn(
+                  "absolute inline-flex size-full animate-ping rounded-full opacity-75",
+                  monitorData?.latestCheck?.status === "up"
+                    ? "bg-green-500"
+                    : monitorData?.latestCheck?.status === "degraded"
+                      ? "bg-yellow-500"
+                      : monitorData?.latestCheck?.status === "down"
+                        ? "bg-red-500"
+                        : "bg-muted-foreground",
+                )}
+              />
+              <span
+                className={cn(
+                  "relative inline-flex size-2.5 rounded-full",
+                  monitorData?.latestCheck?.status === "up"
+                    ? "bg-green-500"
+                    : monitorData?.latestCheck?.status === "degraded"
+                      ? "bg-yellow-500"
+                      : monitorData?.latestCheck?.status === "down"
+                        ? "bg-red-500"
+                        : "bg-muted-foreground",
+                )}
+              />
+            </span>
+            <button
+              type="button"
+              onClick={() => setTestDrawerOpen(true)}
+              className="flex items-center justify-center rounded-lg pl-2 p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              title="Test monitor"
+            >
+              <Zap className="size-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setSidebarOpen((prev) => !prev)}
+              className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              title="Toggle sidebar"
+            >
+              <PanelRight className="size-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Header */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-semibold">
+              {isLoading ? <Skeleton className="h-8 w-40" /> : monitorData?.name}
+            </h1>
+            {isLoading ? (
+              <Skeleton className="mt-1 h-4 w-48" />
+            ) : (
+              <a
+                href={monitorData?.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:underline"
+              >
+                {monitorData?.url}
+                <ExternalLink className="size-3" />
+              </a>
+            )}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <ToggleGroup
+              value={[timeRange]}
+              onValueChange={(value) => {
+                if (value.length > 0) {
+                  setTimeRange(value[value.length - 1] as "1d" | "7d" | "30d");
+                }
+              }}
+              variant="outline"
+            >
+              <ToggleGroupItem value="1d" className="text-xs">
+                Last day
+              </ToggleGroupItem>
+              <ToggleGroupItem value="7d" className="text-xs">
+                7 days
+              </ToggleGroupItem>
+              <ToggleGroupItem value="30d" className="text-xs">
+                30 days
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    disabled={isLoading || !monitorData}
+                  />
+                }
+              >
+                <MoreHorizontal className="size-4" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={() => setEditModalOpen(true)}>
+                  <Pencil className="mr-2 size-4" />
+                  Edit monitor
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {monitorData?.isPublic && (
+                  <DropdownMenuItem
+                    onClick={() => {
+                      if (monitorData) {
+                        const url = `${window.location.origin}/status/${monitorData.id}`;
+                        navigator.clipboard.writeText(url);
+                        toast.success("Public link copied to clipboard");
+                      }
+                    }}
+                  >
+                    <Share className="mr-2 size-4" />
+                    Copy Public Link
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuItem
+                  variant="destructive"
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  <Trash className="mr-2 size-4" />
+                  Delete monitor
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        </div>
+
+        {/* Main Stats */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+          {isLoading ? (
+            [...Array(5)].map((_, i) => (
+              <Card key={i} size="sm">
+                <CardHeader>
+                  <Skeleton className="h-3 w-16" />
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-end gap-2">
-                    <span
+                  <Skeleton className="h-6 w-20" />
+                </CardContent>
+              </Card>
+            ))
+          ) : (
+            <>
+              {statCards.map((card) => (
+                <Card
+                  key={card.label}
+                  size="sm"
+                  className={cn(
+                    "ring-1",
+                    colorMap[card.color].bg,
+                    colorMap[card.color].ring,
+                  )}
+                >
+                  <CardHeader>
+                    <CardTitle
                       className={cn(
-                        "text-xl font-bold",
+                        "text-xs font-semibold uppercase tracking-wider",
                         colorMap[card.color].text,
                       )}
                     >
-                      {card.value}
-                    </span>
-                    <span className="mb-0.5 rounded bg-background/50 px-1 text-xs opacity-70">
-                      {card.subValue}
-                    </span>
-                  </div>
+                      {card.label}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-end gap-2">
+                      <span
+                        className={cn(
+                          "text-xl font-bold",
+                          colorMap[card.color].text,
+                        )}
+                      >
+                        {card.value}
+                      </span>
+                      <span className="mb-0.5 rounded bg-background/50 px-1 text-xs opacity-70">
+                        {card.subValue}
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+
+              {/* Requests card */}
+              <Card size="sm">
+                <CardHeader>
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    REQUESTS
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <span className="text-xl font-bold">
+                    {periodStats?.totalChecks ?? "—"}
+                  </span>
                 </CardContent>
               </Card>
-            ))}
 
-            {/* Requests card */}
-            <Card size="sm">
+              {/* Last Checked card */}
+              <Card size="sm">
+                <CardHeader>
+                  <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    LAST CHECKED
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <span className="text-lg font-medium">
+                    {formatRelativeTime(monitorData?.latestCheck?.checkedAt)}
+                  </span>
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
+
+        {/* Latency Stats */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
+          {latencyCards.map((card) => (
+            <Card key={card.label} size="sm">
               <CardHeader>
                 <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  REQUESTS
+                  {card.label}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <span className="text-xl font-bold">
-                  {periodStats?.totalChecks ?? "—"}
-                </span>
+                <span className="text-lg font-bold">{card.value}</span>
               </CardContent>
             </Card>
+          ))}
+        </div>
 
-            {/* Last Checked card */}
-            <Card size="sm">
-              <CardHeader>
-                <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  LAST CHECKED
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <span className="text-lg font-medium">
-                  {formatRelativeTime(monitorData?.latestCheck?.checkedAt)}
-                </span>
-              </CardContent>
-            </Card>
+        {/* Uptime Chart */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">Uptime</h3>
+            <p className="text-sm text-muted-foreground">
+              Uptime of {timeRange === "1d" ? "24 hours" : timeRange === "7d" ? "7 days" : "30 days"}
+            </p>
+          </div>
+          <UptimeChart monitorId={monitorId} timeRange={timeRange} />
+        </div>
+
+        {/* Latency Chart */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">Latency</h3>
+            <p className="text-sm text-muted-foreground">
+              Response time across all the regions
+            </p>
+            <div className="mt-2 flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">The</span>
+              <span className="rounded border bg-background px-2 py-0.5 text-xs font-medium shadow-sm">
+                P50
+              </span>
+              <span className="text-sm text-muted-foreground">
+                quantile within a
+              </span>
+              <span className="rounded border bg-background px-2 py-0.5 text-xs font-medium shadow-sm">
+                {timeRange === "1d" ? "30 minutes" : timeRange === "7d" ? "3 hours" : "12 hours"}
+              </span>
+              <span className="text-sm text-muted-foreground">resolution</span>
+            </div>
+          </div>
+          <LatencyChart monitorId={monitorId} timeRange={timeRange} />
+        </div>
+
+        {/* Recent Checks */}
+        <div className="space-y-4">
+          <div>
+            <h3 className="text-lg font-semibold">Recent Checks</h3>
+            <p className="text-sm text-muted-foreground">
+              The last 10 checks for this monitor
+            </p>
+          </div>
+          <Card className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Time</TableHead>
+                  <TableHead>Response Time</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {isLoading ? (
+                  [...Array(5)].map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <Skeleton className="h-5 w-16" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-32" />
+                      </TableCell>
+                      <TableCell>
+                        <Skeleton className="h-4 w-16" />
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : allChecks.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={3}
+                      className="py-8 text-center text-muted-foreground"
+                    >
+                      No recent checks found
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  allChecks.slice(0, 10).map((check) => (
+                    <TableRow key={check.id}>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            check.status === "up" ? "default" : "destructive"
+                          }
+                          className={
+                            check.status === "up"
+                              ? "bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-950/40 dark:text-green-400"
+                              : ""
+                          }
+                        >
+                          {check.status === "up" ? "Up" : "Down"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {new Date(check.checkedAt).toLocaleString()}
+                      </TableCell>
+                      <TableCell>
+                        {check.responseTime ? `${check.responseTime}ms` : "—"}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </Card>
+        </div>
+
+        {/* Alerts Section */}
+        <div className="space-y-4">
+          <AlertList
+            monitorId={monitorId}
+            onAddAlert={() => setCreateAlertModalOpen(true)}
+            onEditAlert={handleEditAlert}
+            onDeleteAlert={handleDeleteAlert}
+          />
+        </div>
+
+        {monitorData && (
+          <>
+            <EditMonitorModal
+              open={editModalOpen}
+              onOpenChange={setEditModalOpen}
+              monitor={monitorData}
+            />
+            <DeleteMonitorDialog
+              open={deleteDialogOpen}
+              onOpenChange={setDeleteDialogOpen}
+              monitor={{ id: monitorData.id, name: monitorData.name }}
+            />
+            <CreateAlertModal
+              open={createAlertModalOpen}
+              onOpenChange={setCreateAlertModalOpen}
+              monitorId={monitorId}
+            />
+            <EditAlertModal
+              open={editAlertModalOpen}
+              onOpenChange={setEditAlertModalOpen}
+              alert={selectedAlert}
+            />
+            <DeleteAlertDialog
+              open={deleteAlertDialogOpen}
+              onOpenChange={setDeleteAlertDialogOpen}
+              alert={selectedAlert}
+            />
           </>
         )}
-      </div>
-
-      {/* Latency Stats */}
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-5">
-        {latencyCards.map((card) => (
-          <Card key={card.label} size="sm">
-            <CardHeader>
-              <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                {card.label}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <span className="text-lg font-bold">{card.value}</span>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Uptime Chart */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold">Uptime</h3>
-          <p className="text-sm text-muted-foreground">
-            Uptime of {timeRange === "1d" ? "24 hours" : timeRange === "7d" ? "7 days" : "30 days"}
-          </p>
-        </div>
-        <UptimeChart monitorId={monitorId} timeRange={timeRange} />
-      </div>
-
-      {/* Latency Chart */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold">Latency</h3>
-          <p className="text-sm text-muted-foreground">
-            Response time across all the regions
-          </p>
-          <div className="mt-2 flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">The</span>
-            <span className="rounded border bg-background px-2 py-0.5 text-xs font-medium shadow-sm">
-              P50
-            </span>
-            <span className="text-sm text-muted-foreground">
-              quantile within a
-            </span>
-            <span className="rounded border bg-background px-2 py-0.5 text-xs font-medium shadow-sm">
-              {timeRange === "1d" ? "30 minutes" : timeRange === "7d" ? "3 hours" : "12 hours"}
-            </span>
-            <span className="text-sm text-muted-foreground">resolution</span>
-          </div>
-        </div>
-        <LatencyChart monitorId={monitorId} timeRange={timeRange} />
-      </div>
-
-      {/* Recent Checks */}
-      <div className="space-y-4">
-        <div>
-          <h3 className="text-lg font-semibold">Recent Checks</h3>
-          <p className="text-sm text-muted-foreground">
-            The last 10 checks for this monitor
-          </p>
-        </div>
-        <Card className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Status</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Response Time</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {isLoading ? (
-                [...Array(5)].map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell>
-                      <Skeleton className="h-5 w-16" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-32" />
-                    </TableCell>
-                    <TableCell>
-                      <Skeleton className="h-4 w-16" />
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : allChecks.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={3}
-                    className="py-8 text-center text-muted-foreground"
-                  >
-                    No recent checks found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                allChecks.slice(0, 10).map((check) => (
-                  <TableRow key={check.id}>
-                    <TableCell>
-                      <Badge
-                        variant={
-                          check.status === "up" ? "default" : "destructive"
-                        }
-                        className={
-                          check.status === "up"
-                            ? "bg-green-100 text-green-700 hover:bg-green-100 dark:bg-green-950/40 dark:text-green-400"
-                            : ""
-                        }
-                      >
-                        {check.status === "up" ? "Up" : "Down"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      {new Date(check.checkedAt).toLocaleString()}
-                    </TableCell>
-                    <TableCell>
-                      {check.responseTime ? `${check.responseTime}ms` : "—"}
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </Card>
-      </div>
-
-      {/* Alerts Section */}
-      <div className="space-y-4">
-        <AlertList
-          monitorId={monitorId}
-          onAddAlert={() => setCreateAlertModalOpen(true)}
-          onEditAlert={handleEditAlert}
-          onDeleteAlert={handleDeleteAlert}
-        />
-      </div>
-
-      {monitorData && (
-        <>
-          <EditMonitorModal
-            open={editModalOpen}
-            onOpenChange={setEditModalOpen}
-            monitor={monitorData}
-          />
-          <DeleteMonitorDialog
-            open={deleteDialogOpen}
-            onOpenChange={setDeleteDialogOpen}
-            monitor={{ id: monitorData.id, name: monitorData.name }}
-          />
-          <CreateAlertModal
-            open={createAlertModalOpen}
-            onOpenChange={setCreateAlertModalOpen}
-            monitorId={monitorId}
-          />
-          <EditAlertModal
-            open={editAlertModalOpen}
-            onOpenChange={setEditAlertModalOpen}
-            alert={selectedAlert}
-          />
-          <DeleteAlertDialog
-            open={deleteAlertDialogOpen}
-            onOpenChange={setDeleteAlertDialogOpen}
-            alert={selectedAlert}
-          />
-        </>
-      )}
       </div>
       <MonitorRightSidebar
         monitorId={monitorId}
         open={sidebarOpen}
       />
-    </div>
+      <TestMonitorDrawer
+        monitorId={monitorId}
+        open={testDrawerOpen}
+        onOpenChange={setTestDrawerOpen}
+      />
+    </div >
   );
 }
