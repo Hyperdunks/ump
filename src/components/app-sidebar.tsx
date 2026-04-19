@@ -18,6 +18,11 @@ import { CreateStatusPageModal } from "@/components/status-pages/create-status-p
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
@@ -116,14 +121,23 @@ export default function AppSidebar(
                 <SidebarGroupLabel className="p-0">
                   Monitors ({monitors.length})
                 </SidebarGroupLabel>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="size-6"
-                  onClick={() => setCreateMonitorOpen(true)}
-                >
-                  <Plus className="size-3" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-6"
+                        onClick={() => setCreateMonitorOpen(true)}
+                      />
+                    }
+                  >
+                    <Plus className="size-3" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center">
+                    Add Monitor
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <SidebarGroupContent>
                 <div className="max-h-52 overflow-y-auto">
@@ -164,14 +178,23 @@ export default function AppSidebar(
                 <SidebarGroupLabel className="p-0">
                   Status Pages ({publicMonitors.length})
                 </SidebarGroupLabel>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="size-6"
-                  onClick={() => setCreateStatusPageOpen(true)}
-                >
-                  <Plus className="size-3" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-6"
+                        onClick={() => setCreateStatusPageOpen(true)}
+                      />
+                    }
+                  >
+                    <Plus className="size-3" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center">
+                    Add Status Page
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <SidebarGroupContent>
                 <div className="max-h-52 overflow-y-auto">

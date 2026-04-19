@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { authClient } from "@/lib/auth-client";
 import { queryClient } from "@/lib/query-client";
 
@@ -53,7 +54,9 @@ export function Providers({ children }: { children: ReactNode }) {
             enableSystem
             disableTransitionOnChange
           >
-            {children}
+            <TooltipProvider delay={200} >
+              {children}
+            </TooltipProvider>
           </ThemeProvider>
         </AuthUIProviderTanstack>
       </AuthQueryProvider>

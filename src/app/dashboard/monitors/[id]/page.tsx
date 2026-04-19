@@ -36,6 +36,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -288,22 +293,28 @@ export default function MonitorDetailPage() {
                 )}
               />
             </span>
-            <button
-              type="button"
-              onClick={() => setTestDrawerOpen(true)}
-              className="flex items-center justify-center rounded-lg pl-2 p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              title="Test monitor"
-            >
-              <Zap className="size-4" />
-            </button>
-            <button
-              type="button"
-              onClick={() => setSidebarOpen((prev) => !prev)}
-              className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-              title="Toggle sidebar"
-            >
-              <PanelRight className="size-4" />
-            </button>
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => setTestDrawerOpen(true)}
+                className="flex items-center justify-center rounded-lg pl-2 p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <Zap className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center">
+                Test Monitor
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger
+                onClick={() => setSidebarOpen((prev) => !prev)}
+                className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              >
+                <PanelRight className="size-4" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom" align="center">
+                Toggle sidebar
+              </TooltipContent>
+            </Tooltip>
           </div>
         </div>
 
