@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ExternalLink,
   MoreHorizontal,
+  PanelRight,
   Pencil,
   Share,
   Trash,
@@ -11,6 +12,7 @@ import {
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { MonitorRightSidebar } from "@/components/monitors/monitor-right-sidebar";
 import { toast } from "sonner";
 import { type Alert, AlertList } from "@/components/alerts/alert-list";
 import { CreateAlertModal } from "@/components/alerts/create-alert-modal";
@@ -97,6 +99,7 @@ export default function MonitorDetailPage() {
   const { data: monitorsData } = useMonitors({ limit: 50 });
 
   const [timeRange, setTimeRange] = useState<"1d" | "7d" | "30d">("1d");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   const isLoading = isLoadingMonitor || isLoadingUptime;
 
@@ -203,50 +206,61 @@ export default function MonitorDetailPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Breadcrumb */}
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink render={<Link href="/dashboard/monitors" />}>
-              Monitors
-            </BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
-                {isLoading ? (
-                  <Skeleton className="h-4 w-24" />
-                ) : (
-                  <>
-                    {monitorData?.name}
-                    <ChevronDown className="size-3" />
-                  </>
-                )}
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="max-h-64 overflow-y-auto"
-              >
-                {activeMonitors.map((m) => (
-                  <DropdownMenuItem
-                    key={m.id}
-                    onSelect={() => router.push(`/dashboard/monitors/${m.id}`)}
-                    className={m.id === monitorId ? "bg-accent" : ""}
-                  >
-                    <span className="truncate">{m.name}</span>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Overview</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+    <div className="flex gap-6">
+      <div className="min-w-0 flex-1 space-y-8">
+      {/* Breadcrumb + Sidebar Toggle */}
+      <div className="flex items-center justify-between">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link href="/dashboard/monitors" />}>
+                Monitors
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger className="flex items-center gap-1 text-sm font-medium hover:underline">
+                  {isLoading ? (
+                    <Skeleton className="h-4 w-24" />
+                  ) : (
+                    <>
+                      {monitorData?.name}
+                      <ChevronDown className="size-3" />
+                    </>
+                  )}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="start"
+                  className="max-h-64 overflow-y-auto"
+                >
+                  {activeMonitors.map((m) => (
+                    <DropdownMenuItem
+                      key={m.id}
+                      onSelect={() => router.push(`/dashboard/monitors/${m.id}`)}
+                      className={m.id === monitorId ? "bg-accent" : ""}
+                    >
+                      <span className="truncate">{m.name}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage>Overview</BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
+        <button
+          type="button"
+          onClick={() => setSidebarOpen((prev) => !prev)}
+          className="hidden items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:flex"
+          title="Toggle sidebar"
+        >
+          <PanelRight className="size-4" />
+        </button>
+      </div>
 
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -576,6 +590,11 @@ export default function MonitorDetailPage() {
           />
         </>
       )}
+      </div>
+      <MonitorRightSidebar
+        monitorId={monitorId}
+        open={sidebarOpen}
+      />
     </div>
   );
 }
