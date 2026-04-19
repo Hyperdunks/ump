@@ -99,7 +99,7 @@ export default function MonitorDetailPage() {
   const { data: monitorsData } = useMonitors({ limit: 50 });
 
   const [timeRange, setTimeRange] = useState<"1d" | "7d" | "30d">("1d");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isLoading = isLoadingMonitor || isLoadingUptime;
 
@@ -252,14 +252,42 @@ export default function MonitorDetailPage() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
-        <button
-          type="button"
-          onClick={() => setSidebarOpen((prev) => !prev)}
-          className="hidden items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground md:flex"
-          title="Toggle sidebar"
-        >
-          <PanelRight className="size-4" />
-        </button>
+        <div className="hidden items-center gap-2 md:flex">
+          <span className="relative flex size-2.5">
+            <span
+              className={cn(
+                "absolute inline-flex size-full animate-ping rounded-full opacity-75",
+                monitorData?.latestCheck?.status === "up"
+                  ? "bg-green-500"
+                  : monitorData?.latestCheck?.status === "degraded"
+                    ? "bg-yellow-500"
+                    : monitorData?.latestCheck?.status === "down"
+                      ? "bg-red-500"
+                      : "bg-muted-foreground",
+              )}
+            />
+            <span
+              className={cn(
+                "relative inline-flex size-2.5 rounded-full",
+                monitorData?.latestCheck?.status === "up"
+                  ? "bg-green-500"
+                  : monitorData?.latestCheck?.status === "degraded"
+                    ? "bg-yellow-500"
+                    : monitorData?.latestCheck?.status === "down"
+                      ? "bg-red-500"
+                      : "bg-muted-foreground",
+              )}
+            />
+          </span>
+          <button
+            type="button"
+            onClick={() => setSidebarOpen((prev) => !prev)}
+            className="flex items-center justify-center rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+            title="Toggle sidebar"
+          >
+            <PanelRight className="size-4" />
+          </button>
+        </div>
       </div>
 
       {/* Header */}
