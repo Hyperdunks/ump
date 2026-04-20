@@ -178,10 +178,7 @@ export function EditAlertModal({
                 </SelectTrigger>
                 <SelectContent>
                   {ALERT_CHANNELS.map((channel) => (
-                    <SelectItem
-                      key={channel}
-                      value={channel}
-                    >
+                    <SelectItem key={channel} value={channel}>
                       {channel.charAt(0).toUpperCase() + channel.slice(1)}
                     </SelectItem>
                   ))}

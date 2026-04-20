@@ -51,7 +51,7 @@ export function useMonitor(id: string) {
 
 export function useMonitorChecks(
   id: string,
-  params: { page?: number; limit?: number } = {},
+  params: { page?: number; limit?: number; since?: string } = {},
 ) {
   return useQuery({
     queryKey: queryKeys.monitors.checks(id, params),
@@ -60,6 +60,7 @@ export function useMonitorChecks(
         query: {
           page: params.page ?? 1,
           limit: params.limit ?? 50,
+          ...(params.since ? { since: params.since } : {}),
         },
       });
       if (error) throw error;
@@ -158,6 +159,19 @@ export function useDeleteMonitor() {
     onError: (error) => {
       toast.error("Failed to delete monitor");
       console.error(error);
+    },
+  });
+}
+
+export function useTestMonitor() {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const { data, error } = await api.monitors({ id }).test.post();
+      if (error) throw error;
+      return data;
+    },
+    onError: (error) => {
+      toast.error("Failed to test monitor");
     },
   });
 }

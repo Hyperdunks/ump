@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import {
   type ChartConfig,
@@ -11,10 +12,42 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMonitorChecks } from "@/hooks/api";
 import { calculatePercentile } from "@/lib/utils/percentile";
 
-function getBucketKey(date: Date): string {
-  const bucketMinutes = 30;
-  const minutes = Math.floor(date.getMinutes() / bucketMinutes) * bucketMinutes;
-  return `${date.getHours().toString().padStart(2, "0")}:${minutes.toString().padStart(2, "0")}`;
+function getBucketConfig(timeRange: "1d" | "7d" | "30d") {
+  switch (timeRange) {
+    case "1d":
+      return { minutes: 30, ms: 24 * 60 * 60 * 1000, limit: 500 };
+    case "7d":
+      return { minutes: 180, ms: 7 * 24 * 60 * 60 * 1000, limit: 2500 };
+    case "30d":
+      return { minutes: 720, ms: 30 * 24 * 60 * 60 * 1000, limit: 5000 };
+  }
+}
+
+function formatBucketKey(
+  date: Date,
+  timeRange: "1d" | "7d" | "30d",
+  bucketMinutes: number,
+): string {
+  const bucketMs = bucketMinutes * 60 * 1000;
+  const bucketTime = new Date(Math.floor(date.getTime() / bucketMs) * bucketMs);
+
+  switch (timeRange) {
+    case "1d":
+      return bucketTime.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    case "7d":
+      return bucketTime.toLocaleDateString("en-US", {
+        weekday: "short",
+        hour: "2-digit",
+      });
+    case "30d":
+      return bucketTime.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      });
+  }
 }
 
 const chartConfig = {
@@ -28,8 +61,24 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export default function LatencyChart({ monitorId }: { monitorId: string }) {
-  const { data, isLoading } = useMonitorChecks(monitorId, { limit: 500 });
+export default function LatencyChart({
+  monitorId,
+  timeRange = "1d",
+}: {
+  monitorId: string;
+  timeRange?: "1d" | "7d" | "30d";
+}) {
+  const config = getBucketConfig(timeRange);
+
+  const since = useMemo(
+    () => new Date(Date.now() - config.ms).toISOString(),
+    [config.ms],
+  );
+
+  const { data, isLoading } = useMonitorChecks(monitorId, {
+    limit: config.limit,
+    since,
+  });
 
   const checks = data?.data ?? [];
   const validChecks = checks.filter((c) => c.responseTime !== null);
@@ -37,7 +86,7 @@ export default function LatencyChart({ monitorId }: { monitorId: string }) {
   const buckets = new Map<string, number[]>();
   for (const check of validChecks) {
     const date = new Date(check.checkedAt);
-    const bucketKey = getBucketKey(date);
+    const bucketKey = formatBucketKey(date, timeRange, config.minutes);
     const times = buckets.get(bucketKey) ?? [];
     times.push(check.responseTime as number);
     buckets.set(bucketKey, times);

@@ -13,10 +13,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { ModeToggle } from "@/components/mode-toggle";
 import { CreateMonitorModal } from "@/components/monitors/create-monitor-modal";
 import { CreateStatusPageModal } from "@/components/status-pages/create-status-page-modal";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Sidebar,
   SidebarContent,
@@ -116,18 +121,27 @@ export default function AppSidebar(
                 <SidebarGroupLabel className="p-0">
                   Monitors ({monitors.length})
                 </SidebarGroupLabel>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="size-6"
-                  onClick={() => setCreateMonitorOpen(true)}
-                >
-                  <Plus className="size-3" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-6"
+                        onClick={() => setCreateMonitorOpen(true)}
+                      />
+                    }
+                  >
+                    <Plus className="size-3" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center">
+                    Add Monitor
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <SidebarGroupContent>
-                <ScrollArea className="max-h-32">
-                  {monitors.slice(0, 4).map((monitor) => (
+                <div className="max-h-52 overflow-y-auto">
+                  {monitors.map((monitor) => (
                     <SidebarMenuButton
                       key={monitor.id}
                       render={
@@ -154,7 +168,7 @@ export default function AppSidebar(
                       No monitors found
                     </p>
                   )}
-                </ScrollArea>
+                </div>
               </SidebarGroupContent>
             </SidebarGroup>
 
@@ -164,18 +178,27 @@ export default function AppSidebar(
                 <SidebarGroupLabel className="p-0">
                   Status Pages ({publicMonitors.length})
                 </SidebarGroupLabel>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="size-6"
-                  onClick={() => setCreateStatusPageOpen(true)}
-                >
-                  <Plus className="size-3" />
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger
+                    render={
+                      <Button
+                        variant="ghost"
+                        size="icon-sm"
+                        className="size-6"
+                        onClick={() => setCreateStatusPageOpen(true)}
+                      />
+                    }
+                  >
+                    <Plus className="size-3" />
+                  </TooltipTrigger>
+                  <TooltipContent side="right" align="center">
+                    Add Status Page
+                  </TooltipContent>
+                </Tooltip>
               </div>
               <SidebarGroupContent>
-                <ScrollArea className="max-h-32">
-                  {publicMonitors.slice(0, 4).map((monitor) => (
+                <div className="max-h-52 overflow-y-auto">
+                  {publicMonitors.map((monitor) => (
                     <SidebarMenuButton
                       key={monitor.id}
                       render={<Link href={`/status/${monitor.id}`} />}
@@ -200,7 +223,7 @@ export default function AppSidebar(
                       No public status pages
                     </p>
                   )}
-                </ScrollArea>
+                </div>
               </SidebarGroupContent>
             </SidebarGroup>
           </>
@@ -209,19 +232,22 @@ export default function AppSidebar(
 
       {/* Footer */}
       <SidebarFooter>
-        {state === "expanded" ? (
-          <UserButton
-            size="default"
-            side="right"
-            className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
-          />
-        ) : (
-          <UserButton
-            size="icon"
-            side="right"
-            className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
-          />
-        )}
+        <div className="flex flex-col gap-2 w-full">
+          <ModeToggle />
+          {state === "expanded" ? (
+            <UserButton
+              size="default"
+              side="right"
+              className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20 w-full"
+            />
+          ) : (
+            <UserButton
+              size="icon"
+              side="right"
+              className="bg-primary-foreground text-foreground hover:bg-muted-foreground/20"
+            />
+          )}
+        </div>
       </SidebarFooter>
 
       <CreateMonitorModal

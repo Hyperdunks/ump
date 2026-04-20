@@ -110,12 +110,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -212,12 +208,8 @@
           "name": "alert_config_monitor_id_monitor_id_fk",
           "tableFrom": "alert_config",
           "tableTo": "monitor",
-          "columnsFrom": [
-            "monitor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monitor_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -335,12 +327,8 @@
           "name": "health_check_monitor_id_monitor_id_fk",
           "tableFrom": "health_check",
           "tableTo": "monitor",
-          "columnsFrom": [
-            "monitor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monitor_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -458,12 +446,8 @@
           "name": "incident_monitor_id_monitor_id_fk",
           "tableFrom": "incident",
           "tableTo": "monitor",
-          "columnsFrom": [
-            "monitor_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["monitor_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -632,12 +616,8 @@
           "name": "monitor_user_id_user_id_fk",
           "tableFrom": "monitor",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -733,12 +713,8 @@
           "name": "notification_alert_config_id_alert_config_id_fk",
           "tableFrom": "notification",
           "tableTo": "alert_config",
-          "columnsFrom": [
-            "alert_config_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["alert_config_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -746,12 +722,8 @@
           "name": "notification_incident_id_incident_id_fk",
           "tableFrom": "notification",
           "tableTo": "incident",
-          "columnsFrom": [
-            "incident_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["incident_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -838,12 +810,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -853,9 +821,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -927,9 +893,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -1030,12 +994,8 @@
           "name": "user_integration_user_id_user_id_fk",
           "tableFrom": "user_integration",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1118,57 +1078,32 @@
     "public.alert_channel": {
       "name": "alert_channel",
       "schema": "public",
-      "values": [
-        "email",
-        "webhook",
-        "slack",
-        "discord"
-      ]
+      "values": ["email", "webhook", "slack", "discord"]
     },
     "public.check_status": {
       "name": "check_status",
       "schema": "public",
-      "values": [
-        "up",
-        "down",
-        "degraded"
-      ]
+      "values": ["up", "down", "degraded"]
     },
     "public.http_method": {
       "name": "http_method",
       "schema": "public",
-      "values": [
-        "GET",
-        "POST",
-        "HEAD"
-      ]
+      "values": ["GET", "POST", "HEAD"]
     },
     "public.incident_state": {
       "name": "incident_state",
       "schema": "public",
-      "values": [
-        "detected",
-        "investigating",
-        "resolved"
-      ]
+      "values": ["detected", "investigating", "resolved"]
     },
     "public.monitor_type": {
       "name": "monitor_type",
       "schema": "public",
-      "values": [
-        "http",
-        "https",
-        "tcp",
-        "ping"
-      ]
+      "values": ["http", "https", "tcp", "ping"]
     },
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "user",
-        "admin"
-      ]
+      "values": ["user", "admin"]
     }
   },
   "schemas": {},

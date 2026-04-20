@@ -19,7 +19,7 @@ export default function Navbar({ activeTab, onTabChange }: NavbarProps) {
           <BrandLogo size={20} />
         </div>
 
-        {/* Nav Links + Search + UserButton */}
+        {/* Nav Links + Search + UserButton + Theme Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
           <DynamicSearch />
           <AnimatedBackground

@@ -151,7 +151,10 @@ export function CreateAlertModal({
         createAlert.mutateAsync({
           monitorId,
           data: {
-            name: channels.length > 1 ? `${name} (${channelLabels[channel]})` : name,
+            name:
+              channels.length > 1
+                ? `${name} (${channelLabels[channel]})`
+                : name,
             channel,
             endpoint: endpoints[channel],
             failureThreshold: Number(failureThreshold),
@@ -233,7 +236,9 @@ export function CreateAlertModal({
                       }))
                     }
                     required
-                    className={getEmailError(channel) ? "border-destructive" : ""}
+                    className={
+                      getEmailError(channel) ? "border-destructive" : ""
+                    }
                   />
                   {getEmailError(channel) && (
                     <p className="text-xs text-destructive mt-1">
