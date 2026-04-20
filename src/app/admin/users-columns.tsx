@@ -45,7 +45,7 @@ function DeleteUserAction({ user }: { user: AdminUser }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger 
+      <DialogTrigger
         render={
           <Button variant="ghost" size="icon" className="text-destructive hover:bg-destructive/10 hover:text-destructive text-xs" />
         }
@@ -56,17 +56,17 @@ function DeleteUserAction({ user }: { user: AdminUser }) {
         <DialogHeader>
           <DialogTitle>Delete User</DialogTitle>
           <DialogDescription className="space-y-2 pt-2">
-            <p>
+            <div>
               This action cannot be undone. This will permanently delete the user account and remove their data from our servers.
-            </p>
-            <p>
+            </div>
+            <div>
               Please type <strong className="text-foreground">{user.email}</strong> to confirm.
-            </p>
+            </div>
           </DialogDescription>
         </DialogHeader>
-        <Input 
-          value={emailInput} 
-          onChange={(e) => setEmailInput(e.target.value)} 
+        <Input
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
           placeholder={user.email}
         />
         <DialogFooter>
